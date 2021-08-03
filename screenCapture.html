@@ -5,100 +5,161 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <style>
-
-    #audio {
-      border: 1px solid #999;
-      width: 98%;
-      max-width: 860px;
-    }
-  
-    .error {
-      color: red;
-    }
-  
-    .warn {
-      color: orange;
-    }
-  
-    .info {
-      color: darkgreen;
-    }
-  
-  </style>
 <body>
-  <p>This example shows you the contents of the selected part of your display.
-    Click the Start Capture button to begin.
-  </p>
+  <p>비전 노트 녹화 테스트</p>
     
   <p>
-    <button id="start">Start Capture</button>&nbsp;
-    <button id="stop">Stop Capture</button>
+    <button id="start">녹화 시작</button>&nbsp;
+    <button id="pause" disabled>녹화 일시정지</button>
+    <button id="restart" disabled>녹화 재시작</button>&nbsp;
+    <button id="stop" disabled>녹화 정지</button>
   </p>
-  
-  <audio id="video" autoplay controls></audio>
-  
-  <br>
-  
-  <strong>Log:</strong>
-  <br>
-  <pre id="log"></pre>
+
+  <p>
+    <button id="download" disabled>다운로드</button>
+  </p>
+
+  <p id="status"></p>
 
   <script>
   
   
     const displayMediaOptions = {
       video: true,
-      audio: true
+      audio: {
+        sampleRate: 16000
+      }
     }
     
-    const videoElem = document.getElementById("video");
-    const logElem = document.getElementById("log");
     const startElem = document.getElementById("start");
+    const pauseElem = document.getElementById("pause");
+    const restartElem = document.getElementById("restart");
     const stopElem = document.getElementById("stop");
+    const downloadElem = document.getElementById("download");
+    const statusElem = document.getElementById("status");
     
-    // Set event listeners for the start and stop buttons
     startElem.addEventListener("click", function(evt) {
       startCapture();
+      startElem.disabled = true;
+      pauseElem.disabled = false;
+      restartElem.disabled = true;
+      stopElem.disabled = false;
+      downloadElem.disabled = false;
+      statusElem.innerText = `녹화 중`
     }, false);
     
     stopElem.addEventListener("click", function(evt) {
+      //녹화 중지
+      recorder.stop();
+      //공유 중지
       stopCapture();
       //videoElem.play();
+      startElem.disabled = false;
+      pauseElem.disabled = true;
+      restartElem.disabled = true;
+      stopElem.disabled = true;
+      downloadElem.disabled = true;
+      statusElem.innerText = ``
     }, false);
-    
-    console.log = msg => logElem.innerHTML += `${msg}<br>`;
-    console.error = msg => logElem.innerHTML += `<span class="error">${msg}</span><br>`;
-    console.warn = msg => logElem.innerHTML += `<span class="warn">${msg}<span><br>`;
-    console.info = msg => logElem.innerHTML += `<span class="info">${msg}</span><br>`;
-    
+
+    restartElem.addEventListener("click", function(evt){
+      //recorder.resume();
+      recorder.start();
+      startElem.disabled = true;
+      pauseElem.disabled = false;
+      restartElem.disabled = true;
+      stopElem.disabled = false;
+      downloadElem.disabled = false;
+      statusElem.innerText = `녹화 중`
+    }, false)
+
+    pauseElem.addEventListener("click", function(evt){
+      //recorder.pause();
+      recorder.stop();
+      startElem.disabled = true;
+      pauseElem.disabled = true;
+      restartElem.disabled = false;
+      stopElem.disabled = true;
+      downloadElem.disabled = true;
+      statusElem.innerText = `녹화가 일시정지되었습니다`
+    }, false)
+
+    downloadElem.addEventListener("click", function(evt){
+      recorder.stop();
+      recorder.start();
+    },false)
+
+    let stream;
+    let recorder;
+    let chunks;
     async function startCapture() {
-      logElem.innerHTML = "";
-    
+      //logElem.innerHTML = "";
       try {
-        videoElem.srcObject = await navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
-        dumpOptionsInfo();
+        //공유 시작
+        stream = await navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
+        //두번째 파라미터인 options 없어도 무방; mimeType에 audio/x-wav 불가
+        const options = {
+          audioBitsPerSecond: 16000,
+          mimeType: 'video/webm;codecs=opus'
+        }
+        //recorder 생성
+        recorder = new MediaRecorder(stream, options);
+        chunks = [];
+        recorder.ondataavailable = e => {
+          console.log("data available");
+          chunks.push(e.data);
+        }
+        recorder.onstop = e => {
+          const blob = new Blob(chunks, {type: chunks[0].type})
+          chunks=[];
+          //stream.getVideoTracks()[0].stop();
+          filename = getFileName();
+          let downloadElem = window.document.createElement('a');
+          downloadElem.href = window.URL.createObjectURL(blob);
+          downloadElem.download = filename;
+          document.body.appendChild(downloadElem);
+          downloadElem.click();
+          document.body.removeChild(downloadElem);
+        }
+        recorder.start();
+        //dumpOptionsInfo();
       } catch(err) {
         console.error("Error: " + err);
       }
     }
+
+    function uploadToServer() {
+      const blob = new Blob(chunks, {type: chunks[0].type});
+
+      let formdata = new FormData();
+      formdata.append("fname", "audio.webm");
+      formdata.append("data", blob);
+
+      let xhr = new XMLHttpRequest();
+      xhr.open("POST", "/upload", false);
+      xhr.send(formdata);
+    }
+
     
     function stopCapture(evt) {
-      let tracks = videoElem.srcObject.getTracks();
-    
+      //공유 중지
+      let tracks = stream.getTracks();
       tracks.forEach(track => track.stop());
-      videoElem.srcObject = null;
     }
-    
-    function dumpOptionsInfo() {
-      const videoTrack = videoElem.srcObject.getVideoTracks()[0];
-    
-      console.info("Track settings:");
-      console.info(JSON.stringify(videoTrack.getSettings(), null, 2));
-      console.info("Track constraints:");
-      console.info(JSON.stringify(videoTrack.getConstraints(), null, 2));
+
+    function checkTime(i) {
+      return (i<10) ? "0" + i : i;
     }
-    
+
+    function getFileName() {
+      let today = new Date(),
+      mon = checkTime(today.getMonth() + 1),
+      day = checkTime(today.getDay() + 1),
+      h = checkTime(today.getHours()),
+      m = checkTime(today.getMinutes()),
+      s = checkTime(today.getSeconds());
+      return String(mon + day + h + m +  s);
+    }
   </script>
   
 </body>
