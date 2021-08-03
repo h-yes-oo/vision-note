@@ -7,7 +7,7 @@
   <title>Document</title>
   <style>
 
-    #video {
+    #audio {
       border: 1px solid #999;
       width: 98%;
       max-width: 860px;
@@ -36,8 +36,7 @@
     <button id="stop">Stop Capture</button>
   </p>
   
-  <video id="video" autoplay></video>
-  <audio controls> </audio>
+  <audio id="video" autoplay controls></audio>
   
   <br>
   
@@ -65,7 +64,7 @@
     
     stopElem.addEventListener("click", function(evt) {
       stopCapture();
-      videoElem.play();
+      //videoElem.play();
     }, false);
     
     console.log = msg => logElem.innerHTML += `${msg}<br>`;
