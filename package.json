@@ -60,6 +60,8 @@
     "react-router-dom": "^5.2.0"
   },
   "lint-staged": {
-    "*.{js, ts, tsx, jsx}": "eslint --fix"
+    "src/**/*.{js,ts,jsx,tsx}": [
+      "eslint --fix"
+      ]
   }
 }
