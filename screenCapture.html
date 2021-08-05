@@ -100,7 +100,7 @@
         //두번째 파라미터인 options 없어도 무방; mimeType에 audio/x-wav 불가
         const options = {
           audioBitsPerSecond: 16000,
-          mimeType: 'video/webm;codecs=opus'
+          mimeType: 'audio/webm;codecs=opus'
         }
         //recorder 생성
         recorder = new MediaRecorder(stream, options);
