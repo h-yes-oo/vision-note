@@ -2,9 +2,7 @@ import React, { FC } from 'react';
 
 import Root from './routes';
 
-interface Props {
-
-}
+interface Props {}
 
 const App: FC<Props> = () => {
   return (
@@ -12,6 +10,6 @@ const App: FC<Props> = () => {
       <Root />
     </>
   );
-}
+};
 
 export default App;
