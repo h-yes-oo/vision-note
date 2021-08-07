@@ -1,14 +1,17 @@
-import { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 const RecordingPage = () => {
-  const [start, setStart] = useState(false);
-  const [restart, setRestart] = useState(true);
-  const [stop, setStop] = useState(true);
-  const [download, setDownload] = useState(true);
   const [status, setStatus] = useState('');
   const [recorder, setRecorder] = useState();
   const [stream, setStream] = useState();
-  const [chunks, setChunks] = useState([]);
+  const [timer, setTimer] = useState();
+  const [onRec, setOnRec] = useState(false);
+
+  useEffect(() => {
+    if (recorder !== undefined && recorder.state === 'recording') {
+      setTimer(setInterval(onDownload, 5000));
+    }
+  }, [recorder]);
 
   function checkTime(i) {
     return i < 10 ? `0${i}` : i;
@@ -47,13 +50,7 @@ const RecordingPage = () => {
           mediaRecorder.start();
 
           mediaRecorder.ondataavailable = (e) => {
-            chunks.push(e.data);
-          };
-
-          mediaRecorder.onstop = (e) => {
-            const blob = new Blob(chunks, { type: chunks[0].type });
-            setChunks([]);
-            // stream.getVideoTracks()[0].stop();
+            const blob = new Blob([e.data], { type: e.data.type });
             const filename = getFileName();
             const downloadElem = window.document.createElement('a');
             downloadElem.href = window.URL.createObjectURL(blob);
@@ -63,17 +60,17 @@ const RecordingPage = () => {
             document.body.removeChild(downloadElem);
           };
 
-          setChunks([]);
           setStream(mediaStream);
           setRecorder(mediaRecorder);
+          setOnRec(true);
         });
     } catch (err) {
       console.error(`Error: ${err}`);
     }
   }
 
-  function uploadToServer() {
-    const blob = new Blob(chunks, { type: chunks[0].type });
+  function uploadToServer(dataArray) {
+    const blob = new Blob(dataArray, { type: dataArray[0].type });
 
     const formdata = new FormData();
     formdata.append('fname', 'audio.webm');
@@ -84,7 +81,7 @@ const RecordingPage = () => {
     xhr.send(formdata);
   }
 
-  function stopCapture(evt) {
+  function stopCapture() {
     // 공유 중지
     const tracks = stream.getTracks();
     tracks.forEach((track) => track.stop());
@@ -92,45 +89,18 @@ const RecordingPage = () => {
 
   const onStart = (e) => {
     startCapture();
-    setStart(true);
-    setStop(false);
-    setRestart(true);
-    setDownload(false);
     setStatus(`녹화 중`);
   };
 
-  const onStop = (e) => {
+  const onStop = useCallback(() => {
     // 녹화 중지
     recorder.stop();
     // 공유 중지
     stopCapture();
-    // videoElem.play();
-    setStart(false);
-    setStop(true);
-    setRestart(true);
-    setDownload(true);
     setStatus('');
-  };
-
-  const onRestart = (e) => {
-    // recorder.resume();
-    recorder.start();
-    setStart(true);
-    setStop(false);
-    setRestart(true);
-    setDownload(false);
-    setStatus(`녹화 중`);
-  };
-
-  const onPause = (e) => {
-    // recorder.pause();
-    recorder.stop();
-    setStart(true);
-    setStop(true);
-    setRestart(false);
-    setDownload(true);
-    setStatus(`녹화가 일시정지되었습니다`);
-  };
+    clearInterval(timer);
+    setOnRec(false);
+  }, [timer]);
 
   const onDownload = (e) => {
     recorder.stop();
@@ -140,30 +110,9 @@ const RecordingPage = () => {
   return (
     <div>
       <p>비전 노트 녹화 테스트</p>
-
-      <p>
-        <button onClick={onStart} disabled={start}>
-          녹화 시작
-        </button>
-        &nbsp;
-        <button onClick={onPause} disabled={stop}>
-          녹화 일시정지
-        </button>
-        <button onClick={onRestart} disabled={restart}>
-          녹화 재시작
-        </button>
-        &nbsp;
-        <button onClick={onStop} disabled={stop}>
-          녹화 정지
-        </button>
-      </p>
-
-      <p>
-        <button onClick={onDownload} disabled={download}>
-          다운로드
-        </button>
-      </p>
-
+      <button onClick={onRec ? onStop : onStart}>
+        {onRec ? '녹화 종료하기' : '녹화 시작하기'}
+      </button>
       <p>{status}</p>
     </div>
   );
