@@ -1,6 +1,4 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-echo "\"husky is working\""
 npx lint-staged
-echo "\"husky has done working\""
