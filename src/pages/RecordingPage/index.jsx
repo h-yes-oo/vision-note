@@ -1,7 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 
 const RecordingPage = () => {
-  const [status, setStatus] = useState('');
   const [recorder, setRecorder] = useState();
   const [stream, setStream] = useState();
   const [timer, setTimer] = useState();
@@ -34,7 +33,7 @@ const RecordingPage = () => {
     },
   };
 
-  async function startCapture() {
+  async function onStart() {
     // logElem.innerHTML = "";
     try {
       // 공유 시작
@@ -87,22 +86,16 @@ const RecordingPage = () => {
     tracks.forEach((track) => track.stop());
   }
 
-  const onStart = (e) => {
-    startCapture();
-    setStatus(`녹화 중`);
-  };
-
   const onStop = useCallback(() => {
     // 녹화 중지
     recorder.stop();
     // 공유 중지
     stopCapture();
-    setStatus('');
     clearInterval(timer);
     setOnRec(false);
   }, [timer]);
 
-  const onDownload = (e) => {
+  const onDownload = () => {
     recorder.stop();
     recorder.start();
   };
@@ -113,7 +106,6 @@ const RecordingPage = () => {
       <button onClick={onRec ? onStop : onStart}>
         {onRec ? '녹화 종료하기' : '녹화 시작하기'}
       </button>
-      <p>{status}</p>
     </div>
   );
 };
