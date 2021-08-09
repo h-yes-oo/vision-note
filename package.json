@@ -38,6 +38,7 @@
     ]
   },
   "devDependencies": {
+    "@types/dom-mediacapture-record": "^1.0.10",
     "@types/jest": "^26.0.24",
     "@types/node": "^14.14.31",
     "@types/react": "^17.0.15",
@@ -62,6 +63,6 @@
   "lint-staged": {
     "src/**/*.{js,ts,jsx,tsx}": [
       "eslint --fix"
-      ]
+    ]
   }
 }

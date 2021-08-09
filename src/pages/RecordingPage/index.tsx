@@ -37,9 +37,10 @@ const RecordingPage = () => {
     // logElem.innerHTML = "";
     try {
       // 공유 시작
-      navigator.mediaDevices
+      const mediaDevices = navigator.mediaDevices as any;
+      mediaDevices
         .getDisplayMedia(displayMediaOptions)
-        .then((mediaStream) => {
+        .then((mediaStream: any) => {
           // 두번째 파라미터인 options 없어도 무방; mimeType에 audio/x-wav 불가
           const options = {
             audioBitsPerSecond: 16000,
