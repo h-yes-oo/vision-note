@@ -1,9 +1,9 @@
 import { useState, useCallback, useEffect } from 'react';
 
 const RecordingPage = () => {
-  const [recorder, setRecorder] = useState();
-  const [stream, setStream] = useState();
-  const [timer, setTimer] = useState();
+  const [recorder, setRecorder] = useState<MediaRecorder>();
+  const [stream, setStream] = useState<MediaStream>();
+  const [timer, setTimer] = useState<ReturnType<typeof setInterval>>();
   const [onRec, setOnRec] = useState(false);
 
   useEffect(() => {
@@ -12,8 +12,8 @@ const RecordingPage = () => {
     }
   }, [recorder]);
 
-  function checkTime(i) {
-    return i < 10 ? `0${i}` : i;
+  function checkTime(i: number): string {
+    return i < 10 ? `0${i}` : String(i);
   }
 
   function getFileName() {
@@ -68,7 +68,7 @@ const RecordingPage = () => {
     }
   }
 
-  function uploadToServer(dataArray) {
+  function uploadToServer(dataArray: [Blob]) {
     const blob = new Blob(dataArray, { type: dataArray[0].type });
 
     const formdata = new FormData();
@@ -82,22 +82,22 @@ const RecordingPage = () => {
 
   function stopCapture() {
     // 공유 중지
-    const tracks = stream.getTracks();
-    tracks.forEach((track) => track.stop());
+    const tracks = stream?.getTracks();
+    tracks?.forEach((track) => track.stop());
   }
 
   const onStop = useCallback(() => {
     // 녹화 중지
-    recorder.stop();
+    recorder?.stop();
     // 공유 중지
     stopCapture();
-    clearInterval(timer);
+    if (timer) clearInterval(timer);
     setOnRec(false);
   }, [timer]);
 
   const onDownload = () => {
-    recorder.stop();
-    recorder.start();
+    recorder?.stop();
+    recorder?.start();
   };
 
   return (
