@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="50" viewBox="0 0 240 50">
+    <defs>
+        <linearGradient id="linear-gradient" x2=".922" y2="1" gradientUnits="objectBoundingBox">
+            <stop offset="0" stop-color="#bc9cff"/>
+            <stop offset="1" stop-color="#8ea3f9"/>
+            <stop offset="1" stop-color="#8ba4f9"/>
+        </linearGradient>
+        <linearGradient id="linear-gradient-2" x1=".156" x2=".884" y1="1" y2="-.24" gradientUnits="objectBoundingBox">
+            <stop offset="0" stop-color="#6fcf97"/>
+            <stop offset="1" stop-color="#66d2ea"/>
+        </linearGradient>
+        <linearGradient id="linear-gradient-3" x1=".582" x2=".572" y2="1" gradientUnits="objectBoundingBox">
+            <stop offset="0" stop-color="#bc9cff"/>
+            <stop offset=".45" stop-color="#b39efe"/>
+            <stop offset="1" stop-color="#8ba4f9"/>
+        </linearGradient>
+        <style>
+            .cls-1{fill:#fff}
+        </style>
+    </defs>
+    <g id="그룹_11247" transform="translate(0 0)">
+        <path id="패스_5735" d="M26.52 35.958a1.5 1.5 0 0 1-1.5-1.493 10.51 10.51 0 0 0-10.507-10.45 1.493 1.493 0 1 1 0-2.986 13.464 13.464 0 0 1 13.508 13.437 1.5 1.5 0 0 1-1.501 1.492z" class="cls-1" transform="translate(-1.003 -2.033)"/>
+        <path id="패스_5736" d="M41.315 22.522a1.5 1.5 0 0 1-1.5 1.493 10.49 10.49 0 0 0-8.631 4.516 15.247 15.247 0 0 0-1.5-2.911 13.414 13.414 0 0 1 10.132-4.591 1.5 1.5 0 0 1 1.499 1.493z" class="cls-1" transform="translate(-2.301 -1.962)"/>
+        <g id="그룹_11248" transform="translate(0 0)">
+            <path id="패스_5738" fill="url(#linear-gradient)" d="M319.482 491.782a1.5 1.5 0 0 1-1.5-1.493 10.509 10.509 0 0 0-10.507-10.45 1.493 1.493 0 1 1 0-2.986 13.465 13.465 0 0 1 13.509 13.436 1.5 1.5 0 0 1-1.502 1.493z" transform="translate(-293.965 -457.856)"/>
+            <path id="패스_5739" fill="url(#linear-gradient-2)" d="M334.278 478.346a1.5 1.5 0 0 1-1.5 1.493 10.49 10.49 0 0 0-8.631 4.516 15.25 15.25 0 0 0-1.5-2.911 13.411 13.411 0 0 1 10.131-4.591 1.5 1.5 0 0 1 1.5 1.493z" transform="translate(-295.251 -457.786)"/>
+            <path id="패스_5740" fill="url(#linear-gradient-3)" d="M318.48 505.824c-14.072 0-25.518-11.214-25.518-25s11.446-25 25.518-25 25.52 11.213 25.52 25-11.449 25-25.52 25zm0-47.059a22.063 22.063 0 1 0 22.515 22.059 22.309 22.309 0 0 0-22.515-22.059z" transform="translate(-292.962 -455.824)"/>
+        </g>
+        <text id="vision_note" fill="#2d2d2d" font-family="ProximaNova-Extrabld, Proxima Nova" font-size="33px" transform="translate(63 36)">
+            <tspan x="0" y="0">Vision Note</tspan>
+        </text>
+    </g>
+</svg>
