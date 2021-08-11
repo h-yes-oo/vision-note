@@ -11,6 +11,7 @@ interface Props {}
 
 const Root = styled.div`
   height: 100vh;
+  background-color: #f9f9f9;
 `;
 
 const Header = styled.div`
