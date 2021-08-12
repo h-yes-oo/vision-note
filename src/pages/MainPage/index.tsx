@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import styled from 'styled-components';
 
+import SampleLogo from 'assets/icons/SampleLogo@3x.png';
 import MainImage1 from 'assets/images/MainImage1.svg';
 import Illust1 from 'assets/images/Illust1@3x.png';
 import Illust2 from 'assets/images/Illust2@3x.png';
@@ -18,7 +19,7 @@ const Header = styled.div`
   width: 1000px;
   height: 130px;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   position: fixed;
   background-color: white;
@@ -86,6 +87,8 @@ const GetStarted = styled.button`
 const MainImage = styled.img`
   height: 400px;
 `;
+
+const BtnWrapper = styled.div``;
 
 const SignupButton = styled.button`
   font-family: Pretendard;
@@ -310,14 +313,21 @@ const FooterBtn = styled.a`
   margin-left: 60px;
 `;
 
+const Logo = styled.img`
+  height: 50px;
+`;
+
 interface Props {}
 
 const MainPage: FC<Props> = () => {
   return (
     <Root>
       <Header>
-        <SignupButton>회원가입</SignupButton>
-        <LoginButton>로그인</LoginButton>
+        <Logo src={SampleLogo} />
+        <BtnWrapper>
+          <SignupButton>회원가입</SignupButton>
+          <LoginButton>로그인</LoginButton>
+        </BtnWrapper>
       </Header>
       <ViewHeight>
         <TopDiv>

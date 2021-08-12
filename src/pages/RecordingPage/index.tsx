@@ -34,7 +34,6 @@ const RecordingPage = () => {
   };
 
   async function onStart() {
-    // logElem.innerHTML = "";
     try {
       // 공유 시작
       const mediaDevices = navigator.mediaDevices as any;
