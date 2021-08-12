@@ -45,6 +45,7 @@ module.exports = {
         indent: 2,
       },
     ],
+    'react/prop-types': ['off'], 
   },
   settings: {
     'import/resolver': {
