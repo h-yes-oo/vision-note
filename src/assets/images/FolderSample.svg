@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="219" height="20" viewBox="0 0 219 20">
+    <defs>
+        <style>
+            .cls-7{font-family:AppleSDGothicNeo-Regular,Apple SD Gothic Neo}.cls-2{fill:none}
+        </style>
+    </defs>
+    <g id="그룹_457490" transform="translate(-460 -160)">
+        <g id="그룹_457488" transform="translate(-388 -61)">
+            <text id="한국사" fill="#656565" font-family="AppleSDGothicNeo-Regular, Apple SD Gothic Neo" font-size="16px" transform="translate(1025 236)">
+                <tspan x="0" y="0">한국사</tspan>
+            </text>
+            <g id="그룹_457306" transform="translate(-429 145)">
+                <path id="사각형_348274" d="M0 0H18V18H0z" class="cls-2" transform="translate(1428 76)"/>
+                <g id="그룹_457452" transform="translate(-1096.378 -1000.637)">
+                    <path id="패스_843753" fill="#6899ee" d="M2541.433 1081.177h-9.159l-.611-1.247a.433.433 0 0 0-.409-.294h-4.819a.431.431 0 0 0-.409.294l-.633 1.291a.114.114 0 0 0-.01.019l-.005.011a.1.1 0 0 0 0 .017v11.152a.091.091 0 0 0 .091.091h15.964a.091.091 0 0 0 .091-.091v-11.152a.091.091 0 0 0-.091-.091z"/>
+                    <rect id="사각형_348283" width="16.146" height="10.577" fill="#a1dafb" rx=".525" transform="translate(2525.378 1081.935)"/>
+                </g>
+            </g>
+        </g>
+        <g id="그룹_457489" transform="translate(502 1606) rotate(-90)">
+            <path id="사각형_348274-2" d="M0 0H18V18H0z" class="cls-2" transform="translate(1428 81)"/>
+            <path id="패스_843747" fill="none" stroke="#a2a2a2" stroke-linecap="round" stroke-linejoin="round" d="M-10922-21300l5.623 5.139 5.625-5.139" transform="translate(12353.375 21387.432)"/>
+        </g>
+        <g id="그룹_457487" transform="translate(-539 -61)">
+            <text id="_2021년_1학기" fill="#656565" font-family="Helvetica" font-size="16px" transform="translate(1025 236)">
+                <tspan x="0" y="0">2021</tspan><tspan y="0" class="cls-7">년</tspan><tspan y="0"> 1</tspan><tspan y="0" class="cls-7">학기</tspan>
+            </text>
+            <g id="그룹_457306-2" transform="translate(-429 145)">
+                <path id="사각형_348274-3" d="M0 0H18V18H0z" class="cls-2" transform="translate(1428 76)"/>
+                <g id="그룹_457452-2" transform="translate(-1096.378 -1000.637)">
+                    <path id="패스_843753-2" fill="#7b68ee" d="M2541.433 1081.177h-9.159l-.611-1.247a.433.433 0 0 0-.409-.294h-4.819a.431.431 0 0 0-.409.294l-.633 1.291a.114.114 0 0 0-.01.019l-.005.011a.1.1 0 0 0 0 .017v11.152a.091.091 0 0 0 .091.091h15.964a.091.091 0 0 0 .091-.091v-11.152a.091.091 0 0 0-.091-.091z"/>
+                    <rect id="사각형_348283-2" width="16.146" height="10.577" fill="#aea1fb" rx=".525" transform="translate(2525.378 1081.935)"/>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

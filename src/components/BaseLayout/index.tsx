@@ -7,15 +7,18 @@ import ProfileImage from 'assets/images/SampleProfile.svg';
 import ProfileToggleDown from 'assets/icons/ProfileToggleDown.svg';
 import ProfileToggleUp from 'assets/icons/ProfileToggleUp.svg';
 
-const Root = styled.div`
+const Root = styled.div<{ grey: boolean }>`
   height: 100vh;
-  background-color: #f9f9f9;
+  background-color: ${(props) => (props.grey ? '#f9f9f9' : '')};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const Header = styled.div`
   width: 100vw;
   height: 90px;
-  margin-top: 15px;
+  padding-top: 15px;
   object-fit: contain;
   box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.08);
   background-color: #fff;
@@ -121,13 +124,18 @@ const ProfileToggle = styled.img`
   margin-left: 10px;
 `;
 
+const Contents = styled.div`
+  width: 1000px;
+`;
+
 interface Props {
   children: ReactNode;
+  grey: boolean;
 }
 
-const BaseLayout: FC<Props> = ({ children }) => {
+const BaseLayout: FC<Props> = ({ children, grey }) => {
   return (
-    <Root>
+    <Root grey={grey}>
       <Header>
         <HeaderInside>
           <Logo src={SampleLogo} />
