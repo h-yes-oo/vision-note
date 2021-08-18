@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import styled from 'styled-components';
+import { withRouter, RouteComponentProps } from 'react-router-dom';
 
 import SampleLogo from 'assets/icons/SampleLogo@3x.png';
 import MainImage1 from 'assets/images/MainImage1.svg';
@@ -319,7 +320,7 @@ const Logo = styled.img`
 
 interface Props {}
 
-const MainPage: FC<Props> = () => {
+const MainPage: FC<Props & RouteComponentProps> = ({ history }) => {
   return (
     <Root>
       <Header>
@@ -336,7 +337,9 @@ const MainPage: FC<Props> = () => {
             <SmallText>
               비전노트는 모두를 위한 자동 강의록 서비스입니다
             </SmallText>
-            <GetStarted>Get Started</GetStarted>
+            <GetStarted onClick={() => history.push('/notes')}>
+              Get Started
+            </GetStarted>
           </Info>
           <MainImage src={MainImage1} />
         </TopDiv>

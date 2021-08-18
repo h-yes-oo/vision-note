@@ -46,6 +46,7 @@ module.exports = {
       },
     ],
     'react/prop-types': ['off'], 
+    "no-shadow": "off",
   },
   settings: {
     'import/resolver': {
