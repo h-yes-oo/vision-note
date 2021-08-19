@@ -1,5 +1,6 @@
 import { FC, ReactNode } from 'react';
 import styled from 'styled-components';
+import { withRouter, RouteComponentProps } from 'react-router-dom';
 
 import SampleLogo from 'assets/icons/SampleLogo@3x.png';
 import SearchIcon from 'assets/icons/SearchIcon.svg';

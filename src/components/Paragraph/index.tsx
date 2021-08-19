@@ -16,7 +16,7 @@ const Root = styled.div`
 const Contents = styled.div`
   display: flex;
   font-family: Pretendard;
-  font-size: 16px;
+  font-size: 19px;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;

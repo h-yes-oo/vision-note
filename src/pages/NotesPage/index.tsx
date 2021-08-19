@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect, useCallback } from 'react';
+import { FC, useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 
 import BaseLayout from 'components/BaseLayout';
@@ -40,7 +40,7 @@ const InfoBottom = styled.div`
   justify-content: space-between;
 `;
 
-const NoteTitle = styled.div`
+const NoteTitle = styled.input`
   font-family: Pretendard;
   font-size: 30px;
   font-weight: bold;
@@ -50,6 +50,7 @@ const NoteTitle = styled.div`
   letter-spacing: normal;
   text-align: left;
   color: #000;
+  border: none;
 `;
 
 const NoteDate = styled.div`
@@ -191,11 +192,12 @@ const NotesPage: FC<Props> = () => {
   };
 
   useEffect(() => {
-    document.addEventListener('keydown', () => {
-      addContent(index);
-      setIndex(index + 1);
-    });
-  }, [content, index]);
+    if (ready)
+      document.addEventListener('keydown', () => {
+        addContent(index);
+        setIndex(index + 1);
+      });
+  }, [content, index, ready]);
 
   // temp end
 
@@ -290,13 +292,7 @@ const NotesPage: FC<Props> = () => {
             </ButtonWrapper>
           </InfoTop>
           <InfoMiddle>
-            <NoteTitle
-              contentEditable
-              suppressContentEditableWarning
-              onChange={onTitleChange}
-            >
-              {title}
-            </NoteTitle>
+            <NoteTitle placeholder={title} />
           </InfoMiddle>
           <InfoBottom>
             <NoteDate>{date}</NoteDate>

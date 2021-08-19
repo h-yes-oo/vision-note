@@ -1,6 +1,9 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
+
+import Modal from 'components/Modal';
+import LoginModal from 'components/Modal/login';
 
 import SampleLogo from 'assets/icons/SampleLogo@3x.png';
 import MainImage1 from 'assets/images/MainImage1.svg';
@@ -321,15 +324,37 @@ const Logo = styled.img`
 interface Props {}
 
 const MainPage: FC<Props & RouteComponentProps> = ({ history }) => {
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const openModal = () => {
+    console.log('open modal');
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+
+  const goToNotes = () => history.push('/notes');
+
   return (
     <Root>
       <Header>
         <Logo src={SampleLogo} />
         <BtnWrapper>
           <SignupButton>회원가입</SignupButton>
-          <LoginButton>로그인</LoginButton>
+          <LoginButton onClick={openModal}>로그인</LoginButton>
         </BtnWrapper>
       </Header>
+
+      <LoginModal
+        className="login-modal"
+        visible={modalVisible}
+        btnClosable
+        maskClosable
+        onClose={closeModal}
+        goTo={goToNotes}
+      />
       <ViewHeight>
         <TopDiv>
           <Info>
@@ -337,9 +362,7 @@ const MainPage: FC<Props & RouteComponentProps> = ({ history }) => {
             <SmallText>
               비전노트는 모두를 위한 자동 강의록 서비스입니다
             </SmallText>
-            <GetStarted onClick={() => history.push('/notes')}>
-              Get Started
-            </GetStarted>
+            <GetStarted onClick={goToNotes}>Get Started</GetStarted>
           </Info>
           <MainImage src={MainImage1} />
         </TopDiv>
