@@ -94,6 +94,9 @@ const StartBtn = styled.a`
   color: #fff;
   box-sizing: border-box;
   border-radius: 6px;
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 const FlexDiv = styled.div`
@@ -134,18 +137,25 @@ interface Props {
   grey: boolean;
 }
 
-const BaseLayout: FC<Props> = ({ children, grey }) => {
+const BaseLayout: FC<Props & RouteComponentProps> = ({
+  children,
+  grey,
+  history,
+}) => {
   return (
     <Root grey={grey}>
       <Header>
         <HeaderInside>
-          <Logo src={SampleLogo} />
+          <Logo src={SampleLogo} onClick={() => history.push('/')} />
           <FlexDiv>
             <SearchWrapper>
               <SearchBox placeholder="노트에서 검색하기" />
               <SearchBtn src={SearchIcon} />
             </SearchWrapper>
-            <StartBtn> 학습 시작하기 </StartBtn>
+            <StartBtn onClick={() => history.push('/notes')}>
+              {' '}
+              학습 시작하기{' '}
+            </StartBtn>
           </FlexDiv>
           <FlexDiv>
             <ProfileImg src={ProfileImage} />
@@ -159,4 +169,4 @@ const BaseLayout: FC<Props> = ({ children, grey }) => {
   );
 };
 
-export default BaseLayout;
+export default withRouter(BaseLayout);

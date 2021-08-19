@@ -336,6 +336,7 @@ const MainPage: FC<Props & RouteComponentProps> = ({ history }) => {
   };
 
   const goToNotes = () => history.push('/notes');
+  const goToFolder = () => history.push('/folder');
 
   return (
     <Root>
@@ -353,7 +354,7 @@ const MainPage: FC<Props & RouteComponentProps> = ({ history }) => {
         btnClosable
         maskClosable
         onClose={closeModal}
-        goTo={goToNotes}
+        goTo={goToFolder}
       />
       <ViewHeight>
         <TopDiv>
