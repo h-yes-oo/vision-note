@@ -1,17 +1,20 @@
-import { FC, useState } from 'react';
+import { FC, useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
+import * as T from 'types';
 
 import Modal from 'components/Modal';
 import LoginModal from 'components/Modal/login';
+import SlidingModal from 'components/Modal/sliding';
 
-import SampleLogo from 'assets/icons/SampleLogo@3x.png';
+import SampleLogo from 'assets/icons/SampleLogo3.png';
 import MainImage1 from 'assets/images/MainImage1.svg';
 import Illust1 from 'assets/images/Illust1@3x.png';
 import Illust2 from 'assets/images/Illust2@3x.png';
 import Illust3 from 'assets/images/Illust3@3x.png';
 import ToggleDown from 'assets/icons/ToggleDown.svg';
 import ToggleUp from 'assets/icons/ToggleUp.svg';
+import { sign } from 'crypto';
 
 const Root = styled.div`
   display: flex;
@@ -324,37 +327,35 @@ const Logo = styled.img`
 interface Props {}
 
 const MainPage: FC<Props & RouteComponentProps> = ({ history }) => {
-  const [modalVisible, setModalVisible] = useState(false);
+  const [modalType, setModalType] = useState<T.ModalType>(T.ModalType.No);
 
-  const openModal = () => {
-    console.log('open modal');
-    setModalVisible(true);
+  const loginModal = () => {
+    setModalType(T.ModalType.Login);
+  };
+
+  const signUpModal = () => {
+    setModalType(T.ModalType.SignUp);
   };
 
   const closeModal = () => {
-    setModalVisible(false);
+    setModalType(T.ModalType.No);
   };
 
   const goToNotes = () => history.push('/notes');
-  const goToFolder = () => history.push('/folder');
 
   return (
     <Root>
       <Header>
         <Logo src={SampleLogo} />
         <BtnWrapper>
-          <SignupButton>회원가입</SignupButton>
-          <LoginButton onClick={openModal}>로그인</LoginButton>
+          <SignupButton onClick={signUpModal}>회원가입</SignupButton>
+          <LoginButton onClick={loginModal}>로그인</LoginButton>
         </BtnWrapper>
       </Header>
-
-      <LoginModal
-        className="login-modal"
-        visible={modalVisible}
-        btnClosable
-        maskClosable
+      <SlidingModal
+        visible={modalType !== T.ModalType.No}
         onClose={closeModal}
-        goTo={goToFolder}
+        type={modalType}
       />
       <ViewHeight>
         <TopDiv>

@@ -2,7 +2,7 @@ import { FC, ReactNode } from 'react';
 import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 
-import SampleLogo from 'assets/icons/SampleLogo@3x.png';
+import SampleLogo from 'assets/icons/SampleLogo5.png';
 import SearchIcon from 'assets/icons/SearchIcon.svg';
 import ProfileImage from 'assets/images/SampleProfile.svg';
 import ProfileToggleDown from 'assets/icons/ProfileToggleDown.svg';

@@ -5,3 +5,10 @@ export enum Subject {
   Science,
   General,
 }
+
+export enum ModalType {
+  Login,
+  SignUp,
+  Find,
+  No,
+}

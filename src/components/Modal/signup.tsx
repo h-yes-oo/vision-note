@@ -20,19 +20,6 @@ const Title = styled.div`
   margin-top: 121px;
 `;
 
-const Info = styled.div`
-  font-family: Pretendard;
-  font-size: 18px;
-  font-weight: normal;
-  font-stretch: normal;
-  font-style: normal;
-  line-height: 1.22;
-  letter-spacing: normal;
-  text-align: left;
-  color: #000;
-  margin: 9px 0;
-`;
-
 const Form = styled.input`
   width: 420px;
   height: 61px;
@@ -69,12 +56,9 @@ const Find = styled.a`
   color: #656565;
 
   margin: 30px 0 0;
-  &:hover {
-    cursor: pointer;
-  }
 `;
 
-const LoginBtn = styled.button`
+const SignupButton = styled.button`
   width: 420px;
   height: 61px;
   margin: 19px 0 31px;
@@ -175,7 +159,7 @@ const NotYet = styled.span`
   margin: 0 13px 0 0;
 `;
 
-const SignUp = styled.a`
+const ToLogin = styled.a`
   font-family: Pretendard;
   font-size: 16px;
   font-weight: 500;
@@ -195,25 +179,20 @@ const Flex = styled.div`
 `;
 
 interface Props {
-  toFind: any;
-  toSignUp: any;
+  toLogin: any;
 }
 
-const Login: FC<Props & RouteComponentProps> = ({
-  toFind,
-  toSignUp,
-  history,
-}) => {
+const SignUp: FC<Props & RouteComponentProps> = ({ toLogin, history }) => {
   const goTo = () => history.push('/folder');
 
   return (
     <>
-      <Title>로그인</Title>
-      <Info>학습 노트를 바로 만들고 관리해보세요</Info>
+      <Title>회원가입</Title>
       <Form placeholder="이메일 주소" type="email" />
       <Form placeholder="비밀번호" type="password" />
-      <Find onClick={toFind}>아이디 / 비밀번호 찾기</Find>
-      <LoginBtn onClick={goTo}>로그인</LoginBtn>
+      <Form placeholder="비밀번호 확인" type="password" />
+      <Form placeholder="닉네임" type="password" />
+      <SignupButton onClick={goTo}>가입하기</SignupButton>
       <OrWrapper>
         <Line />
         <OR>또는</OR>
@@ -222,29 +201,29 @@ const Login: FC<Props & RouteComponentProps> = ({
       <SocialWrapper>
         <SocialBox>
           <SocialImage src={Kakao} />
-          카카오 로그인
+          카카오 회원가입
         </SocialBox>
         <SocialBox>
           <SocialImage src={Naver} />
-          네이버 로그인
+          네이버 회원가입
         </SocialBox>
       </SocialWrapper>
       <SocialWrapper>
         <SocialBox>
           <SocialImage src={Facebook} />
-          페이스북 로그인
+          페이스북 회원가입
         </SocialBox>
         <SocialBox>
           <SocialImage src={Google} />
-          구글 로그인
+          구글 회원가입
         </SocialBox>
       </SocialWrapper>
       <Flex>
-        <NotYet>아직 회원이 아니신가요?</NotYet>
-        <SignUp onClick={toSignUp}>회원가입하기</SignUp>
+        <NotYet>이미 계정이 있으신가요?</NotYet>
+        <ToLogin onClick={toLogin}>로그인 하기</ToLogin>
       </Flex>
     </>
   );
 };
 
-export default withRouter(Login);
+export default withRouter(SignUp);
