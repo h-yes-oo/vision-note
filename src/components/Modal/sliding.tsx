@@ -1,7 +1,6 @@
 import React, { FC, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import * as T from 'types';
-import { withRouter, RouteComponentProps } from 'react-router-dom';
 
 import Close from 'assets/icons/Close.svg';
 import Login from 'components/Modal/login';

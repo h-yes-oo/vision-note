@@ -1,10 +1,8 @@
-import { FC, useState, useEffect, useCallback } from 'react';
+import { FC, useState } from 'react';
 import styled from 'styled-components';
-import { withRouter, RouteComponentProps } from 'react-router-dom';
+import { RouteComponentProps } from 'react-router-dom';
 import * as T from 'types';
 
-import Modal from 'components/Modal';
-import LoginModal from 'components/Modal/login';
 import SlidingModal from 'components/Modal/sliding';
 
 import SampleLogo from 'assets/icons/SampleLogo3.png';
@@ -14,7 +12,6 @@ import Illust2 from 'assets/images/Illust2@3x.png';
 import Illust3 from 'assets/images/Illust3@3x.png';
 import ToggleDown from 'assets/icons/ToggleDown.svg';
 import ToggleUp from 'assets/icons/ToggleUp.svg';
-import { sign } from 'crypto';
 
 const Root = styled.div`
   display: flex;
