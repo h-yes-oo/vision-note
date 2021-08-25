@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40">
+    <defs>
+        <style>
+            .cls-5{stroke-linecap:round;stroke-linejoin:round;fill:#fff;stroke:#fff}
+        </style>
+    </defs>
+    <g id="그룹_457336" data-name="그룹 457336" transform="translate(-498 -979)">
+        <rect id="사각형_348304" data-name="사각형 348304" width="40" height="40" rx="5" transform="translate(498 979)" style="fill:none"/>
+        <g id="그룹_457337" data-name="그룹 457337" transform="translate(442.177 384.643)">
+            <path id="사각형_348305" data-name="사각형 348305" transform="translate(72.31 604.356)" style="stroke-linecap:round;stroke-linejoin:round;stroke:#c5c5c5;stroke-width:2px;fill:none" d="M0 0h7.025v2.801H0z"/>
+            <path id="사각형_348306" data-name="사각형 348306" d="M0 0h11.773v11.577a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V0h0z" transform="translate(69.937 609.969)" style="fill:#c5c5c5;stroke-linecap:round;stroke-linejoin:round;stroke:#c5c5c5;stroke-width:2px"/>
+            <path id="선_285" data-name="선 285" transform="translate(68.35 607.157)" style="fill:#fff;stroke-linecap:round;stroke-linejoin:round;stroke:#c5c5c5;stroke-width:2px" d="M0 0h14.946"/>
+            <path id="선_286" data-name="선 286" class="cls-5" transform="translate(78.677 613.839)" d="M0 0v5.835"/>
+            <path id="선_287" data-name="선 287" class="cls-5" transform="translate(75.823 613.839)" d="M0 0v5.835"/>
+            <path id="선_288" data-name="선 288" class="cls-5" transform="translate(72.97 613.839)" d="M0 0v5.835"/>
+        </g>
+    </g>
+</svg>
