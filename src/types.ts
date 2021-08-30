@@ -12,3 +12,8 @@ export enum ModalType {
   Find,
   No,
 }
+
+export enum FileType {
+  Folder,
+  Note,
+}

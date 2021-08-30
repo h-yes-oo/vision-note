@@ -47,6 +47,7 @@ module.exports = {
     ],
     'react/prop-types': ['off'], 
     "no-shadow": "off",
+    'camelcase': 'off'
   },
   settings: {
     'import/resolver': {

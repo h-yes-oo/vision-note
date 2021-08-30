@@ -5,7 +5,7 @@ import * as T from 'types';
 
 import SlidingModal from 'components/Modal/sliding';
 
-import SampleLogo from 'assets/icons/SampleLogo6.png';
+import SampleLogo from 'assets/icons/SampleLogo12.png';
 import MainImage1 from 'assets/images/MainImage1.svg';
 import Illust1 from 'assets/images/Illust1@3x.png';
 import Illust2 from 'assets/images/Illust2@3x.png';
