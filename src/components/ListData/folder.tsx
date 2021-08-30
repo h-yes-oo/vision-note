@@ -131,12 +131,14 @@ const TitleData = styled(TableData)`
 const TitleName = styled.p`
   text-overflow: ellipsis;
   overflow: hidden;
+  user-select: none !important;
 `;
 
 const TitleImage = styled.img<{ depth: number }>`
   width: 24px;
   margin-right: 11px;
   margin-left: ${(props) => `${props.depth * 20}px`};
+  user-select: none !important;
 `;
 
 export default FolderData;

@@ -61,7 +61,7 @@ const FindBtn = styled.button`
   color: #fff;
   &:hover {
     cursor: pointer;
-    box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.2);
+    background-color: #6a58d3;
   }
 `;
 
@@ -76,6 +76,8 @@ const NotYet = styled.span`
   text-align: left;
   color: #000;
   margin: 0 13px 0 0;
+
+  user-select: none !important;
 `;
 
 const ToSignUp = styled.a`

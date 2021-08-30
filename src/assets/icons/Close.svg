@@ -1,14 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24">
-    <defs>
-        <style>
-            .cls-2{fill:none;stroke:#000;stroke-width:1.5px}
-        </style>
-    </defs>
-    <g id="그룹_457243" data-name="그룹 457243" transform="translate(-1000 -40)">
-        <path id="패스_843709" data-name="패스 843709" d="M0 0h24v24H0z" transform="translate(1000 40)" style="fill:#fff"/>
-        <g id="그룹_457242" data-name="그룹 457242" transform="translate(-.166 1.834)">
-            <path id="선_281" data-name="선 281" class="cls-2" transform="translate(1005.166 43.166)" d="m0 0 14 14"/>
-            <path id="선_282" data-name="선 282" class="cls-2" transform="translate(1005.166 43.166)" d="M0 14 14 0"/>
-        </g>
-    </g>
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M1 1L15 15" stroke="black" stroke-width="1.5"/>
+<path d="M1 15L15 1" stroke="black" stroke-width="1.5"/>
 </svg>

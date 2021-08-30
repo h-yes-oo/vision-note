@@ -80,7 +80,7 @@ const SignupButton = styled.button`
   color: #fff;
   &:hover {
     cursor: pointer;
-    box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.2);
+    background-color: #6a58d3;
   }
 `;
 
@@ -139,6 +139,11 @@ const SocialBox = styled.div`
   letter-spacing: normal;
   text-align: left;
   color: #656565;
+
+  &:hover {
+    cursor: pointer;
+    background-color: #f6f8fa;
+  }
 `;
 
 const SocialImage = styled.img`

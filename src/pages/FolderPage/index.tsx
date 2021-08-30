@@ -153,6 +153,10 @@ const Root = styled.div`
   flex-direction: column;
   margin-top: 33px;
   width: 1000px;
+
+  > * {
+    user-select: none !important;
+  }
 `;
 
 const Top = styled.div`
@@ -255,6 +259,7 @@ const TableHeader = styled.th`
   letter-spacing: normal;
   text-align: left;
   color: #000;
+  user-select: none !important;
 
   display: flex;
   align-items: center;

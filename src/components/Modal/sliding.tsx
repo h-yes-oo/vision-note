@@ -46,11 +46,26 @@ const Root = styled.div<{ visible: boolean }>`
 
   display: flex;
   flex-direction: column;
+
+  > * {
+    user-select: none !important;
+  }
 `;
 
-const ClostBtn = styled.img`
-  width: 24px;
-  height: 24px;
+const ClostBtn = styled.a`
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #fff;
+  background-image: url(${Close});
+  background-repeat: no-repeat;
+  background-size: 14px;
+  background-position: 50%;
+
+  &:hover {
+    cursor: pointer;
+    background-color: #f6f8fa;
+  }
 `;
 
 interface ModalProps {
@@ -71,7 +86,7 @@ const SlidingModal: FC<ModalProps> = ({ onClose, visible, type }) => {
     setModalType(type);
   }, [type]);
 
-  const close = (e: any) => {
+  const close = (e: React.MouseEvent) => {
     if (onClose) {
       onClose(e);
     }
@@ -94,7 +109,7 @@ const SlidingModal: FC<ModalProps> = ({ onClose, visible, type }) => {
       <ModalOverlay visible={visible} />
       <ModalWrapper onClick={onMaskClick} tabIndex={-1} visible={visible}>
         <Root visible={visible}>
-          <ClostBtn src={Close} onClick={close} />
+          <ClostBtn onClick={close} />
           {content(modalType)}
         </Root>
       </ModalWrapper>

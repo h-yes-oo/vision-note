@@ -10,13 +10,148 @@ import MainImage1 from 'assets/images/MainImage1.svg';
 import Illust1 from 'assets/images/Illust1@3x.png';
 import Illust2 from 'assets/images/Illust2@3x.png';
 import Illust3 from 'assets/images/Illust3@3x.png';
-import ToggleDown from 'assets/icons/ToggleDown.svg';
-import ToggleUp from 'assets/icons/ToggleUp.svg';
+
+import FAQToggle from 'components/FAQToggle';
+
+interface Props {}
+
+const MainPage: FC<Props & RouteComponentProps> = ({ history }) => {
+  const [modalType, setModalType] = useState<T.ModalType>(T.ModalType.No);
+
+  const loginModal = () => {
+    setModalType(T.ModalType.Login);
+  };
+
+  const signUpModal = () => {
+    setModalType(T.ModalType.SignUp);
+  };
+
+  const closeModal = () => {
+    setModalType(T.ModalType.No);
+  };
+
+  const goToNotes = () => history.push('/notes');
+
+  const FAQContents = [
+    {
+      id: 1,
+      title: '서비스 이용은 어떻게 하나요?',
+      content: '로그인 후 이용하실 수 있습니다',
+    },
+    {
+      id: 2,
+      title: '서비스 이용은 어떻게 하나요?',
+      content: '로그인 후 이용하실 수 있습니다',
+    },
+    {
+      id: 3,
+      title: '서비스 이용은 어떻게 하나요?',
+      content: '로그인 후 이용하실 수 있습니다',
+    },
+    {
+      id: 4,
+      title: '서비스 이용은 어떻게 하나요?',
+      content: '로그인 후 이용하실 수 있습니다',
+    },
+  ];
+
+  return (
+    <Root>
+      <Header>
+        <Logo src={SampleLogo} />
+        <BtnWrapper>
+          <SignupButton onClick={signUpModal}>회원가입</SignupButton>
+          <LoginButton onClick={loginModal}>로그인</LoginButton>
+        </BtnWrapper>
+      </Header>
+      <SlidingModal
+        visible={modalType !== T.ModalType.No}
+        onClose={closeModal}
+        type={modalType}
+      />
+      <ViewHeight>
+        <TopDiv>
+          <Info>
+            <BigText>보는 노트로 {'\n'}꿈에 더 가까이 </BigText>
+            <SmallText>
+              비전노트는 모두를 위한 자동 강의록 서비스입니다
+            </SmallText>
+            <GetStarted onClick={goToNotes}>Get Started</GetStarted>
+          </Info>
+          <MainImage src={MainImage1} />
+        </TopDiv>
+      </ViewHeight>
+      <About>
+        <AboutText>청각장애 학생을 위한 강의 학습 보조 도구</AboutText>
+        <Feature>
+          <Advantage>
+            <Title>자동 자막 생성</Title>
+            <Description>
+              문장 단위로 인식하여 한 문장씩 쌓이게 됩니다.{'\n'}긴 pause를
+              인식하여 문단 단위로 나누게 됩니다.{'\n'}하이라이팅은 글자 단위로,
+              메모는 문단 단위로 작성이 가능합니다.
+            </Description>
+          </Advantage>
+          <Illust src={Illust1} />
+        </Feature>
+        <Feature>
+          <Illust src={Illust2} />
+          <Advantage>
+            <Title>강의록 다시보기</Title>
+            <Description>
+              문장 단위로 인식하여 한 문장씩 쌓이게 됩니다.{'\n'}긴 pause를
+              인식하여 문단 단위로 나누게 됩니다.{'\n'}하이라이팅은 글자 단위로,
+              메모는 문단 단위로 작성이 가능합니다.
+            </Description>
+          </Advantage>
+        </Feature>
+        <Feature>
+          <Advantage>
+            <Title>개인 노트필기</Title>
+            <Description>
+              문장 단위로 인식하여 한 문장씩 쌓이게 됩니다.{'\n'}긴 pause를
+              인식하여 문단 단위로 나누게 됩니다.{'\n'}하이라이팅은 글자 단위로,
+              메모는 문단 단위로 작성이 가능합니다.
+            </Description>
+          </Advantage>
+          <Illust src={Illust3} />
+        </Feature>
+      </About>
+      <FAQ>
+        <FAQTitle>자주 묻는 질문</FAQTitle>
+        {FAQContents.map((val, idx) => (
+          <FAQToggle key={val.id} title={val.title} content={val.content} />
+        ))}
+      </FAQ>
+      <Footer>
+        <FooterLeft>
+          <FooterTitle>Vision Note</FooterTitle>
+          <FooterInfo>
+            서울특별시 비전시 비전구 비전로 123번길 123 비전노트 빌딩 10층{'\n'}
+            대표전화 02-1234-5678 | 이메일: visionnote@vision.com
+          </FooterInfo>
+          <Copyright>
+            Copyright © 2021 Vision Note All Rights Reserved.
+          </Copyright>
+        </FooterLeft>
+        <FooterRight>
+          <FooterBtn>FAQ</FooterBtn>
+          <FooterBtn>개인정보처리방침</FooterBtn>
+          <FooterBtn>이용약관</FooterBtn>
+        </FooterRight>
+      </Footer>
+    </Root>
+  );
+};
 
 const Root = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  > * {
+    user-select: none !important;
+  }
 `;
 
 const Header = styled.div`
@@ -70,52 +205,15 @@ const SmallText = styled.div`
   color: #000;
 `;
 
-const GetStarted = styled.button`
-  font-family: Pretendard;
-  font-size: 18px;
-  font-weight: 500;
-  font-stretch: normal;
-  font-style: normal;
-  line-height: 1.22;
-  letter-spacing: normal;
-  text-align: center;
-  color: #fff;
-  width: 183px;
-  height: 60px;
-  margin: 59px 0 45px;
-  background-color: #7b68ee;
-  border: none;
-  border-radius: 6px;
-`;
-
 const MainImage = styled.img`
   height: 400px;
 `;
 
-const BtnWrapper = styled.div``;
-
-const SignupButton = styled.button`
-  font-family: Pretendard;
-  font-size: 18px;
-  font-weight: 500;
-  font-stretch: normal;
-  font-style: normal;
-  line-height: 1.22;
-  text-align: left;
-  color: #676767;
-  border: none;
-  background-color: white;
+const BtnWrapper = styled.div`
+  display: flex;
 `;
 
-const LoginButton = styled.button`
-  width: 129px;
-  height: 50px;
-  margin: 0 0 0 50px;
-  padding: 16px 41px 13px;
-  border: none;
-  border-radius: 6px;
-  object-fit: contain;
-  background-color: #7b68ee;
+const Button = styled.button`
   font-family: Pretendard;
   font-size: 18px;
   font-weight: 500;
@@ -125,6 +223,45 @@ const LoginButton = styled.button`
   letter-spacing: normal;
   text-align: left;
   color: #fff;
+  border: none;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const PurpleButton = styled(Button)`
+  background-color: #7b68ee;
+  color: #fff;
+  border-radius: 6px;
+
+  &:hover {
+    cursor: pointer;
+    background-color: #6a58d3;
+  }
+`;
+
+const GetStarted = styled(PurpleButton)`
+  width: 183px;
+  height: 60px;
+  margin: 59px 0 45px;
+`;
+
+const LoginButton = styled(PurpleButton)`
+  width: 129px;
+  height: 50px;
+  margin: 0 0 0 50px;
+  padding: 16px 41px 13px;
+`;
+
+const SignupButton = styled(Button)`
+  color: #676767;
+  background-color: white;
+
+  &:hover {
+    cursor: pointer;
+    color: #6a58d3;
+  }
 `;
 
 const ViewHeight = styled.div`
@@ -218,36 +355,6 @@ const FAQTitle = styled.div`
   margin: 82px 0 57px;
 `;
 
-const FAQContent = styled.div`
-  width: 1000px;
-  height: 84px;
-  margin-bottom: 20px;
-  padding: 30px;
-  display: flex;
-  justfy-content: space-between;
-  object-fit: contain;
-  border-radius: 14px;
-  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.1);
-  background-color: #fff;
-  font-family: Pretendard;
-  font-size: 20px;
-  font-weight: 600;
-  font-stretch: normal;
-  font-style: normal;
-  line-height: 1.35;
-  letter-spacing: normal;
-  text-align: left;
-  color: #000;
-  box-sizing: border-box;
-  align-items: center;
-  justify-content: space-between;
-`;
-
-const ToggleBtn = styled.img`
-  width: 45px;
-  height: 45px;
-`;
-
 const Footer = styled.div`
   width: 1000px;
   padding: 40px 0;
@@ -320,126 +427,5 @@ const FooterBtn = styled.a`
 const Logo = styled.img`
   height: 50px;
 `;
-
-interface Props {}
-
-const MainPage: FC<Props & RouteComponentProps> = ({ history }) => {
-  const [modalType, setModalType] = useState<T.ModalType>(T.ModalType.No);
-
-  const loginModal = () => {
-    setModalType(T.ModalType.Login);
-  };
-
-  const signUpModal = () => {
-    setModalType(T.ModalType.SignUp);
-  };
-
-  const closeModal = () => {
-    setModalType(T.ModalType.No);
-  };
-
-  const goToNotes = () => history.push('/notes');
-
-  return (
-    <Root>
-      <Header>
-        <Logo src={SampleLogo} />
-        <BtnWrapper>
-          <SignupButton onClick={signUpModal}>회원가입</SignupButton>
-          <LoginButton onClick={loginModal}>로그인</LoginButton>
-        </BtnWrapper>
-      </Header>
-      <SlidingModal
-        visible={modalType !== T.ModalType.No}
-        onClose={closeModal}
-        type={modalType}
-      />
-      <ViewHeight>
-        <TopDiv>
-          <Info>
-            <BigText>보는 노트로 {'\n'}꿈에 더 가까이 </BigText>
-            <SmallText>
-              비전노트는 모두를 위한 자동 강의록 서비스입니다
-            </SmallText>
-            <GetStarted onClick={goToNotes}>Get Started</GetStarted>
-          </Info>
-          <MainImage src={MainImage1} />
-        </TopDiv>
-      </ViewHeight>
-      <About>
-        <AboutText>청각장애 학생을 위한 강의 학습 보조 도구</AboutText>
-        <Feature>
-          <Advantage>
-            <Title>자동 자막 생성</Title>
-            <Description>
-              문장 단위로 인식하여 한 문장씩 쌓이게 됩니다.{'\n'}긴 pause를
-              인식하여 문단 단위로 나누게 됩니다.{'\n'}하이라이팅은 글자 단위로,
-              메모는 문단 단위로 작성이 가능합니다.
-            </Description>
-          </Advantage>
-          <Illust src={Illust1} />
-        </Feature>
-        <Feature>
-          <Illust src={Illust2} />
-          <Advantage>
-            <Title>강의록 다시보기</Title>
-            <Description>
-              문장 단위로 인식하여 한 문장씩 쌓이게 됩니다.{'\n'}긴 pause를
-              인식하여 문단 단위로 나누게 됩니다.{'\n'}하이라이팅은 글자 단위로,
-              메모는 문단 단위로 작성이 가능합니다.
-            </Description>
-          </Advantage>
-        </Feature>
-        <Feature>
-          <Advantage>
-            <Title>개인 노트필기</Title>
-            <Description>
-              문장 단위로 인식하여 한 문장씩 쌓이게 됩니다.{'\n'}긴 pause를
-              인식하여 문단 단위로 나누게 됩니다.{'\n'}하이라이팅은 글자 단위로,
-              메모는 문단 단위로 작성이 가능합니다.
-            </Description>
-          </Advantage>
-          <Illust src={Illust3} />
-        </Feature>
-      </About>
-      <FAQ>
-        <FAQTitle>자주 묻는 질문</FAQTitle>
-        <FAQContent>
-          서비스 이용은 어떻게 하나요?
-          <ToggleBtn src={ToggleDown} />
-        </FAQContent>
-        <FAQContent>
-          서비스 이용은 어떻게 하나요?
-          <ToggleBtn src={ToggleDown} />
-        </FAQContent>
-        <FAQContent>
-          서비스 이용은 어떻게 하나요?
-          <ToggleBtn src={ToggleDown} />
-        </FAQContent>
-        <FAQContent>
-          서비스 이용은 어떻게 하나요?
-          <ToggleBtn src={ToggleDown} />
-        </FAQContent>
-      </FAQ>
-      <Footer>
-        <FooterLeft>
-          <FooterTitle>Vision Note</FooterTitle>
-          <FooterInfo>
-            서울특별시 비전시 비전구 비전로 123번길 123 비전노트 빌딩 10층{'\n'}
-            대표전화 02-1234-5678 | 이메일: visionnote@vision.com
-          </FooterInfo>
-          <Copyright>
-            Copyright © 2021 Vision Note All Rights Reserved.
-          </Copyright>
-        </FooterLeft>
-        <FooterRight>
-          <FooterBtn>FAQ</FooterBtn>
-          <FooterBtn>개인정보처리방침</FooterBtn>
-          <FooterBtn>이용약관</FooterBtn>
-        </FooterRight>
-      </Footer>
-    </Root>
-  );
-};
 
 export default MainPage;

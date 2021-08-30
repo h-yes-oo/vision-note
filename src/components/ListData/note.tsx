@@ -87,6 +87,8 @@ const SubjectData = styled(TableData)`
 
 const Image24 = styled.img`
   width: 24px;
+
+  user-select: none !important;
 `;
 
 const TitleImage = styled(Image24)<{ depth: number }>`
