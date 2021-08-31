@@ -31,9 +31,10 @@ export interface NoteResponse {
 interface Props {
   data: NoteResponse;
   depth: number;
+  menu: any;
 }
 
-const ListData: FC<Props> = ({ data, depth }) => {
+const ListData: FC<Props> = ({ data, depth, menu }) => {
   if (data.itemType === 'FILE') {
     const note = data.noteFile;
     const oldDate = note?.created_at;
@@ -49,6 +50,8 @@ const ListData: FC<Props> = ({ data, depth }) => {
         date={newDate}
         starred
         subject="과학"
+        menu={menu}
+        noteId={note!.file_id}
       />
     );
   }
@@ -59,6 +62,7 @@ const ListData: FC<Props> = ({ data, depth }) => {
       title={folder?.folder_name}
       depth={depth}
       opened={false}
+      menu={menu}
     />
   );
 };

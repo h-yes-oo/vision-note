@@ -12,9 +12,10 @@ interface Props {
   title: string | undefined;
   depth: number;
   opened: boolean;
+  menu: any;
 }
 
-const FolderData: FC<Props> = ({ title, depth, opened }) => {
+const FolderData: FC<Props> = ({ title, depth, opened, menu }) => {
   const [open, setOpen] = useState<boolean>(opened);
   const folderImage = () => {
     if (depth % 2 === 0) return open ? FolderPurple : FolderPurpleClosed;
@@ -27,7 +28,12 @@ const FolderData: FC<Props> = ({ title, depth, opened }) => {
 
   return (
     <>
-      <DataRow onClick={handleClick}>
+      <DataRow
+        onContextMenu={(e) => {
+          e.preventDefault();
+        }}
+        onClick={handleClick}
+      >
         <TitleData>
           <TitleImage depth={depth} src={folderImage()} />
           <TitleName> {title} </TitleName>
@@ -43,6 +49,7 @@ const FolderData: FC<Props> = ({ title, depth, opened }) => {
             }`}
             data={data}
             depth={depth + 1}
+            menu={menu}
           />
         ))}
     </>

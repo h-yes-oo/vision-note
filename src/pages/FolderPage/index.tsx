@@ -1,13 +1,10 @@
-import { FC, useState, ReactNode } from 'react';
+import React, { FC, useState, useCallback, ReactNode, useEffect } from 'react';
 import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 
 import BaseLayout from 'components/BaseLayout';
-import ListData, {
-  NoteResponse,
-  NoteFile,
-  NoteFolder,
-} from 'components/ListData/list';
+import ListData from 'components/ListData/list';
+import ContextMenu from 'components/ContextMenu';
 
 import Check from 'assets/icons/Check.svg';
 import SortToggleDown from 'assets/icons/SortToggleDown.svg';
@@ -19,6 +16,20 @@ import TrashCan from 'assets/icons/TrashCan.svg';
 interface Props {}
 
 const FolderPage: FC<Props> = () => {
+  const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
+  const [show, setShow] = useState<boolean>(false);
+  const [noteId, setNoteId] = useState<number>(0);
+
+  const handleContextMenu = useCallback(
+    (event: React.MouseEvent, noteId) => {
+      event.preventDefault();
+      setAnchorPoint({ x: event.pageX, y: event.pageY });
+      setShow(true);
+      setNoteId(noteId);
+    },
+    [setAnchorPoint, setShow]
+  );
+
   const notes: ReactNode = SampleData.map((data, index) => (
     <ListData
       key={`${data.itemType}.${
@@ -26,6 +37,7 @@ const FolderPage: FC<Props> = () => {
       }`}
       data={data}
       depth={0}
+      menu={handleContextMenu}
     />
   ));
 
@@ -49,6 +61,13 @@ const FolderPage: FC<Props> = () => {
             </Button>
           </ButtonWrapper>
         </Top>
+        {show && (
+          <ContextMenu
+            anchorPoint={anchorPoint}
+            setShow={setShow}
+            noteId={noteId}
+          />
+        )}
         <Box>
           <thead>
             <TableRow>
@@ -104,9 +123,9 @@ const SampleData = [
       file_id: 2,
       user_id: 3,
       folder_id: 1,
-      file_name: '지구과학 첫걸음',
-      created_at: '2021-08-03 13:16:41.0',
-      updated_at: '2021-08-03 13:16:41.0',
+      file_name: '지구과학 두걸음',
+      created_at: '2021-08-05 13:16:41.0',
+      updated_at: '2021-08-05 13:16:41.0',
     },
     noteFolder: null,
   },

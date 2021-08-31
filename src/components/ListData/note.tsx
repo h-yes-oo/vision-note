@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 
 import Note from 'assets/icons/Note.svg';
@@ -10,19 +10,31 @@ interface Props {
   date: string;
   starred: boolean;
   subject: string;
+  menu: any;
+  noteId: number;
 }
 
-const NoteData: FC<Props> = ({ title, depth, date, starred, subject }) => {
+const NoteData: FC<Props> = ({
+  title,
+  depth,
+  date,
+  starred,
+  subject,
+  menu,
+  noteId,
+}) => {
   return (
-    <DataRow>
-      <TitleData>
-        <TitleImage depth={depth} src={Note} />
-        <TitleName> {title} </TitleName>
-      </TitleData>
-      <StarData>{starred && <Image24 src={Star} />}</StarData>
-      <DateData>{date}</DateData>
-      <SubjectData>{subject}</SubjectData>
-    </DataRow>
+    <>
+      <DataRow onContextMenu={(e) => menu(e, noteId)}>
+        <TitleData>
+          <TitleImage depth={depth} src={Note} />
+          <TitleName> {title} </TitleName>
+        </TitleData>
+        <StarData>{starred && <Image24 src={Star} />}</StarData>
+        <DateData>{date}</DateData>
+        <SubjectData>{subject}</SubjectData>
+      </DataRow>
+    </>
   );
 };
 
