@@ -23,7 +23,6 @@ const FolderData: FC<Props> = ({ title, depth, opened }) => {
 
   const handleClick = () => {
     setOpen(!open);
-    console.log('clicked');
   };
 
   return (

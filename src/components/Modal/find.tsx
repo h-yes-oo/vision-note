@@ -2,6 +2,8 @@ import { FC } from 'react';
 import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 
+import LoginArrow from 'assets/icons/LoginArrow.svg';
+
 const Title = styled.div`
   font-family: Pretendard;
   font-size: 34px;
@@ -12,7 +14,14 @@ const Title = styled.div`
   letter-spacing: normal;
   text-align: left;
   color: #000;
-  margin-top: 121px;
+  margin-top: 281px;
+`;
+
+const Info = styled(Title)`
+  font-size: 18px;
+  font-weight: normal;
+  line-height: 1.22;
+  margin-top: 9px;
 `;
 
 const Form = styled.input`
@@ -50,6 +59,7 @@ const FindBtn = styled.button`
   border-radius: 5px;
   border: none;
   background-color: #7b68ee;
+
   font-family: Pretendard;
   font-size: 18px;
   font-weight: 500;
@@ -59,6 +69,7 @@ const FindBtn = styled.button`
   letter-spacing: normal;
   text-align: center;
   color: #fff;
+
   &:hover {
     cursor: pointer;
     background-color: #6a58d3;
@@ -71,7 +82,6 @@ const NotYet = styled.span`
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
-  line-height: 1.19;
   letter-spacing: normal;
   text-align: left;
   color: #000;
@@ -80,16 +90,16 @@ const NotYet = styled.span`
   user-select: none !important;
 `;
 
-const ToSignUp = styled.a`
+const PurpleAnchor = styled.a`
   font-family: Pretendard;
   font-size: 16px;
   font-weight: 500;
   font-stretch: normal;
   font-style: normal;
-  line-height: 1.19;
   letter-spacing: normal;
   text-align: left;
   color: #7b68ee;
+  display: flex;
   &:hover {
     cursor: pointer;
   }
@@ -99,22 +109,44 @@ const Flex = styled.div`
   display: flex;
 `;
 
+const FlexBetween = styled(Flex)`
+  justify-content: space-between;
+`;
+
+const Arrow = styled.img`
+  height: 18px;
+`;
+
 interface Props {
   toSignUp: any;
+  toLogin: any;
 }
 
-const Find: FC<Props & RouteComponentProps> = ({ toSignUp, history }) => {
+const Find: FC<Props & RouteComponentProps> = ({
+  toSignUp,
+  toLogin,
+  history,
+}) => {
   const goTo = () => history.push('/folder');
 
   return (
     <>
       <Title>비밀번호 찾기</Title>
+      <Info>가입하신 메일 주소로 임시 비밀번호를 보내드립니다.</Info>
       <Form placeholder="이메일 주소" type="email" />
       <FindBtn onClick={goTo}>비밀번호 찾기</FindBtn>
-      <Flex>
-        <NotYet>아직 회원이 아니신가요?</NotYet>
-        <ToSignUp onClick={toSignUp}>회원가입하기</ToSignUp>
-      </Flex>
+      <FlexBetween>
+        <Flex>
+          <NotYet>아직 회원이 아니신가요?</NotYet>
+          <PurpleAnchor onClick={toSignUp}>회원가입하기</PurpleAnchor>
+        </Flex>
+        <Flex>
+          <PurpleAnchor onClick={toLogin}>
+            로그인 하기
+            <Arrow src={LoginArrow} />
+          </PurpleAnchor>
+        </Flex>
+      </FlexBetween>
     </>
   );
 };

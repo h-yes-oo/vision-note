@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 
@@ -6,6 +6,9 @@ import Kakao from 'assets/icons/Kakao.svg';
 import Facebook from 'assets/icons/Facebook.svg';
 import Google from 'assets/icons/Google.svg';
 import Naver from 'assets/icons/Naver@3x.png';
+import SelectToggle from 'assets/icons/SelectToggle.svg';
+import CheckBoxOff from 'assets/icons/CheckBoxOff.svg';
+import CheckBoxOn from 'assets/icons/CheckBoxOn.svg';
 
 const Title = styled.div`
   font-family: Pretendard;
@@ -39,29 +42,47 @@ const Form = styled.input`
   line-height: 1.22;
   letter-spacing: normal;
   text-align: left;
+
   &::placeholder {
     color: #c5c5c5;
   }
 `;
 
-const Find = styled.a`
+const HalfForm = styled(Form)`
+  width: 200px;
+`;
+
+const SelectForm = styled.select`
+  width: 200px;
+  height: 61px;
+  box-sizing: border-box;
+  padding: 0 20px;
+  margin-top: 30px;
+  object-fit: contain;
+  border-radius: 5px;
+  border: solid 1px #e6e6e6;
+  background-color: #fff;
+
   font-family: Pretendard;
-  font-size: 16px;
-  font-weight: 500;
+  font-size: 18px;
+  font-weight: normal;
   font-stretch: normal;
   font-style: normal;
-  line-height: 1.19;
+  line-height: 1.22;
   letter-spacing: normal;
   text-align: left;
-  color: #656565;
 
-  margin: 30px 0 0;
+  background-image: url(${SelectToggle});
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+
+  appearance: none;
 `;
 
 const SignupButton = styled.button`
   width: 420px;
   height: 61px;
-  margin: 19px 0 31px;
+  margin: 19px 0 21px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -84,12 +105,22 @@ const SignupButton = styled.button`
   }
 `;
 
-const OrWrapper = styled.div`
+const Flex = styled.div`
   display: flex;
+`;
+
+const FlexBetween = styled(Flex)`
   justify-content: space-between;
+`;
+
+const FlexAlign = styled(Flex)`
+  align-items: center;
+`;
+
+const OrWrapper = styled(FlexBetween)`
   align-items: center;
   width: 420px;
-  margin: 0 0 29px;
+  margin: 31px 0 29px;
 `;
 
 const Line = styled.div`
@@ -111,15 +142,13 @@ const OR = styled.div`
   // margin: 0 18px;
 `;
 
-const SocialWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
+const SocialWrapper = styled(FlexBetween)`
   align-items: center;
   width: 420px;
   margin: 0 0 20px;
 `;
 
-const SocialBox = styled.div`
+const SocialBox = styled(FlexAlign)`
   width: 200px;
   height: 61px;
   box-sizing: border-box;
@@ -128,8 +157,7 @@ const SocialBox = styled.div`
   border-radius: 5px;
   border: solid 1px #e6e6e6;
   background-color: #fff;
-  display: flex;
-  align-items: center;
+
   font-family: Pretendard;
   font-size: 18px;
   font-weight: normal;
@@ -179,8 +207,46 @@ const ToLogin = styled.a`
   }
 `;
 
-const Flex = styled.div`
-  display: flex;
+const CheckBox = styled.input`
+  height: 20px;
+  width: 20px;
+  border: none;
+  appearance: none;
+  background: url(${CheckBoxOff}) no-repeat;
+  background-size: contain;
+
+  &:checked {
+    background: url(${CheckBoxOn}) no-repeat;
+    background-size: contain;
+  }
+`;
+
+const CheckText = styled.span`
+  font-family: Pretendard;
+  font-size: 14px;
+  font-weight: 600;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 2.29;
+  letter-spacing: -0.35px;
+  text-align: left;
+  color: #73768d;
+`;
+
+const CheckAnchor = styled.a`
+  font-family: Pretendard;
+  font-size: 14px;
+  font-weight: 600;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 2.29;
+  letter-spacing: -0.35px;
+  text-align: left;
+  color: #7b68ee;
+  margin-left: 8px;
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 interface Props {
@@ -188,16 +254,84 @@ interface Props {
 }
 
 const SignUp: FC<Props & RouteComponentProps> = ({ toLogin, history }) => {
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [confirm, setConfirm] = useState<string>('');
+  const [type, setType] = useState<string>('');
+  const [nickname, setNickname] = useState<string>('');
+  const [privacy, setPrivacy] = useState<boolean>(false);
+  const [agreement, setAgreement] = useState<boolean>(false);
+
   const goTo = () => history.push('/folder');
+  const onChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+  };
+  const onChangePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+  };
+  const onChangeConfirm = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setConfirm(e.target.value);
+  };
+  const onChangeNickname = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNickname(e.target.value);
+  };
 
   return (
     <>
       <Title>회원가입</Title>
-      <Form placeholder="이메일 주소" type="email" />
-      <Form placeholder="비밀번호" type="password" />
-      <Form placeholder="비밀번호 확인" type="password" />
-      <Form placeholder="닉네임" type="password" />
+      <Form
+        placeholder="이메일 주소"
+        type="email"
+        value={email}
+        onChange={onChangeEmail}
+      />
+      <Form
+        placeholder="비밀번호"
+        type="password"
+        value={password}
+        onChange={onChangePassword}
+      />
+      <Form
+        placeholder="비밀번호 확인"
+        type="password"
+        value={confirm}
+        onChange={onChangeConfirm}
+      />
+      <FlexBetween>
+        <HalfForm
+          placeholder="닉네임"
+          type="text"
+          value={nickname}
+          onChange={onChangeNickname}
+        />
+        <SelectForm onChange={(e) => setType(e.target.value)}>
+          <option value="default" disabled style={{ color: '#c5c5c5' }}>
+            학생 구분
+          </option>
+          <option value="college">대학생</option>
+          <option value="student">초/중/고</option>
+        </SelectForm>
+      </FlexBetween>
+
       <SignupButton onClick={goTo}>가입하기</SignupButton>
+      <FlexAlign>
+        <CheckBox
+          type="checkbox"
+          checked={privacy}
+          onChange={() => setPrivacy(!privacy)}
+        />
+        <CheckAnchor>개인정보 처리방침</CheckAnchor>
+        <CheckText>에 동의합니다.</CheckText>
+      </FlexAlign>
+      <FlexAlign>
+        <CheckBox
+          type="checkbox"
+          checked={agreement}
+          onChange={() => setAgreement(!agreement)}
+        />
+        <CheckAnchor>서비스 이용약관</CheckAnchor>
+        <CheckText>에 동의합니다.</CheckText>
+      </FlexAlign>
       <OrWrapper>
         <Line />
         <OR>또는</OR>

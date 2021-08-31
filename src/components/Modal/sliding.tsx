@@ -34,7 +34,6 @@ const ModalOverlay = styled.div<{ visible: boolean }>`
 `;
 
 const Root = styled.div<{ visible: boolean }>`
-  width: 500px;
   height: 1080px;
   padding: 40px 40px 230px;
   background-color: #fff;
@@ -100,7 +99,8 @@ const SlidingModal: FC<ModalProps> = ({ onClose, visible, type }) => {
     if (type === T.ModalType.Login)
       return <Login toFind={toFind} toSignUp={toSignUp} />;
     if (type === T.ModalType.SignUp) return <SignUp toLogin={toLogin} />;
-    if (type === T.ModalType.Find) return <Find toSignUp={toSignUp} />;
+    if (type === T.ModalType.Find)
+      return <Find toSignUp={toSignUp} toLogin={toLogin} />;
     return null;
   };
 
