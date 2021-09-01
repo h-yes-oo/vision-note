@@ -65,6 +65,9 @@ const FAQTitle = styled.div`
 const ToggleBtn = styled.img`
   width: 45px;
   height: 45px;
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 const FAQContent = styled.div<{ visible: boolean }>`

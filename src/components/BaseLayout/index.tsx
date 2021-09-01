@@ -2,13 +2,63 @@ import { FC, ReactNode, useState } from 'react';
 import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 
-import SampleLogo from 'assets/icons/SampleLogo12.png';
+import SampleLogo from 'assets/icons/SampleLogo14.png';
 import SearchIcon from 'assets/icons/SearchIcon.svg';
 import ProfileImage from 'assets/images/SampleProfile.svg';
 import ProfileToggleDown from 'assets/icons/ProfileToggleDown.svg';
 import ProfileToggleUp from 'assets/icons/ProfileToggleUp.svg';
 
 import UserMenu from 'components/UserMenu';
+
+interface Props {
+  children: ReactNode;
+  grey: boolean;
+}
+
+const BaseLayout: FC<Props & RouteComponentProps> = ({
+  children,
+  grey,
+  history,
+}) => {
+  const [showUserMenu, setShowUserMenu] = useState<boolean>(false);
+
+  const handleMouseEnter = () => setShowUserMenu(true);
+  const handleMouseLeave = () => setShowUserMenu(false);
+
+  return (
+    <Root grey={grey}>
+      <Header>
+        <HeaderInside>
+          <Logo src={SampleLogo} onClick={() => history.push('/')} />
+          <FlexDiv>
+            <SearchWrapper>
+              <SearchBox placeholder="노트에서 검색하기" />
+              <SearchBtn src={SearchIcon} />
+            </SearchWrapper>
+            <StartBtn onClick={() => history.push('/notes')}>
+              {' '}
+              학습 시작하기{' '}
+            </StartBtn>
+          </FlexDiv>
+          <UserDiv
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
+            <ProfileImg src={ProfileImage} />
+            <ProfileName>혜수님</ProfileName>
+            <Relative>
+              <ProfileToggle
+                src={showUserMenu ? ProfileToggleUp : ProfileToggleDown}
+              />
+              <UserMenu show={showUserMenu} setShow={setShowUserMenu} />
+            </Relative>
+          </UserDiv>
+        </HeaderInside>
+      </Header>
+      {children}
+    </Root>
+  );
+};
 
 const Root = styled.div<{ grey: boolean }>`
   height: 100vh;
@@ -41,8 +91,11 @@ const HeaderInside = styled.div`
 
 const Logo = styled.img`
   width: 240px;
-  height: 50px;
+  height: 60px;
   object-fit: contain;
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 const SearchWrapper = styled.div`
@@ -53,13 +106,17 @@ const SearchWrapper = styled.div`
 `;
 
 const SearchBox = styled.input`
+  display: flex;
+  justify-content: flex-end;
   width: 330px;
   height: 50px;
   padding: 13px 37px 13px 20px;
+  box-sizing: border-box;
   object-fit: contain;
   border-radius: 5px;
   border: solid 1px #e6e6e6;
   background-color: #fff;
+
   font-family: Pretendard;
   font-size: 18px;
   font-weight: normal;
@@ -68,10 +125,10 @@ const SearchBox = styled.input`
   line-height: 1.22;
   letter-spacing: normal;
   text-align: left;
-  color: #c5c5c5;
-  box-sizing: border-box;
-  display: flex;
-  justify-content: flex-end;
+
+  &:placeholder {
+    color: #c5c5c5;
+  }
 `;
 
 const SearchBtn = styled.img`
@@ -80,6 +137,9 @@ const SearchBtn = styled.img`
   object-fit: contain;
   position: absolute;
   right: 14px;
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 const StartBtn = styled.a`
@@ -143,55 +203,5 @@ const Relative = styled.div`
   display: flex;
   align-items: center;
 `;
-
-interface Props {
-  children: ReactNode;
-  grey: boolean;
-}
-
-const BaseLayout: FC<Props & RouteComponentProps> = ({
-  children,
-  grey,
-  history,
-}) => {
-  const [showUserMenu, setShowUserMenu] = useState<boolean>(false);
-
-  const handleMouseEnter = () => setShowUserMenu(true);
-  const handleMouseLeave = () => setShowUserMenu(false);
-
-  return (
-    <Root grey={grey}>
-      <Header>
-        <HeaderInside>
-          <Logo src={SampleLogo} onClick={() => history.push('/')} />
-          <FlexDiv>
-            <SearchWrapper>
-              <SearchBox placeholder="노트에서 검색하기" />
-              <SearchBtn src={SearchIcon} />
-            </SearchWrapper>
-            <StartBtn onClick={() => history.push('/notes')}>
-              {' '}
-              학습 시작하기{' '}
-            </StartBtn>
-          </FlexDiv>
-          <UserDiv
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-          >
-            <ProfileImg src={ProfileImage} />
-            <ProfileName>혜수님</ProfileName>
-            <Relative>
-              <ProfileToggle
-                src={showUserMenu ? ProfileToggleUp : ProfileToggleDown}
-              />
-              <UserMenu show={showUserMenu} />
-            </Relative>
-          </UserDiv>
-        </HeaderInside>
-      </Header>
-      {children}
-    </Root>
-  );
-};
 
 export default withRouter(BaseLayout);

@@ -5,11 +5,20 @@ import DarkMode from 'assets/icons/DarkMode.svg';
 import Logout from 'assets/icons/Logout.svg';
 import UserEdit from 'assets/icons/UserEdit.svg';
 
+import UserModal from 'components/Modal/popup';
+
 interface Props {
   show: boolean;
+  setShow: any;
 }
 
-const UserMenu: FC<Props> = ({ show }) => {
+const UserMenu: FC<Props> = ({ show, setShow }) => {
+  const [userModal, setUserModal] = useState<boolean>(false);
+
+  const closeModal = () => {
+    setUserModal(false);
+  };
+
   const darkmode = () => {
     console.log('darkmode');
   };
@@ -19,23 +28,34 @@ const UserMenu: FC<Props> = ({ show }) => {
   };
 
   const userEdit = () => {
-    console.log('userEdit');
+    setUserModal(true);
+    setShow(false);
+  };
+
+  const User = {
+    email: 'hyesoo5115@naver.com',
+    nickname: '혜수',
+    type: '대학생',
+    storage: 6,
   };
 
   return (
-    <Menu show={show}>
-      <MenuList onClick={darkmode}>
-        <ContextImage src={DarkMode} />
-        다크모드
-      </MenuList>
-      <MenuList onClick={logout}>
-        <ContextImage src={Logout} />
-        로그아웃
-      </MenuList>
-      <MenuList onClick={userEdit}>
-        <ContextImage src={UserEdit} />내 정보 수정
-      </MenuList>
-    </Menu>
+    <>
+      <UserModal onClose={closeModal} visible={userModal} user={User} />
+      <Menu show={show}>
+        <MenuList onClick={darkmode}>
+          <ContextImage src={DarkMode} />
+          다크모드
+        </MenuList>
+        <MenuList onClick={logout}>
+          <ContextImage src={Logout} />
+          로그아웃
+        </MenuList>
+        <MenuList onClick={userEdit}>
+          <ContextImage src={UserEdit} />내 정보 수정
+        </MenuList>
+      </Menu>
+    </>
   );
 };
 

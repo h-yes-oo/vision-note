@@ -5,7 +5,7 @@ import * as T from 'types';
 
 import SlidingModal from 'components/Modal/sliding';
 
-import SampleLogo from 'assets/icons/SampleLogo12.png';
+import SampleLogo from 'assets/icons/SampleLogo14.png';
 import MainImage1 from 'assets/images/MainImage1.svg';
 import Illust1 from 'assets/images/Illust1@3x.png';
 import Illust2 from 'assets/images/Illust2@3x.png';
@@ -425,7 +425,7 @@ const FooterBtn = styled.a`
 `;
 
 const Logo = styled.img`
-  height: 50px;
+  height: 60px;
 `;
 
 export default MainPage;
