@@ -197,7 +197,13 @@ const ButtonWrapper = styled.div`
   align-items: center;
 `;
 
-const Button = styled.div`
+const HoverAnchor = styled.a`
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
+const Button = styled(HoverAnchor)`
   display: flex;
   align-items: center;
   margin-left: 40px;
@@ -307,7 +313,7 @@ const BoxWrapper = styled.div`
   justify-content: space-between;
 `;
 
-const SmallBox = styled.div`
+const SmallBox = styled(HoverAnchor)`
   width: 310px;
   height: 70px;
   object-fit: contain;

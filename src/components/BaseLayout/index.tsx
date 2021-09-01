@@ -1,4 +1,4 @@
-import { FC, ReactNode } from 'react';
+import { FC, ReactNode, useState } from 'react';
 import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 
@@ -7,6 +7,8 @@ import SearchIcon from 'assets/icons/SearchIcon.svg';
 import ProfileImage from 'assets/images/SampleProfile.svg';
 import ProfileToggleDown from 'assets/icons/ProfileToggleDown.svg';
 import ProfileToggleUp from 'assets/icons/ProfileToggleUp.svg';
+
+import UserMenu from 'components/UserMenu';
 
 const Root = styled.div<{ grey: boolean }>`
   height: 100vh;
@@ -107,6 +109,10 @@ const FlexDiv = styled.div`
   align-items: center;
 `;
 
+const UserDiv = styled(FlexDiv)`
+  padding: 4px 0;
+`;
+
 const ProfileImg = styled.img`
   width: 50px;
   height: 50px;
@@ -131,8 +137,11 @@ const ProfileToggle = styled.img`
   margin-left: 10px;
 `;
 
-const Contents = styled.div`
-  width: 1000px;
+const Relative = styled.div`
+  position: relative;
+  height: 50px;
+  display: flex;
+  align-items: center;
 `;
 
 interface Props {
@@ -145,6 +154,11 @@ const BaseLayout: FC<Props & RouteComponentProps> = ({
   grey,
   history,
 }) => {
+  const [showUserMenu, setShowUserMenu] = useState<boolean>(false);
+
+  const handleMouseEnter = () => setShowUserMenu(true);
+  const handleMouseLeave = () => setShowUserMenu(false);
+
   return (
     <Root grey={grey}>
       <Header>
@@ -160,11 +174,19 @@ const BaseLayout: FC<Props & RouteComponentProps> = ({
               학습 시작하기{' '}
             </StartBtn>
           </FlexDiv>
-          <FlexDiv>
+          <UserDiv
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
             <ProfileImg src={ProfileImage} />
             <ProfileName>혜수님</ProfileName>
-            <ProfileToggle src={ProfileToggleDown} />
-          </FlexDiv>
+            <Relative>
+              <ProfileToggle
+                src={showUserMenu ? ProfileToggleUp : ProfileToggleDown}
+              />
+              <UserMenu show={showUserMenu} />
+            </Relative>
+          </UserDiv>
         </HeaderInside>
       </Header>
       {children}
