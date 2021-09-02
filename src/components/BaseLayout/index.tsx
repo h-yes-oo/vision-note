@@ -9,6 +9,8 @@ import ProfileToggleDown from 'assets/icons/ProfileToggleDown.svg';
 import ProfileToggleUp from 'assets/icons/ProfileToggleUp.svg';
 
 import UserMenu from 'components/UserMenu';
+import PopupModal from 'components/PopupModal';
+import SearchModal from 'components/PopupModal/search';
 
 interface Props {
   children: ReactNode;
@@ -21,19 +23,40 @@ const BaseLayout: FC<Props & RouteComponentProps> = ({
   history,
 }) => {
   const [showUserMenu, setShowUserMenu] = useState<boolean>(false);
+  const [showSearch, setShowSearch] = useState<boolean>(false);
+  const [searchKeyword, setSearchKeyword] = useState<string>('');
+
+  const search = () => {
+    setShowSearch(true);
+    console.log(searchKeyword);
+  };
+
+  const closeModal = () => {
+    setShowSearch(false);
+  };
 
   const handleMouseEnter = () => setShowUserMenu(true);
   const handleMouseLeave = () => setShowUserMenu(false);
 
   return (
     <Root grey={grey}>
+      <PopupModal onClose={closeModal} visible={showSearch}>
+        <SearchModal searchKeyword={searchKeyword} />
+      </PopupModal>
       <Header>
         <HeaderInside>
           <Logo src={SampleLogo} onClick={() => history.push('/')} />
           <FlexDiv>
             <SearchWrapper>
-              <SearchBox placeholder="노트에서 검색하기" />
-              <SearchBtn src={SearchIcon} />
+              <SearchBox
+                value={searchKeyword}
+                placeholder="노트에서 검색하기"
+                onChange={(e) => setSearchKeyword(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') search();
+                }}
+              />
+              <SearchBtn src={SearchIcon} onClick={search} />
             </SearchWrapper>
             <StartBtn onClick={() => history.push('/notes')}>
               {' '}

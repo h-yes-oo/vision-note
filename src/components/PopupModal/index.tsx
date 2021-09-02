@@ -29,10 +29,8 @@ const PopupModal: FC<ModalProps> = ({ onClose, visible, children }) => {
 const Root = styled.div<{ visible: boolean }>`
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   width: 1000px;
   height: 745px;
-  padding: 80px;
   box-sizing: border-box;
   border-radius: 20px;
   object-fit: contain;

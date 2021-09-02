@@ -1,4 +1,4 @@
-import React, { FC, ReactNode, useState, useEffect, ReactElement } from 'react';
+import React, { FC, useState } from 'react';
 import styled from 'styled-components';
 
 import Edit from 'assets/icons/Edit.svg';
@@ -74,13 +74,13 @@ const UserModal: FC<Props> = ({ onClose }) => {
           </FlexCenter>
         </Wrapper>
       </Top>
-      <FlexBetween>
+      <Bottom>
         <SignOut>회원 탈퇴</SignOut>
         <Flex>
           <WhiteButton onClick={onClose}>나가기</WhiteButton>
           <PurpleButton>저장하기</PurpleButton>
         </Flex>
-      </FlexBetween>
+      </Bottom>
     </>
   );
 };
@@ -98,14 +98,16 @@ const FlexColumn = styled(Flex)`
   flex-direction: column;
 `;
 
-const FlexBetween = styled(Flex)`
+const Bottom = styled(Flex)`
   align-items: center;
   justify-content: space-between;
+  padding: 99px 80px 0;
 `;
 
 const Top = styled(Flex)`
   align-items: flex-start;
   justify-content: space-between;
+  padding: 80px 80px 0;
 `;
 
 const Wrapper = styled(FlexColumn)`
