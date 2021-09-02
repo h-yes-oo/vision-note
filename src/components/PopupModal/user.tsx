@@ -8,9 +8,10 @@ import ProfileChange from 'assets/icons/ProfileChange.svg';
 
 interface Props {
   onClose?: any;
+  showAlert: any;
 }
 
-const UserModal: FC<Props> = ({ onClose }) => {
+const UserModal: FC<Props> = ({ onClose, showAlert }) => {
   const user = {
     email: 'hyesoo5115@naver.com',
     nickname: '혜수',
@@ -75,7 +76,7 @@ const UserModal: FC<Props> = ({ onClose }) => {
         </Wrapper>
       </Top>
       <Bottom>
-        <SignOut>회원 탈퇴</SignOut>
+        <SignOut onClick={showAlert}>회원 탈퇴</SignOut>
         <Flex>
           <WhiteButton onClick={onClose}>나가기</WhiteButton>
           <PurpleButton>저장하기</PurpleButton>

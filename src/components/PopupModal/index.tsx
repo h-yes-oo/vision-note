@@ -18,7 +18,7 @@ const PopupModal: FC<ModalProps> = ({ onClose, visible, children }) => {
     <>
       <ModalOverlay visible={visible} />
       <ModalWrapper onClick={onMaskClick} tabIndex={-1} visible={visible}>
-        <Root visible={visible === undefined ? false : visible}>
+        <Root visible={visible}>
           {React.cloneElement(children, { onClose, visible })}
         </Root>
       </ModalWrapper>

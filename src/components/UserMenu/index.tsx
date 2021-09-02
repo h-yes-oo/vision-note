@@ -1,5 +1,6 @@
 import { FC, useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
+import { withRouter, RouteComponentProps } from 'react-router-dom';
 
 import DarkMode from 'assets/icons/DarkMode.svg';
 import Logout from 'assets/icons/Logout.svg';
@@ -7,14 +8,31 @@ import UserEdit from 'assets/icons/UserEdit.svg';
 
 import PopupModal from 'components/PopupModal';
 import UserModal from 'components/PopupModal/user';
+import Alert from 'components/Alert';
 
 interface Props {
   show: boolean;
   setShow: any;
 }
 
-const UserMenu: FC<Props> = ({ show, setShow }) => {
+const UserMenu: FC<Props & RouteComponentProps> = ({
+  show,
+  setShow,
+  history,
+}) => {
   const [userModal, setUserModal] = useState<boolean>(false);
+  const [showAlert, setShowAlert] = useState<boolean>(false);
+
+  const confirmSignOut = () => {
+    // TODO : 탈퇴 구현
+    console.log('탈퇴');
+    setShowAlert(false);
+    history.push('/');
+  };
+
+  const cancleSignOut = () => {
+    setShowAlert(false);
+  };
 
   const closeModal = () => {
     setUserModal(false);
@@ -26,6 +44,7 @@ const UserMenu: FC<Props> = ({ show, setShow }) => {
 
   const logout = () => {
     console.log('logout');
+    history.push('/');
   };
 
   const userEdit = () => {
@@ -35,8 +54,14 @@ const UserMenu: FC<Props> = ({ show, setShow }) => {
 
   return (
     <>
+      <Alert
+        cancle={cancleSignOut}
+        confirm={confirmSignOut}
+        visible={showAlert}
+        message={`탈퇴하시면 그동안 작성하신 학습 노트가 모두 사라집니다.\n 계속하시겠습니까?`}
+      />
       <PopupModal onClose={closeModal} visible={userModal}>
-        <UserModal />
+        <UserModal showAlert={() => setShowAlert(true)} />
       </PopupModal>
       <Menu show={show}>
         <MenuList onClick={darkmode}>
@@ -105,4 +130,4 @@ const ContextImage = styled.img`
   margin: 0 10px 0 20px;
 `;
 
-export default UserMenu;
+export default withRouter(UserMenu);
