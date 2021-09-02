@@ -2,7 +2,7 @@ import { FC, ReactNode, useState } from 'react';
 import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 
-import SampleLogo from 'assets/icons/SampleLogo14.png';
+import SampleLogo from 'assets/icons/SampleLogo15.png';
 import SearchIcon from 'assets/icons/SearchIcon.svg';
 import ProfileImage from 'assets/images/SampleProfile.svg';
 import ProfileToggleDown from 'assets/icons/ProfileToggleDown.svg';
@@ -91,7 +91,7 @@ const HeaderInside = styled.div`
 
 const Logo = styled.img`
   width: 240px;
-  height: 60px;
+  height: 90px;
   object-fit: contain;
   &:hover {
     cursor: pointer;

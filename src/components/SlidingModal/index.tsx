@@ -3,9 +3,9 @@ import styled from 'styled-components';
 import * as T from 'types';
 
 import Close from 'assets/icons/Close.svg';
-import Login from 'components/Modal/login';
-import SignUp from 'components/Modal/signup';
-import Find from 'components/Modal/find';
+import Login from 'components/SlidingModal/login';
+import SignUp from 'components/SlidingModal/signup';
+import Find from 'components/SlidingModal/find';
 
 const ModalWrapper = styled.div<{ visible: boolean }>`
   box-sizing: border-box;

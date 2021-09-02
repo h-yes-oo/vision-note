@@ -3,9 +3,9 @@ import styled from 'styled-components';
 import { RouteComponentProps } from 'react-router-dom';
 import * as T from 'types';
 
-import SlidingModal from 'components/Modal/sliding';
+import SlidingModal from 'components/SlidingModal';
 
-import SampleLogo from 'assets/icons/SampleLogo14.png';
+import SampleLogo from 'assets/icons/SampleLogo15.png';
 import MainImage1 from 'assets/images/MainImage1.svg';
 import Illust1 from 'assets/images/Illust1@3x.png';
 import Illust2 from 'assets/images/Illust2@3x.png';
@@ -425,7 +425,7 @@ const FooterBtn = styled.a`
 `;
 
 const Logo = styled.img`
-  height: 60px;
+  height: 90px;
 `;
 
 export default MainPage;

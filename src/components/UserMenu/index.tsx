@@ -5,7 +5,8 @@ import DarkMode from 'assets/icons/DarkMode.svg';
 import Logout from 'assets/icons/Logout.svg';
 import UserEdit from 'assets/icons/UserEdit.svg';
 
-import UserModal from 'components/Modal/popup';
+import PopupModal from 'components/PopupModal';
+import UserModal from 'components/PopupModal/user';
 
 interface Props {
   show: boolean;
@@ -32,16 +33,11 @@ const UserMenu: FC<Props> = ({ show, setShow }) => {
     setShow(false);
   };
 
-  const User = {
-    email: 'hyesoo5115@naver.com',
-    nickname: '혜수',
-    type: '대학생',
-    storage: 6,
-  };
-
   return (
     <>
-      <UserModal onClose={closeModal} visible={userModal} user={User} />
+      <PopupModal onClose={closeModal} visible={userModal}>
+        <UserModal />
+      </PopupModal>
       <Menu show={show}>
         <MenuList onClick={darkmode}>
           <ContextImage src={DarkMode} />

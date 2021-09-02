@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect } from 'react';
+import React, { FC, ReactNode, useState, useEffect, ReactElement } from 'react';
 import styled from 'styled-components';
 
 import Edit from 'assets/icons/Edit.svg';
@@ -6,21 +6,20 @@ import EditType from 'assets/icons/EditType.svg';
 import SampleProfile from 'assets/images/SampleProfile.svg';
 import ProfileChange from 'assets/icons/ProfileChange.svg';
 
-interface ModalProps {
-  onClose: any;
-  visible: boolean;
-  user: any;
+interface Props {
+  onClose?: any;
 }
 
-const UserModal: FC<ModalProps> = ({ onClose, visible, user }) => {
+const UserModal: FC<Props> = ({ onClose }) => {
+  const user = {
+    email: 'hyesoo5115@naver.com',
+    nickname: '혜수',
+    type: '대학생',
+    storage: 6,
+  };
+
   const [editNickname, setEditNickname] = useState<boolean>(false);
   const [nickname, setNickname] = useState<string>(user.nickname);
-
-  const onMaskClick: React.MouseEventHandler<HTMLDivElement> = (e) => {
-    if (e.target === e.currentTarget) {
-      onClose(e);
-    }
-  };
 
   const handleEditNickname = (e: React.MouseEvent) => {
     if (editNickname) {
@@ -34,59 +33,54 @@ const UserModal: FC<ModalProps> = ({ onClose, visible, user }) => {
 
   return (
     <>
-      <ModalOverlay visible={visible} />
-      <ModalWrapper onClick={onMaskClick} tabIndex={-1} visible={visible}>
-        <Root visible={visible}>
-          <Top>
-            <div style={{ position: 'relative' }}>
-              <ProfileImage src={SampleProfile} />
-              <ChangeProfile />
-            </div>
-            <Wrapper>
-              <FlexCenter>
-                <Title>이메일</Title>
-                <Content disabled type="email" placeholder={user.email} />
-              </FlexCenter>
-              <FlexCenter>
-                <Title>닉네임</Title>
-                <Content
-                  disabled={!editNickname}
-                  type="text"
-                  value={nickname}
-                  onChange={(e) => setNickname(e.target.value)}
-                />
-                <EditButton src={Edit} onClick={handleEditNickname} />
-              </FlexCenter>
-              <FlexCenter>
-                <Title>학생 구분</Title>
-                <Content disabled type="text" placeholder={user.type} />
-                <EditButton src={EditType} />
-              </FlexCenter>
-              <FlexCenter>
-                <Title>비밀번호 변경</Title>
-                <Content disabled type="password" placeholder="**********" />
-                <EditButton src={Edit} />
-              </FlexCenter>
-              <FlexCenter>
-                <Title>저장용량</Title>
-                <FlexColumn>
-                  <StatusBar>
-                    <CurrentStatus current={user.storage / 15} />
-                  </StatusBar>
-                  <StorageInfo>{`15GB 중 ${user.storage}GB 사용`}</StorageInfo>
-                </FlexColumn>
-              </FlexCenter>
-            </Wrapper>
-          </Top>
-          <FlexBetween>
-            <SignOut>회원 탈퇴</SignOut>
-            <Flex>
-              <WhiteButton onClick={onClose}>나가기</WhiteButton>
-              <PurpleButton>저장하기</PurpleButton>
-            </Flex>
-          </FlexBetween>
-        </Root>
-      </ModalWrapper>
+      <Top>
+        <div style={{ position: 'relative' }}>
+          <ProfileImage src={SampleProfile} />
+          <ChangeProfile />
+        </div>
+        <Wrapper>
+          <FlexCenter>
+            <Title>이메일</Title>
+            <Content disabled type="email" placeholder={user.email} />
+          </FlexCenter>
+          <FlexCenter>
+            <Title>닉네임</Title>
+            <Content
+              disabled={!editNickname}
+              type="text"
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
+            />
+            <EditButton src={Edit} onClick={handleEditNickname} />
+          </FlexCenter>
+          <FlexCenter>
+            <Title>학생 구분</Title>
+            <Content disabled type="text" placeholder={user.type} />
+            <EditButton src={EditType} />
+          </FlexCenter>
+          <FlexCenter>
+            <Title>비밀번호 변경</Title>
+            <Content disabled type="password" placeholder="**********" />
+            <EditButton src={Edit} />
+          </FlexCenter>
+          <FlexCenter>
+            <Title>저장용량</Title>
+            <FlexColumn>
+              <StatusBar>
+                <CurrentStatus current={user.storage / 15} />
+              </StatusBar>
+              <StorageInfo>{`15GB 중 ${user.storage}GB 사용`}</StorageInfo>
+            </FlexColumn>
+          </FlexCenter>
+        </Wrapper>
+      </Top>
+      <FlexBetween>
+        <SignOut>회원 탈퇴</SignOut>
+        <Flex>
+          <WhiteButton onClick={onClose}>나가기</WhiteButton>
+          <PurpleButton>저장하기</PurpleButton>
+        </Flex>
+      </FlexBetween>
     </>
   );
 };
@@ -228,54 +222,6 @@ const ChangeProfile = styled.a`
   bottom: 0;
   &:hover {
     cursor: pointer;
-  }
-`;
-
-const ModalWrapper = styled.div<{ visible: boolean }>`
-  box-sizing: border-box;
-  display: block;
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: ${(props) => (props.visible ? '1000' : '-1')};
-  ${(props) => (props.visible ? '' : 'transition: all 0.5s;')};
-  overflow: auto;
-  outline: 0;
-`;
-
-const ModalOverlay = styled.div<{ visible: boolean }>`
-  box-sizing: border-box;
-  display: ${(props) => (props.visible ? 'block' : 'none')};
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  background: #000000;
-  opacity: 0.16;
-  z-index: 999;
-`;
-
-const Root = styled(FlexColumn)<{ visible: boolean }>`
-  justify-content: space-between;
-  width: 1000px;
-  height: 745px;
-  padding: 80px;
-  box-sizing: border-box;
-  border-radius: 20px;
-  object-fit: contain;
-  box-shadow: 0 3px 16px 0 rgba(0, 0, 0, 0.16);
-  background-color: #fff;
-  opacity: ${(props) => (props.visible ? '1' : '0')};
-
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  > * {
-    user-select: none !important;
   }
 `;
 
