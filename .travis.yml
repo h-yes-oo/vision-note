@@ -20,6 +20,30 @@ before_deploy:
   - mkdir -p deploy
   - mv visionnote.zip deploy/visionnote.zip
 
+deploy:
+  - provider: s3
+    bucket: visionnote
+    region: ap-northeast-2
+    local_dir: deploy
+    skip_cleanup: true
+    wait_until_deployed: true
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_SECRET_ACCESS_KEY
+    on:
+      branch: master
+  - provider: codedeploy
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_SECRET_ACCESS_KEY
+    bucket: visionnote
+    key: visionnote.zip
+    bundle_key: zip
+    application: Lightsail-codedeploy-app
+    deployment_grout: Lightsail-codedeploy-group
+    region: ap-northeast-2
+    wait_until_deployed: true
+    on:
+      branch: master
+
 notifications:
   email:
     recipients:
