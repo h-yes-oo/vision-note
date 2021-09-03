@@ -20,7 +20,6 @@ const Title = styled.div`
   letter-spacing: normal;
   text-align: left;
   color: #000;
-  margin-top: 121px;
 `;
 
 const Form = styled.input`
@@ -249,6 +248,13 @@ const CheckAnchor = styled.a`
   }
 `;
 
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+`;
+
 interface Props {
   toLogin: any;
 }
@@ -277,7 +283,7 @@ const SignUp: FC<Props & RouteComponentProps> = ({ toLogin, history }) => {
   };
 
   return (
-    <>
+    <Wrapper>
       <Title>회원가입</Title>
       <Form
         placeholder="이메일 주소"
@@ -361,7 +367,7 @@ const SignUp: FC<Props & RouteComponentProps> = ({ toLogin, history }) => {
         <NotYet>이미 계정이 있으신가요?</NotYet>
         <ToLogin onClick={toLogin}>로그인 하기</ToLogin>
       </Flex>
-    </>
+    </Wrapper>
   );
 };
 

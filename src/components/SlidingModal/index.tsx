@@ -34,8 +34,9 @@ const ModalOverlay = styled.div<{ visible: boolean }>`
 `;
 
 const Root = styled.div<{ visible: boolean }>`
-  height: 1080px;
-  padding: 40px 40px 230px;
+  height: 100vh;
+  box-sizing: border-box;
+  padding: 40px;
   background-color: #fff;
   position: fixed;
   transition: all 0.5s;
