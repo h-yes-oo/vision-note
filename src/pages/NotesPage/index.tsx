@@ -212,7 +212,7 @@ const NotesPage: FC<Props> = () => {
     if (html !== '') setTitle(html);
   };
 
-  async function onStart() {
+  const onStart = async () => {
     try {
       // 공유 시작
       const mediaDevices = navigator.mediaDevices as any;
@@ -246,7 +246,7 @@ const NotesPage: FC<Props> = () => {
     } catch (err) {
       console.error(`Error: ${err}`);
     }
-  }
+  };
 
   function uploadToServer(dataArray: [Blob]) {
     const blob = new Blob(dataArray, { type: dataArray[0].type });

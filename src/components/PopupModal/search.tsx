@@ -6,11 +6,10 @@ import Search from 'assets/icons/SearchIcon.svg';
 import ToggleDown from 'assets/icons/ToggleDown.svg';
 
 interface Props {
-  onClose?: any;
   searchKeyword: string;
 }
 
-const SearchModal: FC<Props> = ({ onClose, searchKeyword }) => {
+const SearchModal: FC<Props> = ({ searchKeyword }) => {
   const [keyword, setKeyword] = useState<string>(searchKeyword);
 
   useEffect(() => {

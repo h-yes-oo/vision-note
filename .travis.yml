@@ -1,0 +1,26 @@
+sudo: required
+
+language: generic
+
+services:
+  - docker
+
+before_install:
+  - echo "start creating an image with dockerfile"
+  - docker build -t hyesoo/visionnote -f Dockerfile .
+
+script:
+  - docker run -e CI-true hyesoo/docker-react-app npm run test -- --coverage
+
+after_success:
+  - echo "Test success!!"
+
+before_deploy:
+  - zip -r visionnote .
+  - mkdir -p deploy
+  - mv visionnote.zip deploy/visionnote.zip
+
+notifications:
+  email:
+    recipients:
+      - hyesoo5115@snu.ac.kr

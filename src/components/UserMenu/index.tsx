@@ -61,7 +61,7 @@ const UserMenu: FC<Props & RouteComponentProps> = ({
         message={`탈퇴하시면 그동안 작성하신 학습 노트가 모두 사라집니다.\n 계속하시겠습니까?`}
       />
       <PopupModal onClose={closeModal} visible={userModal}>
-        <UserModal showAlert={() => setShowAlert(true)} />
+        <UserModal onClose={closeModal} showAlert={() => setShowAlert(true)} />
       </PopupModal>
       <Menu show={show}>
         <MenuList onClick={darkmode}>

@@ -7,7 +7,7 @@ import SampleProfile from 'assets/images/SampleProfile.svg';
 import ProfileChange from 'assets/icons/ProfileChange.svg';
 
 interface Props {
-  onClose?: any;
+  onClose: any;
   showAlert: any;
 }
 
