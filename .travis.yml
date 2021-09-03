@@ -38,7 +38,7 @@ deploy:
     key: visionnote.zip
     bundle_key: zip
     application: Lightsail-codedeploy-app
-    deployment_grout: Lightsail-codedeploy-group
+    deployment_group: Lightsail-codedeploy-group
     region: ap-northeast-2
     wait_until_deployed: true
     on:
