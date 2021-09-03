@@ -311,6 +311,7 @@ const SubjectHeader = styled(TableHeader)`
 const BoxWrapper = styled.div`
   display: flex;
   justify-content: space-between;
+  margin-bottom: 41px;
 `;
 
 const SmallBox = styled(HoverAnchor)`
