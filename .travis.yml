@@ -10,7 +10,7 @@ before_install:
   - docker build -t hyesoo/visionnote -f Dockerfile .
 
 script:
-  - docker run -e CI-true hyesoo/docker-react-app npm run test -- --coverage
+  - docker run -e CI-true hyesoo/visionnote npm run test -- --coverage
 
 after_success:
   - echo "Test success!!"
