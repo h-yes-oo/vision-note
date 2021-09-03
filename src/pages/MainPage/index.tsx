@@ -57,13 +57,15 @@ const MainPage: FC<Props & RouteComponentProps> = ({ history }) => {
 
   return (
     <Root>
-      <Header>
-        <Logo src={SampleLogo} />
-        <BtnWrapper>
-          <SignupButton onClick={signUpModal}>회원가입</SignupButton>
-          <LoginButton onClick={loginModal}>로그인</LoginButton>
-        </BtnWrapper>
-      </Header>
+      <HeaderViewWidth>
+        <Header>
+          <Logo src={SampleLogo} />
+          <BtnWrapper>
+            <SignupButton onClick={signUpModal}>회원가입</SignupButton>
+            <LoginButton onClick={loginModal}>로그인</LoginButton>
+          </BtnWrapper>
+        </Header>
+      </HeaderViewWidth>
       <SlidingModal
         visible={modalType !== T.ModalType.No}
         onClose={closeModal}
@@ -154,13 +156,20 @@ const Root = styled.div`
   }
 `;
 
+const HeaderViewWidth = styled.div`
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  position: fixed;
+  background-color: #fff;
+`;
+
 const Header = styled.div`
   width: 1000px;
   height: 130px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: fixed;
   background-color: white;
 `;
 

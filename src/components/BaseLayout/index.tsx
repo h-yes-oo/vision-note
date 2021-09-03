@@ -84,7 +84,6 @@ const BaseLayout: FC<Props & RouteComponentProps> = ({
 };
 
 const Root = styled.div<{ grey: boolean }>`
-  height: 100vh;
   background-color: ${(props) => (props.grey ? '#f9f9f9' : '')};
   display: flex;
   flex-direction: column;
