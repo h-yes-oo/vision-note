@@ -260,7 +260,6 @@ const LoginButton = styled(PurpleButton)`
   width: 129px;
   height: 50px;
   margin: 0 0 0 50px;
-  padding: 16px 41px 13px;
 `;
 
 const SignupButton = styled(Button)`
