@@ -20,7 +20,10 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "baseUrl": "src",
-    "types": ["node", "dom-mediacapture-record"]
+    "types": [
+      "node",
+      "dom-mediacapture-record"
+    ]
   },
   "include": [
     "src",

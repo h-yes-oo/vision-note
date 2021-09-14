@@ -5,21 +5,22 @@ import NoteData from 'components/ListData/note';
 import FolderData from 'components/ListData/folder';
 
 export interface NoteFile {
-  file_id: number;
-  user_id: number;
-  folder_id: number;
-  file_name: string;
-  created_at: string;
-  updated_at: string;
+  fileId: number;
+  userId: number;
+  folderId: number;
+  fileName: string;
+  createdAt: string;
+  updatedAt: string | null;
+  categoryName: string;
+  isImportant: number;
 }
 
 export interface NoteFolder {
-  folder_id: number;
-  user_id: number;
-  parent_folder_id: number;
-  folder_name: string;
-  created_at: string;
-  updated_at: string;
+  folderId: number;
+  parentFolderId: number;
+  folderName: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface NoteResponse {
@@ -37,32 +38,33 @@ interface Props {
 const ListData: FC<Props> = ({ data, depth, menu }) => {
   if (data.itemType === 'FILE') {
     const note = data.noteFile;
-    const oldDate = note?.created_at;
+    const oldDate = note?.createdAt;
     const newDate = `${oldDate?.substr(0, 4)}.${oldDate?.substr(
       5,
       2
     )}.${oldDate?.substr(8, 2)}`;
     return (
       <NoteData
-        key={note?.file_id}
-        title={note?.file_name}
+        key={note?.fileId}
+        title={note?.fileName}
         depth={depth}
         date={newDate}
-        starred
-        subject="과학"
+        starred={note!.isImportant === 1}
+        subject={note!.categoryName}
         menu={menu}
-        noteId={note!.file_id}
+        noteId={note!.fileId}
       />
     );
   }
   const folder = data.noteFolder;
   return (
     <FolderData
-      key={folder?.folder_id}
-      title={folder?.folder_name}
+      key={folder!.folderId}
+      title={folder!.folderName}
       depth={depth}
       opened={false}
       menu={menu}
+      folderId={folder!.folderId}
     />
   );
 };

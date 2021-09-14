@@ -216,33 +216,35 @@ const NotesPage: FC<Props> = () => {
     try {
       // 공유 시작
       const mediaDevices = navigator.mediaDevices as any;
-      mediaDevices
-        .getDisplayMedia(displayMediaOptions)
-        .then((mediaStream: any) => {
-          // 두번째 파라미터인 options 없어도 무방; mimeType에 audio/x-wav 불가
-          const options = {
-            audioBitsPerSecond: 16000,
-            mimeType: 'audio/webm;codecs=opus',
-          };
-          const mediaRecorder = new MediaRecorder(mediaStream, options);
-          mediaRecorder.start();
+      if (mediaDevices !== undefined) {
+        mediaDevices
+          .getDisplayMedia(displayMediaOptions)
+          .then((mediaStream: any) => {
+            // 두번째 파라미터인 options 없어도 무방; mimeType에 audio/x-wav 불가
+            const options = {
+              audioBitsPerSecond: 16000,
+              mimeType: 'audio/webm;codecs=opus',
+            };
+            const mediaRecorder = new MediaRecorder(mediaStream, options);
+            mediaRecorder.start();
 
-          mediaRecorder.ondataavailable = (e) => {
-            const blob = new Blob([e.data], { type: e.data.type });
-            // const filename = getFileName();
-            // const downloadElem = window.document.createElement('a');
-            // downloadElem.href = window.URL.createObjectURL(blob);
-            // downloadElem.download = filename;
-            // document.body.appendChild(downloadElem);
-            // downloadElem.click();
-            // document.body.removeChild(downloadElem);
-          };
+            mediaRecorder.ondataavailable = (e) => {
+              const blob = new Blob([e.data], { type: e.data.type });
+              // const filename = getFileName();
+              // const downloadElem = window.document.createElement('a');
+              // downloadElem.href = window.URL.createObjectURL(blob);
+              // downloadElem.download = filename;
+              // document.body.appendChild(downloadElem);
+              // downloadElem.click();
+              // document.body.removeChild(downloadElem);
+            };
 
-          setStream(mediaStream);
-          setRecorder(mediaRecorder);
-          setRecording(true);
-          setReady(true);
-        });
+            setStream(mediaStream);
+            setRecorder(mediaRecorder);
+            setRecording(true);
+            setReady(true);
+          });
+      }
     } catch (err) {
       console.error(`Error: ${err}`);
     }
