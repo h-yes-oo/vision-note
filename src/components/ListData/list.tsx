@@ -39,10 +39,10 @@ const ListData: FC<Props> = ({ data, depth, menu }) => {
   if (data.itemType === 'FILE') {
     const note = data.noteFile;
     const oldDate = note?.createdAt;
-    const newDate = `${oldDate?.substr(0, 4)}.${oldDate?.substr(
+    const newDate = `${oldDate?.substring(0, 4)}.${oldDate?.substring(
       5,
-      2
-    )}.${oldDate?.substr(8, 2)}`;
+      7
+    )}.${oldDate?.substring(8, 10)}`;
     return (
       <NoteData
         key={note?.fileId}

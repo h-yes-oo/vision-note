@@ -17,8 +17,6 @@ interface Props {
   menu: any;
 }
 
-// /v1/note/folder/{folderId}
-
 const FolderData: FC<Props> = ({ title, folderId, depth, opened, menu }) => {
   const [open, setOpen] = useState<boolean>(opened);
   const [notes, setNotes] = useState<ReactNode>(<></>);
@@ -42,8 +40,8 @@ const FolderData: FC<Props> = ({ title, folderId, depth, opened, menu }) => {
     };
     // authenticate();
     const getFolderItems = async () => {
-      const token =
-        'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTYzMTY3MDkwOH0.gJr_2Y0LEBwS5k26hg1uoEfgdQjHigFxHLbStZH95WYP1rlQraMRdGmGGZz0ULm9sBaO84AemaftQuCmZsV9IQ';
+      // const token =
+      //   'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTYzMTY3MDkwOH0.gJr_2Y0LEBwS5k26hg1uoEfgdQjHigFxHLbStZH95WYP1rlQraMRdGmGGZz0ULm9sBaO84AemaftQuCmZsV9IQ';
       const config = {
         headers: { Authorization: `Bearer ${token}` },
       };
@@ -67,11 +65,9 @@ const FolderData: FC<Props> = ({ title, folderId, depth, opened, menu }) => {
           ))
         );
     };
-    // authenticate().then(() => {
-    //   console.log(folderId);
-    //   getFolderItems();
-    // });
-    getFolderItems();
+    authenticate().then(() => {
+      getFolderItems();
+    });
   }, []);
 
   const handleClick = () => {

@@ -1,10 +1,9 @@
 import React, { FC, useState, useCallback, ReactNode, useEffect } from 'react';
 import styled from 'styled-components';
-import { withRouter, RouteComponentProps } from 'react-router-dom';
-import axios, { AxiosRequestConfig, AxiosPromise, AxiosResponse } from 'axios';
+import axios from 'axios';
 
 import BaseLayout from 'components/BaseLayout';
-import ListData from 'components/ListData/list';
+import ListData, { NoteResponse } from 'components/ListData/list';
 import ContextMenu from 'components/ContextMenu';
 
 import Check from 'assets/icons/Check.svg';
@@ -13,35 +12,6 @@ import NewFolder from 'assets/icons/NewFolder.svg';
 import Star from 'assets/icons/Star.svg';
 import Clock from 'assets/icons/Clock.svg';
 import TrashCan from 'assets/icons/TrashCan.svg';
-
-axios.defaults.baseURL = 'http://api.visionnote.io';
-axios.defaults.headers.post['Content-Type'] = 'multipart/form-data';
-axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
-
-export interface NoteFile {
-  fileId: number;
-  userId: number;
-  folderId: number;
-  fileName: string;
-  createdAt: string;
-  updatedAt: string | null;
-  categoryName: string;
-  isImportant: number;
-}
-
-export interface NoteFolder {
-  folderId: number;
-  parentFolderId: number;
-  folderName: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface NoteResponse {
-  itemType: string;
-  noteFile: NoteFile | null;
-  noteFolder: NoteFolder | null;
-}
 
 interface Props {}
 
@@ -68,8 +38,7 @@ const FolderPage: FC<Props> = () => {
     };
     // authenticate();
     const getRootItems = async () => {
-      const token =
-        'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTYzMTY3MDkwOH0.gJr_2Y0LEBwS5k26hg1uoEfgdQjHigFxHLbStZH95WYP1rlQraMRdGmGGZz0ULm9sBaO84AemaftQuCmZsV9IQ';
+      // const token =  'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTYzMTY3MDkwOH0.gJr_2Y0LEBwS5k26hg1uoEfgdQjHigFxHLbStZH95WYP1rlQraMRdGmGGZz0ULm9sBaO84AemaftQuCmZsV9IQ';
       const config = {
         headers: { Authorization: `Bearer ${token}` },
       };
@@ -92,10 +61,10 @@ const FolderPage: FC<Props> = () => {
       );
     };
 
-    // authenticate().then(() => {
-    //   getRootItems();
-    // });
-    getRootItems();
+    authenticate().then(() => {
+      getRootItems();
+    });
+    // getRootItems();
   }, []);
 
   const handleContextMenu = useCallback(

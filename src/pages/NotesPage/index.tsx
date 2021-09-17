@@ -332,7 +332,7 @@ const NotesPage: FC<Props> = () => {
               note=""
             />
           ) : (
-            <StartNote startRec={onStart} />
+            <StartNote startRec={onStart} setReady={setReady} />
           )}
         </NoteContents>
       </Root>

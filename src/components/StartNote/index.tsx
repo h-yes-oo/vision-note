@@ -1,5 +1,6 @@
-import { FC, useState } from 'react';
+import React, { FC, useState, useRef, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
+import axios from 'axios';
 
 import * as T from 'types';
 
@@ -140,6 +141,17 @@ const StartBtn = styled.a`
   }
 `;
 
+const UploadButton = styled.input`
+  overflow: hidden;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  clip: rect(0, 0, 0, 0);
+`;
+
 const BtnImage = styled.img`
   width: 40px;
   height: 40px;
@@ -148,12 +160,61 @@ const BtnImage = styled.img`
 
 interface Props {
   startRec: any;
+  setReady: any;
 }
 
-const StartNote: FC<Props> = ({ startRec }) => {
+const StartNote: FC<Props> = ({ startRec, setReady }) => {
   const [course, setCourse] = useState<T.Subject | undefined>(undefined);
   const [onRec, setOnRec] = useState<boolean>(false);
   const [onUpload, setOnUpload] = useState<boolean>(false);
+  const [file, setFile] = useState<File | null>(null);
+  const fileRef: React.RefObject<HTMLInputElement> =
+    useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    let token: string;
+    const authenticate = async () => {
+      const frm = new FormData();
+      frm.append('email', 'hyesoo5115@naver.com');
+      frm.append('password', '1q2w3e4r');
+      const response = await axios.post('/v1/authenticate', frm);
+      token = response.data.token;
+    };
+    const sendFile = async (fileToSend: File) => {
+      const data = new FormData();
+      data.append('wavfile', fileToSend, fileToSend.name);
+      const config = {
+        headers: {
+          'content-type': 'multipart/form-data',
+        },
+      };
+      const SttApi = axios.create({
+        baseURL: 'http://api.visionnote.io:8081',
+      });
+
+      const response = await SttApi.put(
+        '/client/dynamic/recognize',
+        data,
+        config
+      );
+      console.log(response);
+    };
+
+    if (file !== null) {
+      console.log(file);
+      authenticate().then(() => sendFile(file));
+      setReady(true);
+    }
+  }, [file]);
+
+  const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    // Update the state
+    setFile(event.target.files ? event.target.files[0] : null);
+  };
+
+  const onClickUpload = () => {
+    if (fileRef.current !== null) fileRef.current.click();
+  };
 
   return (
     <Root>
@@ -200,7 +261,7 @@ const StartNote: FC<Props> = ({ startRec }) => {
         </Course>
         <Course>
           <CourseBox
-            onClick={(e) => setCourse(T.Subject.General)}
+            onClick={() => setCourse(T.Subject.General)}
             full={GeneralFull}
             empty={GeneralEmpty}
             selected={course === T.Subject.General}
@@ -220,7 +281,9 @@ const StartNote: FC<Props> = ({ startRec }) => {
         <StartBtn
           onMouseOver={() => setOnUpload(true)}
           onMouseOut={() => setOnUpload(false)}
+          onClick={onClickUpload}
         >
+          <UploadButton ref={fileRef} type="file" onChange={onFileChange} />
           <BtnImage src={onUpload ? UploadWhite : UploadGrey} />
           녹음 파일 업로드 하기
         </StartBtn>
