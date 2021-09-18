@@ -1,11 +1,14 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
+import { useSetRecoilState } from 'recoil';
+import axios from 'axios';
 
 import Kakao from 'assets/icons/Kakao.svg';
 import Facebook from 'assets/icons/Facebook.svg';
 import Google from 'assets/icons/Google.svg';
 import Naver from 'assets/icons/Naver@3x.png';
+import { authenticateToken } from 'state';
 
 const Title = styled.div`
   font-family: Pretendard;
@@ -210,16 +213,39 @@ const Login: FC<Props & RouteComponentProps> = ({
   toSignUp,
   history,
 }) => {
-  const goTo = () => history.push('/folder');
+  const setAuthToken = useSetRecoilState(authenticateToken);
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+
+  const authenticate = async () => {
+    const frm = new FormData();
+    frm.append('email', email);
+    frm.append('password', password);
+    try {
+      const response = await axios.post('/v1/authenticate', frm);
+      setAuthToken(response.data.token);
+      history.push('/folder');
+    } catch (e) {
+      alert('아이디와 비밀번호를 다시 확인해주세요');
+    }
+  };
 
   return (
     <>
       <Title>로그인</Title>
       <Info>학습 노트를 바로 만들고 관리해보세요</Info>
-      <Form placeholder="이메일 주소" type="email" />
-      <Form placeholder="비밀번호" type="password" />
+      <Form
+        placeholder="이메일 주소"
+        type="email"
+        onChange={(e) => setEmail(e.target.value)}
+      />
+      <Form
+        placeholder="비밀번호"
+        type="password"
+        onChange={(e) => setPassword(e.target.value)}
+      />
       <Find onClick={toFind}>아이디 / 비밀번호 찾기</Find>
-      <LoginBtn onClick={goTo}>로그인</LoginBtn>
+      <LoginBtn onClick={authenticate}>로그인</LoginBtn>
       <OrWrapper>
         <Line />
         <OR>또는</OR>

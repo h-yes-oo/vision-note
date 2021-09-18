@@ -1,12 +1,13 @@
 import { FC, useState, useEffect, ReactNode } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 
 import FolderPurple from 'assets/icons/FolderPurple.svg';
 import FolderBlue from 'assets/icons/FolderBlue.svg';
 import FolderPurpleClosed from 'assets/icons/FolderPurpleClosed.svg';
 import FolderBlueClosed from 'assets/icons/FolderBlueClosed.svg';
-
+import { authenticateToken } from 'state';
 import ListData, { NoteResponse } from './list';
 
 interface Props {
@@ -24,29 +25,14 @@ const FolderData: FC<Props> = ({ title, folderId, depth, opened, menu }) => {
     if (depth % 2 === 0) return open ? FolderPurple : FolderPurpleClosed;
     return open ? FolderBlue : FolderBlueClosed;
   };
+  const authToken = useRecoilValue(authenticateToken);
 
   useEffect(() => {
-    let token: string;
-    const authenticate = async () => {
-      const frm = new FormData();
-      frm.append('email', 'hyesoo5115@naver.com');
-      frm.append('password', '1q2w3e4r');
-      try {
-        const response = await axios.post('/v1/authenticate', frm);
-        token = response.data.token;
-      } catch (e) {
-        console.log('authenticate error');
-      }
-    };
-    // authenticate();
     const getFolderItems = async () => {
-      // const token =
-      //   'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTYzMTY3MDkwOH0.gJr_2Y0LEBwS5k26hg1uoEfgdQjHigFxHLbStZH95WYP1rlQraMRdGmGGZz0ULm9sBaO84AemaftQuCmZsV9IQ';
       const config = {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${authToken}` },
       };
       const response = await axios.get(`/v1/note/folder/${folderId}`, config);
-      console.log(response.data);
       const folderData: NoteResponse[] = response.data;
       if (folderData.length === 0) console.log(folderId);
       if (folderData !== undefined)
@@ -65,10 +51,8 @@ const FolderData: FC<Props> = ({ title, folderId, depth, opened, menu }) => {
           ))
         );
     };
-    authenticate().then(() => {
-      getFolderItems();
-    });
-  }, []);
+    if (authToken !== '') getFolderItems();
+  }, [authToken]);
 
   const handleClick = () => {
     setOpen(!open);

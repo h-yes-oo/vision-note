@@ -1,10 +1,12 @@
 import React, { FC, useState, useCallback, ReactNode, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 
 import BaseLayout from 'components/BaseLayout';
 import ListData, { NoteResponse } from 'components/ListData/list';
 import ContextMenu from 'components/ContextMenu';
+import { authenticateToken } from 'state';
 
 import Check from 'assets/icons/Check.svg';
 import SortToggleDown from 'assets/icons/SortToggleDown.svg';
@@ -19,31 +21,15 @@ const FolderPage: FC<Props> = () => {
   const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
   const [show, setShow] = useState<boolean>(false);
   const [noteId, setNoteId] = useState<number>(0);
-  // const [data, setData] = useState<any[]>([]);
   const [notes, setNotes] = useState<ReactNode>(<></>);
+  const authToken = useRecoilValue(authenticateToken);
 
   useEffect(() => {
-    let token: string;
-    const authenticate = async () => {
-      const frm = new FormData();
-      frm.append('email', 'hyesoo5115@naver.com');
-      frm.append('password', '1q2w3e4r');
-      try {
-        const response = await axios.post('/v1/authenticate', frm);
-        token = response.data.token;
-        console.log(token);
-      } catch (e) {
-        console.log('authenticate error');
-      }
-    };
-    // authenticate();
     const getRootItems = async () => {
-      // const token =  'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTYzMTY3MDkwOH0.gJr_2Y0LEBwS5k26hg1uoEfgdQjHigFxHLbStZH95WYP1rlQraMRdGmGGZz0ULm9sBaO84AemaftQuCmZsV9IQ';
       const config = {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${authToken}` },
       };
       const response = await axios.get('/v1/note/folder/root', config);
-      console.log(response.data.items);
       const data: NoteResponse[] = response.data.items;
       setNotes(
         data.map((value, index) => (
@@ -60,12 +46,8 @@ const FolderPage: FC<Props> = () => {
         ))
       );
     };
-
-    authenticate().then(() => {
-      getRootItems();
-    });
-    // getRootItems();
-  }, []);
+    if (authToken !== '') getRootItems();
+  }, [authToken]);
 
   const handleContextMenu = useCallback(
     (event: React.MouseEvent, noteId) => {

@@ -172,24 +172,16 @@ const StartNote: FC<Props> = ({ startRec, setReady }) => {
     useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    let token: string;
-    const authenticate = async () => {
-      const frm = new FormData();
-      frm.append('email', 'hyesoo5115@naver.com');
-      frm.append('password', '1q2w3e4r');
-      const response = await axios.post('/v1/authenticate', frm);
-      token = response.data.token;
-    };
     const sendFile = async (fileToSend: File) => {
       const data = new FormData();
-      data.append('wavfile', fileToSend, fileToSend.name);
+      data.append('wavfile', fileToSend);
       const config = {
         headers: {
-          'content-type': 'multipart/form-data',
+          'Content-Type': 'multipart/form-data',
         },
       };
       const SttApi = axios.create({
-        baseURL: 'http://api.visionnote.io:8081',
+        baseURL: 'http://52.78.213.224',
       });
 
       const response = await SttApi.put(
@@ -202,7 +194,7 @@ const StartNote: FC<Props> = ({ startRec, setReady }) => {
 
     if (file !== null) {
       console.log(file);
-      authenticate().then(() => sendFile(file));
+      sendFile(file);
       setReady(true);
     }
   }, [file]);
