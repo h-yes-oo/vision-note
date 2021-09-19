@@ -1,6 +1,10 @@
 import { FC, useState } from 'react';
 import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
+import axios from 'axios';
+import { useSetRecoilState } from 'recoil';
+
+import { authenticateToken } from 'state';
 
 import Kakao from 'assets/icons/Kakao.svg';
 import Facebook from 'assets/icons/Facebook.svg';
@@ -267,8 +271,54 @@ const SignUp: FC<Props & RouteComponentProps> = ({ toLogin, history }) => {
   const [nickname, setNickname] = useState<string>('');
   const [privacy, setPrivacy] = useState<boolean>(false);
   const [agreement, setAgreement] = useState<boolean>(false);
+  const setAuthToken = useSetRecoilState(authenticateToken);
 
-  const goTo = () => history.push('/folder');
+  const authenticate = async () => {
+    const frm = new FormData();
+    frm.append('email', email);
+    frm.append('password', password);
+    try {
+      const response = await axios.post('/v1/authenticate', frm);
+      setAuthToken(response.data.token);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const signUp = async () => {
+    const userData = new FormData();
+    userData.append('avatar', '');
+    userData.append('email', email);
+    userData.append('nickname', nickname);
+    userData.append('password', password);
+    userData.append('socialType', 'NORMAL');
+    userData.append('typeId', type);
+    await axios.post('/v1/user', userData).catch((error) => {
+      if (error.response.status === 409) alert('이미 가입된 메일입니다');
+      else alert('회원가입에 실패했습니다. 정보를 다시 확인해주세요');
+      setEmail('');
+      setNickname('');
+      setPassword('');
+      setConfirm('');
+      return false;
+    });
+    history.push('/folder');
+    return true;
+  };
+
+  const goTo = async () => {
+    if (password !== confirm) alert('비밀번호가 같지 않습니다');
+    else if (!privacy) alert('개인정보 처리방침에 동의해주세요');
+    else if (!agreement) alert('이용약관에 동의해주세요');
+    else if (email === '' || nickname === '' || password === '')
+      alert('필수 정보를 입력해주세요');
+    else {
+      const signUpSuccess = await signUp();
+      // 로그인 성공시 자동 로그인
+      if (signUpSuccess) authenticate();
+    }
+  };
+
   const onChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
   };
@@ -314,8 +364,8 @@ const SignUp: FC<Props & RouteComponentProps> = ({ toLogin, history }) => {
           <option value="default" disabled style={{ color: '#c5c5c5' }}>
             학생 구분
           </option>
-          <option value="college">대학생</option>
-          <option value="student">초/중/고</option>
+          <option value="2">대학생</option>
+          <option value="1">초/중/고</option>
         </SelectForm>
       </FlexBetween>
 

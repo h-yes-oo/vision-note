@@ -10,9 +10,6 @@ before_install:
   - docker build -t hyesoo/visionnote -f Dockerfile .
 
 script:
-  - cat Dockerfile
-  - pwd
-  - ls
   - docker run -e CI=true hyesoo/visionnote npm run test -- --coverage
 
 after_success:
