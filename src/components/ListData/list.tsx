@@ -1,5 +1,4 @@
-import { FC, useState, ReactNode } from 'react';
-import styled from 'styled-components';
+import { FC } from 'react';
 
 import NoteData from 'components/ListData/note';
 import FolderData from 'components/ListData/folder';
@@ -37,7 +36,7 @@ interface Props {
 
 const ListData: FC<Props> = ({ data, depth, menu }) => {
   if (data.itemType === 'FILE') {
-    const note = data.noteFile;
+    const note = data.noteFile!;
     const oldDate = note?.createdAt;
     const newDate = `${oldDate?.substring(0, 4)}.${oldDate?.substring(
       5,
@@ -49,22 +48,22 @@ const ListData: FC<Props> = ({ data, depth, menu }) => {
         title={note?.fileName}
         depth={depth}
         date={newDate}
-        starred={note!.isImportant === 1}
-        subject={note!.categoryName}
+        starred={note.isImportant === 1}
+        subject={note.categoryName}
         menu={menu}
-        noteId={note!.fileId}
+        noteId={note.fileId}
       />
     );
   }
-  const folder = data.noteFolder;
+  const folder = data.noteFolder!;
   return (
     <FolderData
-      key={folder!.folderId}
-      title={folder!.folderName}
+      key={folder.folderId}
+      title={folder.folderName}
       depth={depth}
       opened={false}
       menu={menu}
-      folderId={folder!.folderId}
+      folderId={folder.folderId}
     />
   );
 };

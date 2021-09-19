@@ -34,10 +34,9 @@ const FolderData: FC<Props> = ({ title, folderId, depth, opened, menu }) => {
       };
       const response = await axios.get(`/v1/note/folder/${folderId}`, config);
       const folderData: NoteResponse[] = response.data;
-      if (folderData.length === 0) console.log(folderId);
       if (folderData !== undefined)
         setNotes(
-          folderData.map((value, index) => (
+          folderData.map((value) => (
             <ListData
               key={`${value.itemType}.${
                 value.noteFile

@@ -8,7 +8,9 @@ interface Props {}
 const App: FC<Props> = () => {
   return (
     <RecoilRoot>
-      <Root />
+      <React.Suspense fallback={<div>Loading...</div>}>
+        <Root />
+      </React.Suspense>
     </RecoilRoot>
   );
 };

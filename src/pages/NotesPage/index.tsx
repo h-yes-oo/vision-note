@@ -300,7 +300,7 @@ const NotesPage: FC<Props> = () => {
             <NoteDate>{date}</NoteDate>
             <RecordingWrapper visible={ready}>
               <RecordingStatus
-                onClick={(e) => {
+                onClick={() => {
                   if (recording) onStop();
                   else onStart();
                   setRecording(!recording);
@@ -314,10 +314,10 @@ const NotesPage: FC<Props> = () => {
               ) : (
                 <ToggleBtn
                   src={showRecord ? ToggleUp : ToggleDown}
-                  onClick={(e) => setShowRecord(!showRecord)}
+                  onClick={() => setShowRecord(!showRecord)}
                 />
               )}
-              <MemoBtn onClick={(e) => setShowMemo(!showMemo)}>
+              <MemoBtn onClick={() => setShowMemo(!showMemo)}>
                 {showMemo ? '전체 메모 닫기' : '전체 메모 보기'}
               </MemoBtn>
             </RecordingWrapper>

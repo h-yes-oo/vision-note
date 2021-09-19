@@ -1,6 +1,7 @@
 import { FC, ReactNode, useState } from 'react';
 import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
+import { useRecoilValue } from 'recoil';
 
 import SampleLogo from 'assets/icons/SampleLogo15.png';
 import SearchIcon from 'assets/icons/SearchIcon.svg';
@@ -8,6 +9,7 @@ import ProfileImage from 'assets/images/SampleProfile.svg';
 import ProfileToggleDown from 'assets/icons/ProfileToggleDown.svg';
 import ProfileToggleUp from 'assets/icons/ProfileToggleUp.svg';
 
+import { userName } from 'state';
 import UserMenu from 'components/UserMenu';
 import PopupModal from 'components/PopupModal';
 import SearchModal from 'components/PopupModal/search';
@@ -25,6 +27,7 @@ const BaseLayout: FC<Props & RouteComponentProps> = ({
   const [showUserMenu, setShowUserMenu] = useState<boolean>(false);
   const [showSearch, setShowSearch] = useState<boolean>(false);
   const [searchKeyword, setSearchKeyword] = useState<string>('');
+  const userNickname = useRecoilValue(userName);
 
   const search = () => {
     setShowSearch(true);
@@ -68,7 +71,7 @@ const BaseLayout: FC<Props & RouteComponentProps> = ({
             onMouseLeave={handleMouseLeave}
           >
             <ProfileImg src={ProfileImage} />
-            <ProfileName>혜수님</ProfileName>
+            <ProfileName>{userNickname}님</ProfileName>
             <Relative>
               <ProfileToggle
                 src={showUserMenu ? ProfileToggleUp : ProfileToggleDown}

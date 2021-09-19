@@ -32,7 +32,7 @@ const FolderPage: FC<Props> = () => {
       const response = await axios.get('/v1/note/folder/root', config);
       const data: NoteResponse[] = response.data.items;
       setNotes(
-        data.map((value, index) => (
+        data.map((value) => (
           <ListData
             key={`${value.itemType}.${
               value.noteFile

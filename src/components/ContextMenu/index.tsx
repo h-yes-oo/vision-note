@@ -1,4 +1,4 @@
-import { FC, useState, useEffect, useCallback } from 'react';
+import { FC } from 'react';
 import styled from 'styled-components';
 
 import ContextDelete from 'assets/icons/ContextDelete.svg';

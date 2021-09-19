@@ -1,6 +1,5 @@
 import { FC, useState } from 'react';
 import styled from 'styled-components';
-import { withRouter, RouteComponentProps } from 'react-router-dom';
 import axios from 'axios';
 import { useSetRecoilState } from 'recoil';
 
@@ -263,7 +262,7 @@ interface Props {
   toLogin: any;
 }
 
-const SignUp: FC<Props & RouteComponentProps> = ({ toLogin, history }) => {
+const SignUp: FC<Props> = ({ toLogin }) => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [confirm, setConfirm] = useState<string>('');
@@ -421,4 +420,4 @@ const SignUp: FC<Props & RouteComponentProps> = ({ toLogin, history }) => {
   );
 };
 
-export default withRouter(SignUp);
+export default SignUp;

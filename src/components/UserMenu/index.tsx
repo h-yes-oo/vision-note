@@ -31,6 +31,7 @@ const UserMenu: FC<Props & RouteComponentProps> = ({
     console.log('탈퇴');
     setShowAlert(false);
     history.push('/');
+    logout();
   };
 
   const cancleSignOut = () => {

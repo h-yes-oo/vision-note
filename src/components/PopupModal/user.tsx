@@ -22,7 +22,7 @@ const UserModal: FC<Props> = ({ onClose, showAlert }) => {
   const [editNickname, setEditNickname] = useState<boolean>(false);
   const [nickname, setNickname] = useState<string>(user.nickname);
 
-  const handleEditNickname = (e: React.MouseEvent) => {
+  const handleEditNickname = () => {
     if (editNickname) {
       // TODO : 닉네임 수정하기
       console.log(nickname);

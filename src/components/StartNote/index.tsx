@@ -217,7 +217,7 @@ const StartNote: FC<Props> = ({ startRec, setReady }) => {
       <CourseWrapper>
         <Course>
           <CourseBox
-            onClick={(e) => setCourse(T.Subject.Korean)}
+            onClick={() => setCourse(T.Subject.Korean)}
             full={KoreanFull}
             empty={KoreanEmpty}
             selected={course === T.Subject.Korean}
@@ -226,7 +226,7 @@ const StartNote: FC<Props> = ({ startRec, setReady }) => {
         </Course>
         <Course>
           <CourseBox
-            onClick={(e) => setCourse(T.Subject.Math)}
+            onClick={() => setCourse(T.Subject.Math)}
             full={MathFull}
             empty={MathEmpty}
             selected={course === T.Subject.Math}
@@ -235,7 +235,7 @@ const StartNote: FC<Props> = ({ startRec, setReady }) => {
         </Course>
         <Course>
           <CourseBox
-            onClick={(e) => setCourse(T.Subject.Social)}
+            onClick={() => setCourse(T.Subject.Social)}
             full={SocialFull}
             empty={SocialEmpty}
             selected={course === T.Subject.Social}
@@ -244,7 +244,7 @@ const StartNote: FC<Props> = ({ startRec, setReady }) => {
         </Course>
         <Course>
           <CourseBox
-            onClick={(e) => setCourse(T.Subject.Science)}
+            onClick={() => setCourse(T.Subject.Science)}
             full={ScienceFull}
             empty={ScienceEmpty}
             selected={course === T.Subject.Science}
