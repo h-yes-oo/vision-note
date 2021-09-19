@@ -1,7 +1,7 @@
 import React, { FC, useState, useCallback, ReactNode, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilValue } from 'recoil';
 
 import BaseLayout from 'components/BaseLayout';
 import ListData, { NoteResponse } from 'components/ListData/list';
@@ -46,7 +46,7 @@ const FolderPage: FC<Props> = () => {
         ))
       );
     };
-    if (authToken !== '') getRootItems();
+    if (authToken !== null) getRootItems();
   }, [authToken]);
 
   const handleContextMenu = useCallback(
@@ -58,17 +58,6 @@ const FolderPage: FC<Props> = () => {
     },
     [setAnchorPoint, setShow]
   );
-
-  // const notes: ReactNode = data.map((value, index) => (
-  //   <ListData
-  //     key={`${value.itemType}.${
-  //       value.noteFile ? value.noteFile!.fileId : value.noteFolder!.folderId
-  //     }`}
-  //     data={value}
-  //     depth={0}
-  //     menu={handleContextMenu}
-  //   />
-  // ));
 
   return (
     <BaseLayout grey>
@@ -132,69 +121,6 @@ const FolderPage: FC<Props> = () => {
     </BaseLayout>
   );
 };
-
-// const SampleData = [
-//   {
-//     itemType: 'FILE',
-//     noteFile: {
-//       file_id: 1,
-//       user_id: 3,
-//       folder_id: 1,
-//       file_name: '지구과학 첫걸음',
-//       created_at: '2021-08-03 13:16:40.0',
-//       updated_at: '2021-08-03 13:16:40.0',
-//     },
-//     noteFolder: null,
-//   },
-//   {
-//     itemType: 'FILE',
-//     noteFile: {
-//       file_id: 2,
-//       user_id: 3,
-//       folder_id: 1,
-//       file_name: '지구과학 두걸음',
-//       created_at: '2021-08-05 13:16:41.0',
-//       updated_at: '2021-08-05 13:16:41.0',
-//     },
-//     noteFolder: null,
-//   },
-//   {
-//     itemType: 'FOLDER',
-//     noteFile: null,
-//     noteFolder: {
-//       folder_id: 2,
-//       user_id: 3,
-//       parent_folder_id: 1,
-//       folder_name: '2021년 1학기',
-//       created_at: '2021-08-03 13:16:02.0',
-//       updated_at: '2021-08-03 13:16:02.0',
-//     },
-//   },
-//   {
-//     itemType: 'FOLDER',
-//     noteFile: null,
-//     noteFolder: {
-//       folder_id: 3,
-//       user_id: 3,
-//       parent_folder_id: 1,
-//       folder_name: '2020년 2학기',
-//       created_at: '2021-08-03 13:16:02.0',
-//       updated_at: '2021-08-03 13:16:02.0',
-//     },
-//   },
-//   {
-//     itemType: 'FOLDER',
-//     noteFile: null,
-//     noteFolder: {
-//       folder_id: 4,
-//       user_id: 3,
-//       parent_folder_id: 1,
-//       folder_name: '2019년 1학기',
-//       created_at: '2021-08-03 13:16:02.0',
-//       updated_at: '2021-08-03 13:16:02.0',
-//     },
-//   },
-// ];
 
 const Root = styled.div`
   display: flex;

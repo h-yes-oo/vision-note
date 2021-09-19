@@ -1,7 +1,7 @@
 import { FC, useState, useEffect, ReactNode } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilValue } from 'recoil';
 
 import FolderPurple from 'assets/icons/FolderPurple.svg';
 import FolderBlue from 'assets/icons/FolderBlue.svg';
@@ -51,7 +51,7 @@ const FolderData: FC<Props> = ({ title, folderId, depth, opened, menu }) => {
           ))
         );
     };
-    if (authToken !== '') getFolderItems();
+    if (authToken !== null) getFolderItems();
   }, [authToken]);
 
   const handleClick = () => {
@@ -75,45 +75,6 @@ const FolderData: FC<Props> = ({ title, folderId, depth, opened, menu }) => {
     </>
   );
 };
-
-// const SampleData = [
-//   {
-//     itemType: 'FILE',
-//     noteFile: {
-//       fileId: 4,
-//       userId: 3,
-//       folderId: 2,
-//       fileName: '수학 다시 보는 개념',
-//       createdAt: '2021-08-03 13:20:05.0',
-//       updatedAt: '2021-08-03 13:20:05.0',
-//     },
-//     noteFolder: null,
-//   },
-//   {
-//     itemType: 'FOLDER',
-//     noteFile: null,
-//     noteFolder: {
-//       folderId: 5,
-//       userId: 3,
-//       parent_folderId: 2,
-//       folderName: '한국사',
-//       createdAt: '2021-08-03 13:18:13.0',
-//       updatedAt: '2021-08-03 13:18:13.0',
-//     },
-//   },
-//   {
-//     itemType: 'FOLDER',
-//     noteFile: null,
-//     noteFolder: {
-//       folderId: 6,
-//       userId: 3,
-//       parent_folderId: 2,
-//       folderName: '쉽게 배우는 알고리즘',
-//       createdAt: '2021-08-03 13:18:13.0',
-//       updatedAt: '2021-08-03 13:18:13.0',
-//     },
-//   },
-// ];
 
 const DataRow = styled.tr`
   height: 65px;

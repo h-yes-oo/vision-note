@@ -208,11 +208,7 @@ interface Props {
   toSignUp: any;
 }
 
-const Login: FC<Props & RouteComponentProps> = ({
-  toFind,
-  toSignUp,
-  history,
-}) => {
+const Login: FC<Props> = ({ toFind, toSignUp }) => {
   const setAuthToken = useSetRecoilState(authenticateToken);
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -223,8 +219,8 @@ const Login: FC<Props & RouteComponentProps> = ({
     frm.append('password', password);
     try {
       const response = await axios.post('/v1/authenticate', frm);
+      localStorage.setItem('user', JSON.stringify(response.data.token));
       setAuthToken(response.data.token);
-      history.push('/folder');
     } catch (e) {
       alert('아이디와 비밀번호를 다시 확인해주세요');
     }
@@ -279,4 +275,4 @@ const Login: FC<Props & RouteComponentProps> = ({
   );
 };
 
-export default withRouter(Login);
+export default Login;

@@ -8,9 +8,9 @@ import {
 } from 'recoil';
 import axios from 'axios';
 
-export const authenticateToken = atom<string>({
+export const authenticateToken = atom<string | null>({
   key: 'authenticateToken',
-  default: '',
+  default: JSON.parse(localStorage.getItem('user') ?? 'null'),
 });
 
 // export const getAuthenticateToken = selectorFamily({

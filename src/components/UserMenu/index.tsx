@@ -1,11 +1,13 @@
-import { FC, useState, useEffect, useCallback } from 'react';
+import { FC, useState } from 'react';
 import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
+import { useSetRecoilState } from 'recoil';
 
 import DarkMode from 'assets/icons/DarkMode.svg';
 import Logout from 'assets/icons/Logout.svg';
 import UserEdit from 'assets/icons/UserEdit.svg';
 
+import { authenticateToken } from 'state';
 import PopupModal from 'components/PopupModal';
 import UserModal from 'components/PopupModal/user';
 import Alert from 'components/Alert';
@@ -22,6 +24,7 @@ const UserMenu: FC<Props & RouteComponentProps> = ({
 }) => {
   const [userModal, setUserModal] = useState<boolean>(false);
   const [showAlert, setShowAlert] = useState<boolean>(false);
+  const setAuthToken = useSetRecoilState(authenticateToken);
 
   const confirmSignOut = () => {
     // TODO : 탈퇴 구현
@@ -43,8 +46,8 @@ const UserMenu: FC<Props & RouteComponentProps> = ({
   };
 
   const logout = () => {
-    console.log('logout');
-    history.push('/');
+    localStorage.removeItem('user');
+    setAuthToken(null);
   };
 
   const userEdit = () => {
