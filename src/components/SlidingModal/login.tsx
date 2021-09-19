@@ -1,5 +1,5 @@
 import React, { FC, useState } from 'react';
-import styled, { keyframes } from 'styled-components';
+import styled from 'styled-components';
 import { useSetRecoilState } from 'recoil';
 import axios from 'axios';
 
@@ -8,6 +8,7 @@ import Facebook from 'assets/icons/Facebook.svg';
 import Google from 'assets/icons/Google.svg';
 import Naver from 'assets/icons/Naver@3x.png';
 import { authenticateToken } from 'state';
+import LoadingDots from 'components/LoadingDots';
 
 const Title = styled.div`
   font-family: Pretendard;
@@ -100,23 +101,6 @@ const LoginBtn = styled.button`
     cursor: pointer;
     background-color: #6a58d3;
   }
-`;
-
-const LoadingBtn = styled.div`
-  width: 420px;
-  height: 61px;
-  margin: 19px 0 31px !important;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  padding: 2rem 0;
-  margin: 0 -5%;
-  overflow: hidden;
-  border-radius: 5px;
-  border: none;
-  background-color: #e4e5ec;
-  box-sizing: border-box;
 `;
 
 const OrWrapper = styled.div`
@@ -218,90 +202,6 @@ const SignUp = styled.a`
 const Flex = styled.div`
   display: flex;
 `;
-
-const dotFalling = keyframes`
-  0% {
-    box-shadow: 9999px -15px 0 0 rgba(152, 128, 255, 0);
-  }
-  25%,
-  50%,
-  75% {
-    box-shadow: 9999px 0 0 0 #9A9BA6;
-  }
-  100% {
-    box-shadow: 9999px 15px 0 0 rgba(152, 128, 255, 0);
-  }
-`;
-
-const dotFallingBefore = keyframes`
-  0% {
-    box-shadow: 9984px -15px 0 0 rgba(152, 128, 255, 0);
-  }
-  25%,
-  50%,
-  75% {
-    box-shadow: 9984px 0 0 0 #9A9BA6;
-  }
-  100% {
-    box-shadow: 9984px 15px 0 0 rgba(152, 128, 255, 0);
-  }
-`;
-
-const dotFallingAfter = keyframes`
-  0% {
-    box-shadow: 10014px -15px 0 0 rgba(152, 128, 255, 0);
-  }
-  25%,
-  50%,
-  75% {
-    box-shadow: 10014px 0 0 0 #9A9BA6;
-  }
-  100% {
-    box-shadow: 10014px 15px 0 0 rgba(152, 128, 255, 0);
-  }
-`;
-
-const DotFalling = styled.div`
-  position: relative;
-  left: -9999px;
-  width: 10px;
-  height: 10px;
-  border-radius: 5px;
-  background-color: #9a9ba6;
-  color: #9a9ba6;
-  box-shadow: 9999px 0 0 0 #9a9ba6;
-  animation: ${dotFalling} 1s infinite linear;
-  animation-delay: 0.1s;
-
-  &::before {
-    content: '';
-    display: inline-block;
-    position: absolute;
-    top: 0;
-    width: 10px;
-    height: 10px;
-    border-radius: 5px;
-    background-color: #9a9ba6;
-    color: #9a9ba6;
-    animation: ${dotFallingBefore} 1s infinite linear;
-    animation-delay: 0s;
-  }
-
-  &::after {
-    content: '';
-    display: inline-block;
-    position: absolute;
-    top: 0;
-    width: 10px;
-    height: 10px;
-    border-radius: 5px;
-    background-color: #9a9ba6;
-    color: #9a9ba6;
-    animation: ${dotFallingAfter} 1s infinite linear;
-    animation-delay: 0.2s;
-  }
-`;
-
 interface Props {
   toFind: any;
   toSignUp: any;
@@ -349,9 +249,7 @@ const Login: FC<Props> = ({ toFind, toSignUp }) => {
       />
       <Find onClick={toFind}>아이디 / 비밀번호 찾기</Find>
       {loading ? (
-        <LoadingBtn>
-          <DotFalling />
-        </LoadingBtn>
+        <LoadingDots />
       ) : (
         <LoginBtn onClick={authenticate}>로그인</LoginBtn>
       )}

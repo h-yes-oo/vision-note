@@ -12,6 +12,7 @@ import Naver from 'assets/icons/Naver@3x.png';
 import SelectToggle from 'assets/icons/SelectToggle.svg';
 import CheckBoxOff from 'assets/icons/CheckBoxOff.svg';
 import CheckBoxOn from 'assets/icons/CheckBoxOn.svg';
+import LoadingDots from 'components/LoadingDots';
 
 const Title = styled.div`
   font-family: Pretendard;
@@ -271,6 +272,7 @@ const SignUp: FC<Props> = ({ toLogin }) => {
   const [privacy, setPrivacy] = useState<boolean>(false);
   const [agreement, setAgreement] = useState<boolean>(false);
   const setAuthToken = useSetRecoilState(authenticateToken);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const authenticate = async () => {
     const frm = new FormData();
@@ -293,16 +295,17 @@ const SignUp: FC<Props> = ({ toLogin }) => {
     userData.append('password', password);
     userData.append('socialType', 'NORMAL');
     userData.append('typeId', type);
-    await axios.post('/v1/user', userData).catch((error) => {
-      if (error.response.status === 409) alert('이미 가입된 메일입니다');
-      else alert('회원가입에 실패했습니다. 정보를 다시 확인해주세요');
+    try {
+      await axios.post('/v1/user', userData);
+      return true;
+    } catch {
+      alert('이미 가입된 메일입니다');
       setEmail('');
       setNickname('');
       setPassword('');
       setConfirm('');
       return false;
-    });
-    return true;
+    }
   };
 
   const goTo = async () => {
@@ -312,9 +315,11 @@ const SignUp: FC<Props> = ({ toLogin }) => {
     else if (email === '' || nickname === '' || password === '')
       alert('필수 정보를 입력해주세요');
     else {
+      setLoading(true);
       const signUpSuccess = await signUp();
       // 로그인 성공시 자동 로그인
       if (signUpSuccess) authenticate();
+      else setLoading(false);
     }
   };
 
@@ -368,7 +373,11 @@ const SignUp: FC<Props> = ({ toLogin }) => {
         </SelectForm>
       </FlexBetween>
 
-      <SignupButton onClick={goTo}>가입하기</SignupButton>
+      {loading ? (
+        <LoadingDots />
+      ) : (
+        <SignupButton onClick={goTo}>가입하기</SignupButton>
+      )}
       <FlexAlign>
         <CheckBox
           type="checkbox"
