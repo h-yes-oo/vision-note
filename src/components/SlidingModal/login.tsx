@@ -249,7 +249,7 @@ const Login: FC<Props> = ({ toFind, toSignUp }) => {
       />
       <Find onClick={toFind}>아이디 / 비밀번호 찾기</Find>
       {loading ? (
-        <LoadingDots />
+        <LoadingDots small={false} />
       ) : (
         <LoginBtn onClick={authenticate}>로그인</LoginBtn>
       )}

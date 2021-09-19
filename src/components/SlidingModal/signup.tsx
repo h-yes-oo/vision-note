@@ -374,7 +374,7 @@ const SignUp: FC<Props> = ({ toLogin }) => {
       </FlexBetween>
 
       {loading ? (
-        <LoadingDots />
+        <LoadingDots small={false} />
       ) : (
         <SignupButton onClick={goTo}>가입하기</SignupButton>
       )}

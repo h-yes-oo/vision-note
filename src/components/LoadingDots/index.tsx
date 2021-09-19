@@ -1,16 +1,14 @@
 import { FC } from 'react';
 import styled, { keyframes } from 'styled-components';
 
-const LoadingBtn = styled.div`
-  width: 420px;
-  height: 61px;
-  margin: 19px 0 31px !important;
+const LoadingBtn = styled.div<{ small: boolean }>`
+  width: ${(props) => (props.small ? '140px' : '420px')};
+  height: ${(props) => (props.small ? '50px' : '61px')};
+  margin: ${(props) => (props.small ? '0 0 0 20px' : ' 19px 0 31px ')};
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
-  padding: 2rem 0;
-  margin: 0 -5%;
   overflow: hidden;
   border-radius: 5px;
   border: none;
@@ -101,11 +99,13 @@ const DotFalling = styled.div`
   }
 `;
 
-interface Props {}
+interface Props {
+  small: boolean;
+}
 
-const LoadingDots: FC<Props> = () => {
+const LoadingDots: FC<Props> = ({ small }) => {
   return (
-    <LoadingBtn>
+    <LoadingBtn small={small}>
       <DotFalling />
     </LoadingBtn>
   );

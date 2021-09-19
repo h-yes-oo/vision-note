@@ -1,7 +1,8 @@
 import { FC, useState } from 'react';
 import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
-import { useSetRecoilState } from 'recoil';
+import { useRecoilState } from 'recoil';
+import axios from 'axios';
 
 import DarkMode from 'assets/icons/DarkMode.svg';
 import Logout from 'assets/icons/Logout.svg';
@@ -24,14 +25,19 @@ const UserMenu: FC<Props & RouteComponentProps> = ({
 }) => {
   const [userModal, setUserModal] = useState<boolean>(false);
   const [showAlert, setShowAlert] = useState<boolean>(false);
-  const setAuthToken = useSetRecoilState(authenticateToken);
+  const [authToken, setAuthToken] = useRecoilState(authenticateToken);
 
-  const confirmSignOut = () => {
-    // TODO : 탈퇴 구현
-    console.log('탈퇴');
-    setShowAlert(false);
-    history.push('/');
-    logout();
+  const confirmSignOut = async () => {
+    try {
+      await axios.delete('/v1/user', {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      setShowAlert(false);
+      history.push('/');
+      logout();
+    } catch {
+      alert('탈퇴에 실패했습니다. 다시 시도해주세요');
+    }
   };
 
   const cancleSignOut = () => {
