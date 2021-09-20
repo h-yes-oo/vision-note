@@ -3,8 +3,10 @@ import styled from 'styled-components';
 import axios from 'axios';
 import { useRecoilValue } from 'recoil';
 
+import { NotesMode } from 'types';
 import BaseLayout from 'components/BaseLayout';
 import ListData, { NoteResponse } from 'components/ListData/list';
+import FolderData from 'components/ListData/folder';
 import ContextMenu from 'components/ContextMenu';
 import { authenticateToken } from 'state';
 
@@ -14,6 +16,10 @@ import NewFolder from 'assets/icons/NewFolder.svg';
 import Star from 'assets/icons/Star.svg';
 import Clock from 'assets/icons/Clock.svg';
 import TrashCan from 'assets/icons/TrashCan.svg';
+import Download from 'assets/icons/Download.svg';
+import GreyStar from 'assets/icons/GreyStar.svg';
+import GreyTrashCan from 'assets/icons/GreyTrashCan.svg';
+import Folder40 from 'assets/icons/Folder40.svg';
 
 interface Props {}
 
@@ -22,7 +28,10 @@ const FolderPage: FC<Props> = () => {
   const [show, setShow] = useState<boolean>(false);
   const [noteId, setNoteId] = useState<number>(0);
   const [notes, setNotes] = useState<ReactNode>(<></>);
+  const [rootFolderId, setRootFolderId] = useState<number>(1);
   const authToken = useRecoilValue(authenticateToken);
+  const [selectMode, setSelectMode] = useState<boolean>(false);
+  const [mode, setMode] = useState<NotesMode>(NotesMode.All);
 
   useEffect(() => {
     const getRootItems = async () => {
@@ -31,6 +40,7 @@ const FolderPage: FC<Props> = () => {
       };
       const response = await axios.get('/v1/note/folder/root', config);
       const data: NoteResponse[] = response.data.items;
+      setRootFolderId(response.data.rootFolderId);
       setNotes(
         data.map((value) => (
           <ListData
@@ -59,25 +69,94 @@ const FolderPage: FC<Props> = () => {
     [setAnchorPoint, setShow]
   );
 
+  const onClickNewFolder = async () => {
+    const folderData = new FormData();
+    folderData.append('folderName', '새폴더');
+    folderData.append('rootFolderId', String(rootFolderId));
+    const response = await axios.post('/v1/note/folder', folderData, {
+      headers: { Authorization: `Bearer ${authToken}` },
+    });
+    console.log(response);
+    setNotes(
+      <>
+        <FolderData
+          key={1000}
+          title="새폴더"
+          folderId={1000}
+          depth={0}
+          opened={false}
+          menu={handleContextMenu}
+        />
+        {notes}
+      </>
+    );
+  };
+
+  const downloadAll = () => {
+    console.log('download all');
+    setSelectMode(false);
+  };
+
+  const starAll = () => {
+    console.log('star all');
+    setSelectMode(false);
+  };
+
+  const deleteAll = () => {
+    console.log('delete all');
+    setSelectMode(false);
+  };
+
+  const getTitle = () => {
+    if (mode === NotesMode.All) return '내 학습노트';
+    if (mode === NotesMode.Star) return '중요 노트함';
+    return '휴지통';
+  };
+
   return (
     <BaseLayout grey>
       <Root>
         <Top>
-          내 학습 노트
-          <ButtonWrapper>
-            <Button>
-              <FolderImage src={NewFolder} />
-              <ButtonName>새폴더</ButtonName>
-            </Button>
-            <Button>
-              <ButtonImage src={Check} />
-              <ButtonName>파일 선택하기</ButtonName>
-            </Button>
-            <Button>
-              <Sort>정렬 기준</Sort>
-              <ButtonImage src={SortToggleDown} />
-            </Button>
-          </ButtonWrapper>
+          {getTitle()}
+          {selectMode ? (
+            <ButtonWrapper>
+              <Button>
+                <FolderImage src={Download} />
+                <ButtonName onClick={downloadAll}>노트 다운로드</ButtonName>
+              </Button>
+              <Button>
+                <FolderImage src={GreyStar} />
+                <ButtonName onClick={starAll}>중요 표시</ButtonName>
+              </Button>
+              <Button>
+                <FolderImage src={GreyTrashCan} />
+                <ButtonName onClick={deleteAll}>노트 삭제</ButtonName>
+              </Button>
+              <Button>
+                <ButtonImage src={Check} />
+                <ButtonName onClick={() => setSelectMode(false)}>
+                  선택모드 해제
+                </ButtonName>
+              </Button>
+            </ButtonWrapper>
+          ) : (
+            <ButtonWrapper>
+              <Button>
+                <FolderImage src={NewFolder} />
+                <ButtonName onClick={onClickNewFolder}>새폴더</ButtonName>
+              </Button>
+              <Button>
+                <ButtonImage src={Check} />
+                <ButtonName onClick={() => setSelectMode(true)}>
+                  파일 선택하기
+                </ButtonName>
+              </Button>
+              <Button>
+                <Sort>정렬 기준</Sort>
+                <ButtonImage src={SortToggleDown} />
+              </Button>
+            </ButtonWrapper>
+          )}
         </Top>
         {show && (
           <ContextMenu
@@ -98,19 +177,19 @@ const FolderPage: FC<Props> = () => {
           <tbody>{notes}</tbody>
         </Box>
         <BoxWrapper>
-          <SmallBox>
+          <SmallBox onClick={() => setMode(NotesMode.All)}>
+            <BoxTitle>
+              <BoxImage src={Folder40} />
+              전체 노트함
+            </BoxTitle>
+          </SmallBox>
+          <SmallBox onClick={() => setMode(NotesMode.Star)}>
             <BoxTitle>
               <BoxImage src={Star} />
               중요 노트함
             </BoxTitle>
           </SmallBox>
-          <SmallBox>
-            <BoxTitle>
-              <BoxImage src={Clock} />
-              최근 노트함
-            </BoxTitle>
-          </SmallBox>
-          <SmallBox>
+          <SmallBox onClick={() => setMode(NotesMode.Trash)}>
             <BoxTitle>
               <BoxImage src={TrashCan} />
               휴지통

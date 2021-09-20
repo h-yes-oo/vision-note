@@ -1,6 +1,9 @@
 import { FC } from 'react';
 import styled from 'styled-components';
+import axios from 'axios';
+import { useRecoilValue } from 'recoil';
 
+import { authenticateToken } from 'state';
 import ContextDelete from 'assets/icons/ContextDelete.svg';
 import ContextDownload from 'assets/icons/ContextDownload.svg';
 import ContextStar from 'assets/icons/ContextStar.svg';
@@ -12,6 +15,7 @@ interface Props {
 }
 
 const ContextMenu: FC<Props> = ({ anchorPoint, setShow, noteId }) => {
+  const authToken = useRecoilValue(authenticateToken);
   const handleClick = () => setShow(false);
 
   const handleDownload = () => {
@@ -24,9 +28,11 @@ const ContextMenu: FC<Props> = ({ anchorPoint, setShow, noteId }) => {
     // event.stopPropagation();
   };
 
-  const handleDelete = () => {
-    console.log(`${noteId} delete`);
+  const handleDelete = async () => {
     // event.stopPropagation();
+    await axios.delete(`/v1/note/file/${noteId}`, {
+      headers: { Authorization: `Bearer ${authToken}` },
+    });
   };
 
   return (

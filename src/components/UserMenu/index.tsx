@@ -28,7 +28,9 @@ const UserMenu: FC<Props & RouteComponentProps> = ({
   };
 
   const darkmode = () => {
-    console.log('darkmode');
+    alert(
+      '아직 지원하지 않는 기능입니다. 빠른 시일 내에 제공하고자 노력하겠습니다.'
+    );
   };
 
   const logout = () => {

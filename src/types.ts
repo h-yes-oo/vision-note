@@ -17,3 +17,9 @@ export enum FileType {
   Folder,
   Note,
 }
+
+export enum NotesMode {
+  All,
+  Star,
+  Trash,
+}
