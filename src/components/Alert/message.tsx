@@ -5,7 +5,7 @@ import Alert from '.';
 
 interface ModalProps {
   cancle: () => void;
-  confirm: () => Promise<void>;
+  confirm: () => void | Promise<void>;
   visible: boolean;
   message: string;
 }

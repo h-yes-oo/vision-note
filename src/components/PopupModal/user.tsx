@@ -6,6 +6,7 @@ import axios from 'axios';
 
 import { userInfo, authenticateToken } from 'state';
 import LoadingDots from 'components/LoadingDots';
+import Alert from 'components/Alert';
 import AlertWithMessage from 'components/Alert/message';
 
 import Edit from 'assets/icons/Edit.svg';
@@ -37,6 +38,8 @@ const UserModal: FC<Props & RouteComponentProps> = ({
   const [nickname, setNickname] = useState<string>(user.nickname);
   const [type, setType] = useState<number>(user.typeId);
   const [avatar, setAvatar] = useState<string>(user.avatar);
+  const [newPassword, setNewPassword] = useState<string>('');
+  const [confirmPassword, setConfirmPassword] = useState<string>('');
   // loading status
   const [loading, setLoading] = useState<boolean>(false);
   // RefObjects
@@ -46,6 +49,7 @@ const UserModal: FC<Props & RouteComponentProps> = ({
     useRef<HTMLInputElement>(null);
   // Alert states
   const [showSignOutAlert, setShowSignOutAlert] = useState<boolean>(false);
+  const [showPasswordAlert, setShowPasswordAlert] = useState<boolean>(false);
 
   const logout = () => {
     localStorage.removeItem('user');
@@ -116,12 +120,10 @@ const UserModal: FC<Props & RouteComponentProps> = ({
     setEditType(false);
     setLoading(true);
     const userData = new FormData();
-    userData.append('avatar', avatar);
-    userData.append('email', user.email);
-    userData.append('nickname', nickname);
-    userData.append('password', 'coco1003!');
-    userData.append('socialType', user.socialType);
-    userData.append('typeId', String(type));
+    if (avatar !== user.avatar) userData.append('avatar', avatar);
+    if (nickname !== user.nickname) userData.append('nickname', nickname);
+    if (newPassword !== '') userData.append('password', newPassword);
+    if (type !== user.type) userData.append('typeId', String(type));
 
     try {
       await axios.put('/v1/user', userData, {
@@ -136,6 +138,20 @@ const UserModal: FC<Props & RouteComponentProps> = ({
       setAvatar(user.avatar);
     }
     setLoading(false);
+  };
+
+  const cancleNewPassword = () => {
+    setNewPassword('');
+    setConfirmPassword('');
+    setShowPasswordAlert(false);
+  };
+
+  const confirmNewPassword = () => {
+    if (newPassword !== confirmPassword) {
+      setNewPassword('');
+      setConfirmPassword('');
+      alert('비밀번호를 다시 확인해주세요');
+    } else setShowPasswordAlert(false);
   };
 
   const ModalInner = (
@@ -194,15 +210,18 @@ const UserModal: FC<Props & RouteComponentProps> = ({
           <FlexCenter>
             <Title>비밀번호 변경</Title>
             <Content disabled type="password" placeholder="**********" />
-            <EditButton src={Edit} />
+            <EditButton
+              src={showPasswordAlert ? EditPurple : Edit}
+              onClick={() => setShowPasswordAlert(!showPasswordAlert)}
+            />
           </FlexCenter>
           <FlexCenter>
             <Title>저장용량</Title>
             <FlexColumn>
               <StatusBar>
-                <CurrentStatus current={user.storage / 15} />
+                <CurrentStatus current={user.storage ?? 0 / 15} />
               </StatusBar>
-              <StorageInfo>{`15GB 중 ${user.storage}GB 사용`}</StorageInfo>
+              <StorageInfo>{`15GB 중 ${user.storage ?? 0}GB 사용`}</StorageInfo>
             </FlexColumn>
           </FlexCenter>
         </Wrapper>
@@ -229,12 +248,56 @@ const UserModal: FC<Props & RouteComponentProps> = ({
         visible={showSignOutAlert}
         message={`탈퇴하시면 그동안 작성하신 학습 노트가 모두 사라집니다.\n 계속하시겠습니까?`}
       />
+      <Alert
+        cancle={cancleNewPassword}
+        confirm={confirmNewPassword}
+        visible={showPasswordAlert}
+      >
+        <>
+          <Form
+            type="password"
+            placeholder="새 비밀번호"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+          />
+          <Form
+            type="password"
+            placeholder="새 비밀번호 확인"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+        </>
+      </Alert>
       <PopupModal onClose={onClose} visible={visible}>
         {ModalInner}
       </PopupModal>
     </>
   );
 };
+
+const Form = styled.input`
+  height: 61px;
+  box-sizing: border-box;
+  padding: 0 20px;
+  margin-bottom: 20px;
+  object-fit: contain;
+  border-radius: 5px;
+  border: solid 1px #e6e6e6;
+  background-color: #fff;
+
+  font-family: Pretendard;
+  font-size: 18px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.22;
+  letter-spacing: normal;
+  text-align: left;
+
+  &::placeholder {
+    color: #c5c5c5;
+  }
+`;
 
 const UserIcon = styled.img`
   width: 24px;

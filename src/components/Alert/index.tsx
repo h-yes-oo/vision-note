@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 interface ModalProps {
   cancle: () => void;
-  confirm: () => Promise<void>;
+  confirm: () => void | Promise<void>;
   visible: boolean;
   children: ReactElement;
 }
