@@ -275,7 +275,12 @@ const StartNote: FC<Props> = ({ startRec, setReady }) => {
           onMouseOut={() => setOnUpload(false)}
           onClick={onClickUpload}
         >
-          <UploadButton ref={fileRef} type="file" onChange={onFileChange} />
+          <UploadButton
+            ref={fileRef}
+            type="file"
+            accept=".wav"
+            onChange={onFileChange}
+          />
           <BtnImage src={onUpload ? UploadWhite : UploadGrey} />
           녹음 파일 업로드 하기
         </StartBtn>

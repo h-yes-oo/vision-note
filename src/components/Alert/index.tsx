@@ -1,26 +1,20 @@
-import React, { FC } from 'react';
+import React, { FC, ReactElement } from 'react';
 import styled from 'styled-components';
 
 interface ModalProps {
-  cancle: any;
-  confirm: any;
+  cancle: () => void;
+  confirm: () => Promise<void>;
   visible: boolean;
-  message: string;
+  children: ReactElement;
 }
 
-const Alert: FC<ModalProps> = ({ cancle, confirm, visible, message }) => {
-  const onMaskClick: React.MouseEventHandler<HTMLDivElement> = (e) => {
-    if (e.target === e.currentTarget) {
-      cancle(e);
-    }
-  };
-
+const Alert: FC<ModalProps> = ({ cancle, confirm, visible, children }) => {
   return (
     <>
       <ModalOverlay visible={visible} />
       <ModalWrapper tabIndex={-1} visible={visible}>
         <Root visible={visible}>
-          <Message>{message}</Message>
+          {children}
           <ButtonWrapper>
             <WhiteButton onClick={cancle}>취소</WhiteButton>
             <PurpleButton onClick={confirm}>확인</PurpleButton>
@@ -30,19 +24,6 @@ const Alert: FC<ModalProps> = ({ cancle, confirm, visible, message }) => {
     </>
   );
 };
-
-const Message = styled.div`
-  font-family: Pretendard;
-  font-size: 16px;
-  font-weight: 500;
-  font-stretch: normal;
-  font-style: normal;
-  line-height: 1.5;
-  letter-spacing: normal;
-  text-align: center;
-  color: #000;
-  padding: 20px 19px 0;
-`;
 
 const ButtonWrapper = styled.div`
   display: flex;
@@ -93,7 +74,6 @@ const Root = styled.div<{ visible: boolean }>`
   justify-content: space-between;
 
   width: 442px;
-  height: 192px;
   border-radius: 14px;
   box-shadow: 0 3px 16px 0 rgba(0, 0, 0, 0.16);
   background-color: #fff;

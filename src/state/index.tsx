@@ -21,6 +21,6 @@ export const userInfo = selector({
 export const userName = selector({
   key: 'UserName',
   get: ({ get }) => {
-    return get(userInfo).nickname;
+    return get(userInfo).nickname ?? '비회원';
   },
 });

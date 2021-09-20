@@ -1,17 +1,14 @@
 import { FC, useState } from 'react';
 import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
-import { useRecoilState } from 'recoil';
-import axios from 'axios';
+import { useSetRecoilState } from 'recoil';
 
 import DarkMode from 'assets/icons/DarkMode.svg';
 import Logout from 'assets/icons/Logout.svg';
 import UserEdit from 'assets/icons/UserEdit.svg';
 
 import { authenticateToken } from 'state';
-import PopupModal from 'components/PopupModal';
 import UserModal from 'components/PopupModal/user';
-import Alert from 'components/Alert';
 
 interface Props {
   show: boolean;
@@ -24,25 +21,7 @@ const UserMenu: FC<Props & RouteComponentProps> = ({
   history,
 }) => {
   const [userModal, setUserModal] = useState<boolean>(false);
-  const [showAlert, setShowAlert] = useState<boolean>(false);
-  const [authToken, setAuthToken] = useRecoilState(authenticateToken);
-
-  const confirmSignOut = async () => {
-    try {
-      await axios.delete('/v1/user', {
-        headers: { Authorization: `Bearer ${authToken}` },
-      });
-      setShowAlert(false);
-      history.push('/');
-      logout();
-    } catch {
-      alert('탈퇴에 실패했습니다. 다시 시도해주세요');
-    }
-  };
-
-  const cancleSignOut = () => {
-    setShowAlert(false);
-  };
+  const setAuthToken = useSetRecoilState(authenticateToken);
 
   const closeModal = () => {
     setUserModal(false);
@@ -55,6 +34,7 @@ const UserMenu: FC<Props & RouteComponentProps> = ({
   const logout = () => {
     localStorage.removeItem('user');
     setAuthToken(null);
+    history.push('/');
   };
 
   const userEdit = () => {
@@ -64,15 +44,7 @@ const UserMenu: FC<Props & RouteComponentProps> = ({
 
   return (
     <>
-      <Alert
-        cancle={cancleSignOut}
-        confirm={confirmSignOut}
-        visible={showAlert}
-        message={`탈퇴하시면 그동안 작성하신 학습 노트가 모두 사라집니다.\n 계속하시겠습니까?`}
-      />
-      <PopupModal onClose={closeModal} visible={userModal}>
-        <UserModal onClose={closeModal} showAlert={() => setShowAlert(true)} />
-      </PopupModal>
+      <UserModal onClose={closeModal} visible={userModal} />
       <Menu show={show}>
         <MenuList onClick={darkmode}>
           <ContextImage src={DarkMode} />

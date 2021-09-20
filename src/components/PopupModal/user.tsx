@@ -1,4 +1,4 @@
-import { FC, useState, useEffect, useRef } from 'react';
+import React, { FC, useState, useRef } from 'react';
 import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import { useRecoilValue, useRecoilState } from 'recoil';
@@ -6,6 +6,7 @@ import axios from 'axios';
 
 import { userInfo, authenticateToken } from 'state';
 import LoadingDots from 'components/LoadingDots';
+import AlertWithMessage from 'components/Alert/message';
 
 import Edit from 'assets/icons/Edit.svg';
 import EditPurple from 'assets/icons/EditPurple.svg';
@@ -14,32 +15,67 @@ import EditTypeUp from 'assets/icons/EditTypeUp.svg';
 import UserEdit from 'assets/icons/UserEdit.svg';
 import SampleProfile from 'assets/images/SampleProfile.svg';
 import ProfileChange from 'assets/icons/ProfileChange.svg';
+import PopupModal from '.';
 
 interface Props {
+  visible: boolean;
   onClose: any;
-  showAlert: any;
 }
 
 const UserModal: FC<Props & RouteComponentProps> = ({
+  visible,
   onClose,
-  showAlert,
   history,
 }) => {
+  // recoil states
   const user = useRecoilValue(userInfo);
   const [authToken, setAuthToken] = useRecoilState(authenticateToken);
-
+  // editing status
   const [editNickname, setEditNickname] = useState<boolean>(false);
   const [editType, setEditType] = useState<boolean>(false);
+  // edited values
   const [nickname, setNickname] = useState<string>(user.nickname);
   const [type, setType] = useState<number>(user.typeId);
   const [avatar, setAvatar] = useState<string>(user.avatar);
+  // loading status
   const [loading, setLoading] = useState<boolean>(false);
+  // RefObjects
   const nicknameRef: React.RefObject<HTMLInputElement> =
     useRef<HTMLInputElement>(null);
+  const fileRef: React.RefObject<HTMLInputElement> =
+    useRef<HTMLInputElement>(null);
+  // Alert states
+  const [showSignOutAlert, setShowSignOutAlert] = useState<boolean>(false);
 
-  useEffect(() => {
-    console.log(user);
-  }, []);
+  const logout = () => {
+    localStorage.removeItem('user');
+    setAuthToken(null);
+    history.push('/');
+  };
+
+  const confirmSignOut = async () => {
+    try {
+      await axios.delete('/v1/user', {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      setShowSignOutAlert(false);
+      history.push('/');
+      logout();
+    } catch {
+      alert('탈퇴에 실패했습니다. 다시 시도해주세요');
+    }
+  };
+
+  const cancleSignOut = () => {
+    setShowSignOutAlert(false);
+  };
+
+  const onAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setAvatar(e.target.value);
+
+  const onClickChangeProfile = () => {
+    if (fileRef.current !== null) fileRef.current.click();
+  };
 
   const handleEditNickname = () => {
     if (editNickname) {
@@ -69,6 +105,12 @@ const UserModal: FC<Props & RouteComponentProps> = ({
     }
   };
 
+  const closeModal = () => {
+    setEditNickname(false);
+    setEditType(false);
+    onClose();
+  };
+
   const saveChanges = async () => {
     setEditNickname(false);
     setEditType(false);
@@ -96,12 +138,19 @@ const UserModal: FC<Props & RouteComponentProps> = ({
     setLoading(false);
   };
 
-  return (
+  const ModalInner = (
     <>
       <Top>
         <div style={{ position: 'relative' }}>
           <ProfileImage src={SampleProfile} />
-          <ChangeProfile />
+          <ChangeProfile onClick={onClickChangeProfile}>
+            <UploadButton
+              ref={fileRef}
+              type="file"
+              accept=".jpg, .png"
+              onChange={onAvatarChange}
+            />
+          </ChangeProfile>
         </div>
         <Wrapper>
           <FlexCenter>
@@ -159,9 +208,9 @@ const UserModal: FC<Props & RouteComponentProps> = ({
         </Wrapper>
       </Top>
       <Bottom>
-        <SignOut onClick={showAlert}>회원 탈퇴</SignOut>
+        <SignOut onClick={() => setShowSignOutAlert(true)}>회원 탈퇴</SignOut>
         <Flex>
-          <WhiteButton onClick={onClose}>나가기</WhiteButton>
+          <WhiteButton onClick={closeModal}>나가기</WhiteButton>
           {loading ? (
             <LoadingDots small />
           ) : (
@@ -169,6 +218,20 @@ const UserModal: FC<Props & RouteComponentProps> = ({
           )}
         </Flex>
       </Bottom>
+    </>
+  );
+
+  return (
+    <>
+      <AlertWithMessage
+        cancle={cancleSignOut}
+        confirm={confirmSignOut}
+        visible={showSignOutAlert}
+        message={`탈퇴하시면 그동안 작성하신 학습 노트가 모두 사라집니다.\n 계속하시겠습니까?`}
+      />
+      <PopupModal onClose={onClose} visible={visible}>
+        {ModalInner}
+      </PopupModal>
     </>
   );
 };
@@ -403,6 +466,17 @@ const StorageInfo = styled.div`
   text-align: left;
   color: #656565;
   margin-top: 10px;
+`;
+
+const UploadButton = styled.input`
+  overflow: hidden;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  clip: rect(0, 0, 0, 0);
 `;
 
 export default withRouter(UserModal);
