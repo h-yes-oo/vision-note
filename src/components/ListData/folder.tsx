@@ -1,13 +1,16 @@
-import { FC, useState, useEffect, ReactNode } from 'react';
+import { FC, useState, useEffect, ReactNode, useCallback, useRef } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { useRecoilValue } from 'recoil';
+
+import { NotesMode } from 'types';
+import ContextMenuFolder from 'components/ContextMenu/folder';
 
 import FolderPurple from 'assets/icons/FolderPurple.svg';
 import FolderBlue from 'assets/icons/FolderBlue.svg';
 import FolderPurpleClosed from 'assets/icons/FolderPurpleClosed.svg';
 import FolderBlueClosed from 'assets/icons/FolderBlueClosed.svg';
-import { authenticateToken } from 'state';
+import { authenticateToken, notesMode } from 'state';
 import ListData, { NoteResponse } from './list';
 
 interface Props {
@@ -15,15 +18,41 @@ interface Props {
   folderId: number;
   depth: number;
   opened: boolean;
-  menu: any;
+  refreshNotes: any;
 }
 
-const FolderData: FC<Props> = ({ title, folderId, depth, opened, menu }) => {
+const FolderData: FC<Props> = ({
+  title,
+  folderId,
+  depth,
+  opened,
+  refreshNotes,
+}) => {
   const [open, setOpen] = useState<boolean>(opened);
   const [notes, setNotes] = useState<ReactNode>(<></>);
   const [refresh, setRefresh] = useState<boolean>(false);
+  const mode = useRecoilValue(notesMode);
+  // about context menu
+  const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
+  const [contextMode, setShowContextMenu] = useState<boolean>(false);
+  // about editing folder name
+  const [editing, setEditing] = useState<boolean>(false);
+  const [newName, setNewName] = useState<string>('');
+  const folderNameRef: React.RefObject<HTMLInputElement> =
+    useRef<HTMLInputElement>(null);
 
-  const refreshNotes = () => setRefresh(!refresh);
+  const handleContextMenu = useCallback(
+    (event: React.MouseEvent) => {
+      event.preventDefault();
+      setAnchorPoint({ x: event.pageX, y: event.pageY });
+      setShowContextMenu(true);
+    },
+    [setAnchorPoint, setShowContextMenu]
+  );
+
+  const closeContextMenu = () => setShowContextMenu(false);
+
+  const refreshFolder = () => setRefresh(!refresh);
 
   const folderImage = () => {
     if (depth % 2 === 0) return open ? FolderPurple : FolderPurpleClosed;
@@ -37,7 +66,13 @@ const FolderData: FC<Props> = ({ title, folderId, depth, opened, menu }) => {
         headers: { Authorization: `Bearer ${authToken}` },
       };
       const response = await axios.get(`/v1/note/folder/${folderId}`, config);
-      const folderData: NoteResponse[] = response.data;
+      let folderData: NoteResponse[] = response.data;
+      if (mode === NotesMode.Star)
+        folderData = folderData.filter(
+          (value) =>
+            value.itemType === 'FOLDER' ||
+            (value.itemType === 'FILE' && value.noteFile!.isImportant === 1)
+        );
       if (folderData !== undefined)
         setNotes(
           folderData.map((value) => (
@@ -49,29 +84,56 @@ const FolderData: FC<Props> = ({ title, folderId, depth, opened, menu }) => {
               }`}
               data={value}
               depth={depth + 1}
-              refreshNotes={refreshNotes}
+              refreshNotes={refreshFolder}
             />
           ))
         );
     };
     if (authToken !== null) getFolderItems();
-  }, [refresh]);
+  }, [refresh, mode]);
 
   const handleClick = () => {
     setOpen(!open);
   };
 
+  const editFolderName = () => {
+    setEditing(true);
+    if (folderNameRef.current !== null)
+      setTimeout(() => folderNameRef.current!.focus(), 10);
+  };
+
+  const endEditing = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      setEditing(false);
+      if (newName !== '') {
+        // TODO : edit folder name with axios
+        console.log(newName);
+      }
+    }
+  };
+
   return (
     <>
-      <DataRow
-        onContextMenu={(e) => {
-          menu(e, folderId, false);
-        }}
-        onClick={handleClick}
-      >
+      <ContextMenuFolder
+        visible={contextMode}
+        anchorPoint={anchorPoint}
+        closeContextMenu={closeContextMenu}
+        folderId={folderId}
+        refreshNotes={refreshNotes}
+        editFolderName={editFolderName}
+      />
+      <DataRow onContextMenu={handleContextMenu} onClick={handleClick}>
         <TitleData>
           <TitleImage depth={depth} src={folderImage()} />
-          <TitleName> {title} </TitleName>
+          <EditTitleName
+            type="text"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            onKeyPress={endEditing}
+            ref={folderNameRef}
+            visible={editing}
+          />
+          <TitleName visible={!editing}> {title} </TitleName>
         </TitleData>
       </DataRow>
       {open && notes}
@@ -118,10 +180,24 @@ const TitleData = styled(TableData)`
   justify-content: flex-start;
 `;
 
-const TitleName = styled.p`
+const TitleName = styled.p<{ visible: boolean }>`
+  display: ${(props) => (props.visible ? '' : 'none')};
   text-overflow: ellipsis;
   overflow: hidden;
   user-select: none !important;
+`;
+
+const EditTitleName = styled.input<{ visible: boolean }>`
+  display: ${(props) => (props.visible ? '' : 'none')};
+  border: 2px solid #06cc80;
+  border-radius: 3px;
+  box-sizing: border-box;
+  font-family: Pretendard;
+  font-size: 16px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.19;
 `;
 
 const TitleImage = styled.img<{ depth: number }>`

@@ -1,6 +1,9 @@
-import { FC } from 'react';
+import { FC, useState, useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { selectedNotes, selectMode } from 'state';
+import ContextMenu from 'components/ContextMenu';
 import Note from 'assets/icons/Note.svg';
 import Star from 'assets/icons/Star.svg';
 
@@ -10,8 +13,8 @@ interface Props {
   date: string;
   starred: boolean;
   subject: string;
-  menu: any;
   noteId: number;
+  refreshNotes: any;
 }
 
 const NoteData: FC<Props> = ({
@@ -20,12 +23,65 @@ const NoteData: FC<Props> = ({
   date,
   starred,
   subject,
-  menu,
   noteId,
+  refreshNotes,
 }) => {
+  const [selectedIds, setSelectedIds] = useRecoilState(selectedNotes);
+  const selecting = useRecoilValue(selectMode);
+  const [selected, setSelected] = useState<boolean>(
+    selectedIds.includes(noteId)
+  );
+  // about context menu
+  const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
+  const [showContextMenu, setShowContextMenu] = useState<boolean>(false);
+
+  useEffect(() => {
+    setSelected(selectedIds.includes(noteId));
+  }, [selectedIds]);
+
+  const addToSelectedIds = (noteId: number) => {
+    setSelectedIds([...selectedIds, noteId]);
+  };
+
+  const removeFromSelectedIds = (noteId: number) => {
+    setSelectedIds(selectedIds.filter((value) => value !== noteId));
+  };
+
+  const toggleSelected = () => {
+    if (selected) removeFromSelectedIds(noteId);
+    else addToSelectedIds(noteId);
+    setSelected(!selected);
+  };
+
+  const moveToNote = () => {
+    console.log(noteId);
+  };
+
+  const handleContextMenu = useCallback(
+    (event: React.MouseEvent) => {
+      event.preventDefault();
+      setAnchorPoint({ x: event.pageX, y: event.pageY });
+      setShowContextMenu(true);
+    },
+    [setAnchorPoint, setShowContextMenu]
+  );
+
+  const closeContextMenu = () => setShowContextMenu(false);
+
   return (
     <>
-      <DataRow onContextMenu={(e) => menu(e, noteId, true)}>
+      <ContextMenu
+        visible={showContextMenu}
+        anchorPoint={anchorPoint}
+        closeContextMenu={closeContextMenu}
+        noteId={noteId}
+        refreshNotes={refreshNotes}
+      />
+      <DataRow
+        selected={selectedIds.includes(noteId)}
+        onClick={selecting ? toggleSelected : moveToNote}
+        onContextMenu={handleContextMenu}
+      >
         <TitleData>
           <TitleImage depth={depth} src={Note} />
           <TitleName> {title} </TitleName>
@@ -38,7 +94,7 @@ const NoteData: FC<Props> = ({
   );
 };
 
-const DataRow = styled.div`
+const DataRow = styled.div<{ selected: boolean }>`
   height: 65px;
   border-bottom: #e6e6e6 1px solid;
   padding: 0 30px;
@@ -46,6 +102,8 @@ const DataRow = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+
+  ${(props) => (props.selected ? 'background-color : #f6f6f6;' : '')}
 
   &:hover {
     background-color: #f6f6f6;

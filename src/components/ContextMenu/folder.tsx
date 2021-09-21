@@ -5,39 +5,29 @@ import { useRecoilValue } from 'recoil';
 
 import { authenticateToken } from 'state';
 import ContextDelete from 'assets/icons/ContextDelete.svg';
-import ContextDownload from 'assets/icons/ContextDownload.svg';
-import ContextStar from 'assets/icons/ContextStar.svg';
+import Edit from 'assets/icons/Edit.svg';
 
 interface Props {
   visible: boolean;
   anchorPoint: { x: number; y: number };
   closeContextMenu: any;
-  noteId: number;
+  folderId: number;
   refreshNotes: () => void;
+  editFolderName: any;
 }
 
-const ContextMenu: FC<Props> = ({
+const ContextMenuFolder: FC<Props> = ({
   visible,
   anchorPoint,
   closeContextMenu,
-  noteId,
+  folderId,
   refreshNotes,
+  editFolderName,
 }) => {
   const authToken = useRecoilValue(authenticateToken);
 
-  const downloadNote = () => {
-    console.log(`${noteId} download`);
-    // event.stopPropagation();
-  };
-
-  const starNote = () => {
-    console.log(`${noteId} star`);
-    // event.stopPropagation();
-  };
-
-  const deleteNote = async () => {
-    // event.stopPropagation();
-    await axios.delete(`/v1/note/file/${noteId}`, {
+  const deleteFolder = async () => {
+    await axios.delete(`/v1/note/folder/${folderId}`, {
       headers: { Authorization: `Bearer ${authToken}` },
     });
     refreshNotes();
@@ -47,17 +37,13 @@ const ContextMenu: FC<Props> = ({
     <Root visible={visible}>
       <PreventClick onClick={closeContextMenu} />
       <Menu top={anchorPoint.y} left={anchorPoint.x} onClick={closeContextMenu}>
-        <MenuList onClick={downloadNote}>
-          <ContextImage src={ContextDownload} />
-          노트 다운로드
+        <MenuList onClick={editFolderName}>
+          <ContextImage src={Edit} />
+          폴더 이름 변경
         </MenuList>
-        <MenuList onClick={starNote}>
-          <ContextImage src={ContextStar} />
-          중요 노트함
-        </MenuList>
-        <MenuList onClick={deleteNote}>
+        <MenuList onClick={deleteFolder}>
           <ContextImage src={ContextDelete} />
-          노트 삭제하기
+          폴더 삭제하기
         </MenuList>
       </Menu>
     </Root>
@@ -126,4 +112,4 @@ const ContextImage = styled.img`
   margin: 0 10px 0 20px;
 `;
 
-export default ContextMenu;
+export default ContextMenuFolder;

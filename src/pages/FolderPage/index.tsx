@@ -1,12 +1,12 @@
 import { FC, useState, ReactNode, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useRecoilState } from 'recoil';
 
 import { NotesMode } from 'types';
 import BaseLayout from 'components/BaseLayout';
 import ListData, { NoteResponse } from 'components/ListData/list';
-import { authenticateToken } from 'state';
+import { authenticateToken, selectMode, selectedNotes, notesMode } from 'state';
 
 import Check from 'assets/icons/Check.svg';
 import SortToggleDown from 'assets/icons/SortToggleDown.svg';
@@ -28,9 +28,9 @@ const FolderPage: FC<Props> = () => {
   const authToken = useRecoilValue(authenticateToken);
   const [refresh, setRefresh] = useState<boolean>(false);
   // about folder page mode
-  const [selectMode, setSelectMode] = useState<boolean>(false);
-  const [mode, setMode] = useState<NotesMode>(NotesMode.All);
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [mode, setMode] = useRecoilState(notesMode);
+  const [selecting, setSelecting] = useRecoilState(selectMode);
+  const [selectedIds, setSelectedIds] = useRecoilState(selectedNotes);
 
   const refreshNotes = () => setRefresh(!refresh);
 
@@ -40,8 +40,14 @@ const FolderPage: FC<Props> = () => {
         headers: { Authorization: `Bearer ${authToken}` },
       };
       const response = await axios.get('/v1/note/folder/root', config);
-      const data: NoteResponse[] = response.data.items;
+      let data: NoteResponse[] = response.data.items;
       setRootFolderId(response.data.rootFolderId);
+      if (mode === NotesMode.Star)
+        data = data.filter(
+          (value) =>
+            value.itemType === 'FOLDER' ||
+            (value.itemType === 'FILE' && value.noteFile!.isImportant === 1)
+        );
       setNotes(
         data.map((value) => (
           <ListData
@@ -58,7 +64,7 @@ const FolderPage: FC<Props> = () => {
       );
     };
     if (authToken !== null) getRootItems();
-  }, [refresh]);
+  }, [refresh, mode]);
 
   const onClickNewFolder = async () => {
     const folderData = new FormData();
@@ -76,22 +82,32 @@ const FolderPage: FC<Props> = () => {
 
   const downloadAll = () => {
     console.log('download all');
-    setSelectMode(false);
+    setSelectedIds([]);
+    setSelecting(false);
   };
 
   const starAll = () => {
     console.log('star all');
-    setSelectMode(false);
+    setSelectedIds([]);
+    setSelecting(false);
   };
 
   const deleteAll = () => {
-    console.log('delete all');
-    setSelectMode(false);
+    selectedIds.map(async (noteId) => {
+      await axios.delete(`/v1/note/file/${noteId}`, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+    });
+    refreshNotes();
+    setSelectedIds([]);
+    setSelecting(false);
   };
 
   const onClickMode = (mode: NotesMode) => {
     setMode(mode);
-    setSelectMode(false);
+    setSelectedIds([]);
+    setSelecting(false);
+    refreshNotes();
   };
 
   const getTitle = () => {
@@ -102,12 +118,12 @@ const FolderPage: FC<Props> = () => {
 
   const getTopMenu = () => {
     // 중요 노트함 기본 모드
-    if (mode === NotesMode.Star && !selectMode)
+    if (mode === NotesMode.Star && !selecting)
       return (
         <ButtonWrapper>
           <Button>
             <ButtonImage src={Check} />
-            <ButtonName onClick={() => setSelectMode(true)}>
+            <ButtonName onClick={() => setSelecting(true)}>
               파일 선택하기
             </ButtonName>
           </Button>
@@ -118,7 +134,7 @@ const FolderPage: FC<Props> = () => {
         </ButtonWrapper>
       );
     // 중요 노트함 파일 선택 모드
-    if (mode === NotesMode.Star && selectMode)
+    if (mode === NotesMode.Star && selecting)
       return (
         <ButtonWrapper>
           <Button>
@@ -131,19 +147,19 @@ const FolderPage: FC<Props> = () => {
           </Button>
           <Button>
             <ButtonImage src={Check} />
-            <ButtonName onClick={() => setSelectMode(false)}>
+            <ButtonName onClick={() => setSelecting(false)}>
               선택모드 해제
             </ButtonName>
           </Button>
         </ButtonWrapper>
       );
     // 휴지통 기본 모드
-    if (mode === NotesMode.Trash && !selectMode)
+    if (mode === NotesMode.Trash && !selecting)
       return (
         <ButtonWrapper>
           <Button>
             <ButtonImage src={Check} />
-            <ButtonName onClick={() => setSelectMode(true)}>
+            <ButtonName onClick={() => setSelecting(true)}>
               파일 선택하기
             </ButtonName>
           </Button>
@@ -160,7 +176,7 @@ const FolderPage: FC<Props> = () => {
         </ButtonWrapper>
       );
     // 휴지통 파일 선택 모드
-    if (mode === NotesMode.Trash && selectMode)
+    if (mode === NotesMode.Trash && selecting)
       return (
         <ButtonWrapper>
           <Button>
@@ -171,14 +187,14 @@ const FolderPage: FC<Props> = () => {
           </Button>
           <Button>
             <ButtonImage src={Check} />
-            <ButtonName onClick={() => setSelectMode(false)}>
+            <ButtonName onClick={() => setSelecting(false)}>
               선택모드 해제
             </ButtonName>
           </Button>
         </ButtonWrapper>
       );
     // 전체 노트함 파일 선택 모드
-    if (mode === NotesMode.All && selectMode)
+    if (mode === NotesMode.All && selecting)
       return (
         <ButtonWrapper>
           <Button>
@@ -195,7 +211,7 @@ const FolderPage: FC<Props> = () => {
           </Button>
           <Button>
             <ButtonImage src={Check} />
-            <ButtonName onClick={() => setSelectMode(false)}>
+            <ButtonName onClick={() => setSelecting(false)}>
               선택모드 해제
             </ButtonName>
           </Button>
@@ -210,7 +226,7 @@ const FolderPage: FC<Props> = () => {
         </Button>
         <Button>
           <ButtonImage src={Check} />
-          <ButtonName onClick={() => setSelectMode(true)}>
+          <ButtonName onClick={() => setSelecting(true)}>
             파일 선택하기
           </ButtonName>
         </Button>

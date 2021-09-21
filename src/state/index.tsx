@@ -1,5 +1,6 @@
 import { atom, selector } from 'recoil';
 import axios from 'axios';
+import { NotesMode } from 'types';
 
 export const authenticateToken = atom<string | null>({
   key: 'authenticateToken',
@@ -23,4 +24,19 @@ export const userName = selector({
   get: ({ get }) => {
     return get(userInfo).nickname ?? '비회원';
   },
+});
+
+export const selectMode = atom<boolean>({
+  key: 'selectMode',
+  default: false,
+});
+
+export const selectedNotes = atom<number[]>({
+  key: 'selected',
+  default: [],
+});
+
+export const notesMode = atom<NotesMode>({
+  key: 'notesMode',
+  default: NotesMode.All,
 });
