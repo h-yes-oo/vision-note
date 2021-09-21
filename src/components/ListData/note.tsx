@@ -1,4 +1,4 @@
-import { FC, useState, useCallback, useEffect } from 'react';
+import React, { FC, useState, useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -68,6 +68,10 @@ const NoteData: FC<Props> = ({
 
   const closeContextMenu = () => setShowContextMenu(false);
 
+  const onDragStart = (e: React.DragEvent) => {
+    e.dataTransfer.setData('text', `n${noteId}`);
+  };
+
   return (
     <>
       <ContextMenu
@@ -81,6 +85,8 @@ const NoteData: FC<Props> = ({
         selected={selectedIds.includes(noteId)}
         onClick={selecting ? toggleSelected : moveToNote}
         onContextMenu={handleContextMenu}
+        draggable
+        onDragStart={onDragStart}
       >
         <TitleData>
           <TitleImage depth={depth} src={Note} />

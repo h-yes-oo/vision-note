@@ -1,4 +1,11 @@
-import { FC, useState, useEffect, ReactNode, useCallback, useRef } from 'react';
+import React, {
+  FC,
+  useState,
+  useEffect,
+  ReactNode,
+  useCallback,
+  useRef,
+} from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { useRecoilValue } from 'recoil';
@@ -38,6 +45,8 @@ const FolderData: FC<Props> = ({
   // about editing folder name
   const [editing, setEditing] = useState<boolean>(false);
   const [newName, setNewName] = useState<string>('');
+  const [dragOver, setDragOver] = useState<boolean>(false);
+
   const folderNameRef: React.RefObject<HTMLInputElement> =
     useRef<HTMLInputElement>(null);
 
@@ -55,8 +64,9 @@ const FolderData: FC<Props> = ({
   const refreshFolder = () => setRefresh(!refresh);
 
   const folderImage = () => {
-    if (depth % 2 === 0) return open ? FolderPurple : FolderPurpleClosed;
-    return open ? FolderBlue : FolderBlueClosed;
+    if (depth % 2 === 0)
+      return open || dragOver ? FolderPurple : FolderPurpleClosed;
+    return open || dragOver ? FolderBlue : FolderBlueClosed;
   };
   const authToken = useRecoilValue(authenticateToken);
 
@@ -111,6 +121,34 @@ const FolderData: FC<Props> = ({
       }
     }
   };
+  const onDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const data = e.dataTransfer.getData('text');
+    const type = data[0];
+    const id = data.slice(1);
+    if (type === 'f') {
+      console.log(`folder ${title} get folder id ${id}`);
+    } else {
+      console.log(`folder ${title} get note id ${id}`);
+    }
+  };
+
+  const onDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    // setOpen(true);
+    setDragOver(true);
+  };
+
+  const onDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+  };
+
+  const onDragStart = (e: React.DragEvent) => {
+    setOpen(false);
+    e.dataTransfer.setData('text', `f${folderId}`);
+  };
 
   return (
     <>
@@ -122,7 +160,16 @@ const FolderData: FC<Props> = ({
         refreshNotes={refreshNotes}
         editFolderName={editFolderName}
       />
-      <DataRow onContextMenu={handleContextMenu} onClick={handleClick}>
+      <DataRow
+        onContextMenu={handleContextMenu}
+        onClick={handleClick}
+        onDrop={onDrop}
+        onDragOver={onDragOver}
+        onDragLeave={onDragLeave}
+        dragOver={dragOver}
+        draggable
+        onDragStart={onDragStart}
+      >
         <TitleData>
           <TitleImage depth={depth} src={folderImage()} />
           <EditTitleName
@@ -141,7 +188,7 @@ const FolderData: FC<Props> = ({
   );
 };
 
-const DataRow = styled.div`
+const DataRow = styled.div<{ dragOver: boolean }>`
   height: 65px;
   border-bottom: #e6e6e6 1px solid;
   padding: 0 30px;
@@ -149,6 +196,7 @@ const DataRow = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  ${(props) => (props.dragOver ? 'background-color: #f6f6f6;' : '')}
 
   &:hover {
     background-color: #f6f6f6;

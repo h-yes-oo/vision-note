@@ -116,6 +116,16 @@ const FolderPage: FC<Props> = () => {
     return '휴지통';
   };
 
+  const startSelectMode = () => {
+    setSelecting(true);
+    setSelectedIds([]);
+  };
+
+  const stopSelectMode = () => {
+    setSelecting(false);
+    setSelectedIds([]);
+  };
+
   const getTopMenu = () => {
     // 중요 노트함 기본 모드
     if (mode === NotesMode.Star && !selecting)
@@ -123,9 +133,7 @@ const FolderPage: FC<Props> = () => {
         <ButtonWrapper>
           <Button>
             <ButtonImage src={Check} />
-            <ButtonName onClick={() => setSelecting(true)}>
-              파일 선택하기
-            </ButtonName>
+            <ButtonName onClick={startSelectMode}>파일 선택하기</ButtonName>
           </Button>
           <Button>
             <Sort>정렬 기준</Sort>
@@ -147,9 +155,7 @@ const FolderPage: FC<Props> = () => {
           </Button>
           <Button>
             <ButtonImage src={Check} />
-            <ButtonName onClick={() => setSelecting(false)}>
-              선택모드 해제
-            </ButtonName>
+            <ButtonName onClick={stopSelectMode}>선택모드 해제</ButtonName>
           </Button>
         </ButtonWrapper>
       );
@@ -159,9 +165,7 @@ const FolderPage: FC<Props> = () => {
         <ButtonWrapper>
           <Button>
             <ButtonImage src={Check} />
-            <ButtonName onClick={() => setSelecting(true)}>
-              파일 선택하기
-            </ButtonName>
+            <ButtonName onClick={startSelectMode}>파일 선택하기</ButtonName>
           </Button>
           <Button>
             <ButtonImage src={EmptyTrashCan} />
@@ -187,9 +191,7 @@ const FolderPage: FC<Props> = () => {
           </Button>
           <Button>
             <ButtonImage src={Check} />
-            <ButtonName onClick={() => setSelecting(false)}>
-              선택모드 해제
-            </ButtonName>
+            <ButtonName onClick={stopSelectMode}>선택모드 해제</ButtonName>
           </Button>
         </ButtonWrapper>
       );
@@ -211,9 +213,7 @@ const FolderPage: FC<Props> = () => {
           </Button>
           <Button>
             <ButtonImage src={Check} />
-            <ButtonName onClick={() => setSelecting(false)}>
-              선택모드 해제
-            </ButtonName>
+            <ButtonName onClick={stopSelectMode}>선택모드 해제</ButtonName>
           </Button>
         </ButtonWrapper>
       );
@@ -226,9 +226,7 @@ const FolderPage: FC<Props> = () => {
         </Button>
         <Button>
           <ButtonImage src={Check} />
-          <ButtonName onClick={() => setSelecting(true)}>
-            파일 선택하기
-          </ButtonName>
+          <ButtonName onClick={startSelectMode}>파일 선택하기</ButtonName>
         </Button>
         <Button>
           <Sort>정렬 기준</Sort>
