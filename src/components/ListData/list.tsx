@@ -1,7 +1,10 @@
 import { FC } from 'react';
+import { useRecoilValue } from 'recoil';
 
 import NoteData from 'components/ListData/note';
 import FolderData from 'components/ListData/folder';
+import { notesMode } from 'state';
+import { NotesMode } from 'types';
 
 export interface NoteFile {
   fileId: number;
@@ -35,6 +38,8 @@ interface Props {
 }
 
 const ListData: FC<Props> = ({ data, depth, refreshNotes }) => {
+  const mode = useRecoilValue(notesMode);
+
   if (data.itemType === 'FILE') {
     const note = data.noteFile!;
     const oldDate = note?.createdAt;
@@ -63,7 +68,7 @@ const ListData: FC<Props> = ({ data, depth, refreshNotes }) => {
       key={folder.folderId}
       title={folder.folderName}
       depth={depth}
-      opened={false}
+      opened={mode === NotesMode.Star}
       folderId={folder.folderId}
       refreshNotes={refreshNotes}
     />

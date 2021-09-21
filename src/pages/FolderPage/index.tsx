@@ -39,6 +39,7 @@ const FolderPage: FC<Props> = () => {
       const config = {
         headers: { Authorization: `Bearer ${authToken}` },
       };
+      setNotes(<div>loading...</div>);
       const response = await axios.get('/v1/note/folder/root', config);
       let data: NoteResponse[] = response.data.items;
       setRootFolderId(response.data.rootFolderId);
