@@ -17,7 +17,7 @@ import FolderPurple from 'assets/icons/FolderPurple.svg';
 import FolderBlue from 'assets/icons/FolderBlue.svg';
 import FolderPurpleClosed from 'assets/icons/FolderPurpleClosed.svg';
 import FolderBlueClosed from 'assets/icons/FolderBlueClosed.svg';
-import { authenticateToken, notesMode } from 'state';
+import { authenticateToken, notesMode, selectMode } from 'state';
 import ListData, { NoteResponse } from './list';
 
 interface Props {
@@ -39,6 +39,7 @@ const FolderData: FC<Props> = ({
   const [notes, setNotes] = useState<ReactNode>(<></>);
   const [refresh, setRefresh] = useState<boolean>(false);
   const mode = useRecoilValue(notesMode);
+  const selecting = useRecoilValue(selectMode);
   // about context menu
   const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
   const [contextMode, setShowContextMenu] = useState<boolean>(false);
@@ -53,10 +54,12 @@ const FolderData: FC<Props> = ({
   const handleContextMenu = useCallback(
     (event: React.MouseEvent) => {
       event.preventDefault();
-      setAnchorPoint({ x: event.pageX, y: event.pageY });
-      setShowContextMenu(true);
+      if (!selecting) {
+        setAnchorPoint({ x: event.pageX, y: event.pageY });
+        setShowContextMenu(true);
+      }
     },
-    [setAnchorPoint, setShowContextMenu]
+    [setAnchorPoint, setShowContextMenu, selecting]
   );
 
   const closeContextMenu = () => setShowContextMenu(false);

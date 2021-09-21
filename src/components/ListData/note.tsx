@@ -60,10 +60,12 @@ const NoteData: FC<Props> = ({
   const handleContextMenu = useCallback(
     (event: React.MouseEvent) => {
       event.preventDefault();
-      setAnchorPoint({ x: event.pageX, y: event.pageY });
-      setShowContextMenu(true);
+      if (!selecting) {
+        setAnchorPoint({ x: event.pageX, y: event.pageY });
+        setShowContextMenu(true);
+      }
     },
-    [setAnchorPoint, setShowContextMenu]
+    [setAnchorPoint, setShowContextMenu, selecting]
   );
 
   const closeContextMenu = () => setShowContextMenu(false);
