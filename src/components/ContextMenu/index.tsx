@@ -3,58 +3,105 @@ import styled from 'styled-components';
 import axios from 'axios';
 import { useRecoilValue } from 'recoil';
 
+import { ContextMode } from 'types';
 import { authenticateToken } from 'state';
 import ContextDelete from 'assets/icons/ContextDelete.svg';
 import ContextDownload from 'assets/icons/ContextDownload.svg';
 import ContextStar from 'assets/icons/ContextStar.svg';
+import Edit from 'assets/icons/Edit.svg';
 
 interface Props {
+  mode: ContextMode;
   anchorPoint: { x: number; y: number };
-  setShow: any;
-  noteId: number;
+  setContextMode: any;
+  contextItemId: number;
+  refreshNotes: () => void;
 }
 
-const ContextMenu: FC<Props> = ({ anchorPoint, setShow, noteId }) => {
+const ContextMenu: FC<Props> = ({
+  mode,
+  anchorPoint,
+  setContextMode,
+  contextItemId,
+  refreshNotes,
+}) => {
   const authToken = useRecoilValue(authenticateToken);
-  const handleClick = () => setShow(false);
+  const handleClick = () => setContextMode(ContextMode.No);
 
-  const handleDownload = () => {
-    console.log(`${noteId} download`);
+  const downloadNote = () => {
+    console.log(`${contextItemId} download`);
     // event.stopPropagation();
   };
 
-  const handleStar = () => {
-    console.log(`${noteId} star`);
+  const starNote = () => {
+    console.log(`${contextItemId} star`);
     // event.stopPropagation();
   };
 
-  const handleDelete = async () => {
+  const deleteNote = async () => {
     // event.stopPropagation();
-    await axios.delete(`/v1/note/file/${noteId}`, {
+    await axios.delete(`/v1/note/file/${contextItemId}`, {
       headers: { Authorization: `Bearer ${authToken}` },
     });
+    refreshNotes();
+  };
+
+  const editFolderName = () => {
+    console.log(`${contextItemId} edit`);
+  };
+
+  const deleteFolder = async () => {
+    await axios.delete(`/v1/note/folder/${contextItemId}`, {
+      headers: { Authorization: `Bearer ${authToken}` },
+    });
+    refreshNotes();
+  };
+
+  const selectMenu = () => {
+    if (mode === ContextMode.Note)
+      return (
+        <>
+          <MenuList onClick={downloadNote}>
+            <ContextImage src={ContextDownload} />
+            노트 다운로드
+          </MenuList>
+          <MenuList onClick={starNote}>
+            <ContextImage src={ContextStar} />
+            중요 노트함
+          </MenuList>
+          <MenuList onClick={deleteNote}>
+            <ContextImage src={ContextDelete} />
+            노트 삭제하기
+          </MenuList>
+        </>
+      );
+    return (
+      <>
+        <MenuList onClick={editFolderName}>
+          <ContextImage src={Edit} />
+          폴더 이름 변경
+        </MenuList>
+        <MenuList onClick={deleteFolder}>
+          <ContextImage src={ContextDelete} />
+          폴더 삭제하기
+        </MenuList>
+      </>
+    );
   };
 
   return (
-    <>
+    <Root visible={mode !== ContextMode.No}>
       <PreventClick onClick={handleClick} />
       <Menu top={anchorPoint.y} left={anchorPoint.x} onClick={handleClick}>
-        <MenuList onClick={handleDownload}>
-          <ContextImage src={ContextDownload} />
-          노트 다운로드
-        </MenuList>
-        <MenuList onClick={handleStar}>
-          <ContextImage src={ContextStar} />
-          중요 노트함
-        </MenuList>
-        <MenuList onClick={handleDelete}>
-          <ContextImage src={ContextDelete} />
-          노트 삭제하기
-        </MenuList>
+        {selectMenu()}
       </Menu>
-    </>
+    </Root>
   );
 };
+
+const Root = styled.div<{ visible: boolean }>`
+  display: ${(props) => (props.visible ? '' : 'none')};
+`;
 
 const PreventClick = styled.div`
   width: 100vw;

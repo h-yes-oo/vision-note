@@ -1,7 +1,9 @@
-import { FC } from 'react';
+import { FC, useState, useCallback } from 'react';
 
+import { ContextMode } from 'types';
 import NoteData from 'components/ListData/note';
 import FolderData from 'components/ListData/folder';
+import ContextMenu from 'components/ContextMenu';
 
 export interface NoteFile {
   fileId: number;
@@ -31,10 +33,25 @@ export interface NoteResponse {
 interface Props {
   data: NoteResponse;
   depth: number;
-  menu: any;
+  refreshNotes: any;
 }
 
-const ListData: FC<Props> = ({ data, depth, menu }) => {
+const ListData: FC<Props> = ({ data, depth, refreshNotes }) => {
+  // about context menu
+  const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
+  const [contextMode, setContextMode] = useState<ContextMode>(ContextMode.No);
+  const [contextItemId, setContextItemId] = useState<number>(0);
+
+  const handleContextMenu = useCallback(
+    (event: React.MouseEvent, contextItemId, note) => {
+      event.preventDefault();
+      setAnchorPoint({ x: event.pageX, y: event.pageY });
+      setContextMode(note ? ContextMode.Note : ContextMode.Folder);
+      setContextItemId(contextItemId);
+    },
+    [setAnchorPoint, setContextMode]
+  );
+
   if (data.itemType === 'FILE') {
     const note = data.noteFile!;
     const oldDate = note?.createdAt;
@@ -43,28 +60,46 @@ const ListData: FC<Props> = ({ data, depth, menu }) => {
       7
     )}.${oldDate?.substring(8, 10)}`;
     return (
-      <NoteData
-        key={note?.fileId}
-        title={note?.fileName}
-        depth={depth}
-        date={newDate}
-        starred={note.isImportant === 1}
-        subject={note.categoryName}
-        menu={menu}
-        noteId={note.fileId}
-      />
+      <>
+        <ContextMenu
+          mode={contextMode}
+          anchorPoint={anchorPoint}
+          setContextMode={setContextMode}
+          contextItemId={contextItemId}
+          refreshNotes={refreshNotes}
+        />
+        <NoteData
+          key={note?.fileId}
+          title={note?.fileName}
+          depth={depth}
+          date={newDate}
+          starred={note.isImportant === 1}
+          subject={note.categoryName}
+          menu={handleContextMenu}
+          noteId={note.fileId}
+        />
+      </>
     );
   }
   const folder = data.noteFolder!;
   return (
-    <FolderData
-      key={folder.folderId}
-      title={folder.folderName}
-      depth={depth}
-      opened={false}
-      menu={menu}
-      folderId={folder.folderId}
-    />
+    <>
+      <ContextMenu
+        mode={contextMode}
+        anchorPoint={anchorPoint}
+        setContextMode={setContextMode}
+        contextItemId={contextItemId}
+        refreshNotes={refreshNotes}
+      />
+      <FolderData
+        key={folder.folderId}
+        title={folder.folderName}
+        depth={depth}
+        opened={false}
+        menu={handleContextMenu}
+        folderId={folder.folderId}
+      />
+    </>
   );
 };
 

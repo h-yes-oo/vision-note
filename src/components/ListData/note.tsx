@@ -25,7 +25,7 @@ const NoteData: FC<Props> = ({
 }) => {
   return (
     <>
-      <DataRow onContextMenu={(e) => menu(e, noteId)}>
+      <DataRow onContextMenu={(e) => menu(e, noteId, true)}>
         <TitleData>
           <TitleImage depth={depth} src={Note} />
           <TitleName> {title} </TitleName>
@@ -38,7 +38,7 @@ const NoteData: FC<Props> = ({
   );
 };
 
-const DataRow = styled.tr`
+const DataRow = styled.div`
   height: 65px;
   border-bottom: #e6e6e6 1px solid;
   padding: 0 30px;
@@ -52,7 +52,7 @@ const DataRow = styled.tr`
   }
 `;
 
-const TableData = styled.td`
+const TableData = styled.div`
   font-family: Pretendard;
   font-size: 16px;
   font-weight: normal;

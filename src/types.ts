@@ -23,3 +23,9 @@ export enum NotesMode {
   Star,
   Trash,
 }
+
+export enum ContextMode {
+  No,
+  Note,
+  Folder,
+}

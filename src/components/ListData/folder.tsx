@@ -21,6 +21,10 @@ interface Props {
 const FolderData: FC<Props> = ({ title, folderId, depth, opened, menu }) => {
   const [open, setOpen] = useState<boolean>(opened);
   const [notes, setNotes] = useState<ReactNode>(<></>);
+  const [refresh, setRefresh] = useState<boolean>(false);
+
+  const refreshNotes = () => setRefresh(!refresh);
+
   const folderImage = () => {
     if (depth % 2 === 0) return open ? FolderPurple : FolderPurpleClosed;
     return open ? FolderBlue : FolderBlueClosed;
@@ -45,13 +49,13 @@ const FolderData: FC<Props> = ({ title, folderId, depth, opened, menu }) => {
               }`}
               data={value}
               depth={depth + 1}
-              menu={menu}
+              refreshNotes={refreshNotes}
             />
           ))
         );
     };
     if (authToken !== null) getFolderItems();
-  }, [authToken]);
+  }, [refresh]);
 
   const handleClick = () => {
     setOpen(!open);
@@ -61,7 +65,7 @@ const FolderData: FC<Props> = ({ title, folderId, depth, opened, menu }) => {
     <>
       <DataRow
         onContextMenu={(e) => {
-          e.preventDefault();
+          menu(e, folderId, false);
         }}
         onClick={handleClick}
       >
@@ -75,7 +79,7 @@ const FolderData: FC<Props> = ({ title, folderId, depth, opened, menu }) => {
   );
 };
 
-const DataRow = styled.tr`
+const DataRow = styled.div`
   height: 65px;
   border-bottom: #e6e6e6 1px solid;
   padding: 0 30px;
@@ -89,7 +93,7 @@ const DataRow = styled.tr`
   }
 `;
 
-const TableData = styled.td`
+const TableData = styled.div`
   font-family: Pretendard;
   font-size: 16px;
   font-weight: normal;
