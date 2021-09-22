@@ -6,7 +6,13 @@ import { useRecoilValue, useRecoilState } from 'recoil';
 import { NotesMode } from 'types';
 import BaseLayout from 'components/BaseLayout';
 import ListData, { NoteResponse } from 'components/ListData/list';
-import { authenticateToken, selectMode, selectedNotes, notesMode } from 'state';
+import {
+  authenticateToken,
+  selectMode,
+  selectedNotes,
+  notesMode,
+  dragRefresh,
+} from 'state';
 
 import Check from 'assets/icons/Check.svg';
 import SortToggleDown from 'assets/icons/SortToggleDown.svg';
@@ -31,11 +37,13 @@ const FolderPage: FC<Props> = () => {
   const [mode, setMode] = useRecoilState(notesMode);
   const [selecting, setSelecting] = useRecoilState(selectMode);
   const [selectedIds, setSelectedIds] = useRecoilState(selectedNotes);
+  // const refreshDrag = useRecoilValue<() => void>(dragRefresh);
 
-  const refreshNotes = () => setRefresh(!refresh);
+  const refreshRoot = () => setRefresh(!refresh);
 
   useEffect(() => {
     const getRootItems = async () => {
+      console.log('reload root');
       const config = {
         headers: { Authorization: `Bearer ${authToken}` },
       };
@@ -59,7 +67,8 @@ const FolderPage: FC<Props> = () => {
             }`}
             data={value}
             depth={0}
-            refreshNotes={refreshNotes}
+            refreshNotes={refreshRoot}
+            refreshRoot={refreshRoot}
           />
         ))
       );
@@ -75,7 +84,7 @@ const FolderPage: FC<Props> = () => {
       await axios.post('/v1/note/folder', folderData, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
-      refreshNotes();
+      refreshRoot();
     } catch {
       alert('새 폴더를 생성하지 못했습니다');
     }
@@ -93,13 +102,13 @@ const FolderPage: FC<Props> = () => {
     setSelecting(false);
   };
 
-  const deleteAll = () => {
-    selectedIds.map(async (noteId) => {
+  const deleteAll = async () => {
+    await selectedIds.map(async (noteId) => {
       await axios.delete(`/v1/note/file/${noteId}`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
     });
-    refreshNotes();
+    refreshRoot();
     setSelectedIds([]);
     setSelecting(false);
   };
@@ -108,7 +117,7 @@ const FolderPage: FC<Props> = () => {
     setMode(mode);
     setSelectedIds([]);
     setSelecting(false);
-    refreshNotes();
+    refreshRoot();
   };
 
   const getTitle = () => {
@@ -237,6 +246,46 @@ const FolderPage: FC<Props> = () => {
     );
   };
 
+  const onDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    const data = e.dataTransfer.getData('text');
+    const type = data[0];
+    const id = data.slice(1);
+    if (type === 'f') {
+      // 폴더(id)를 루트 폴더 내부로 옮길 때
+      const fileData = new FormData();
+      fileData.append('folderId', String(id));
+      fileData.append('parentFolderId', String(rootFolderId));
+      await axios.put(`/v1/note/folder/${id}`, fileData, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      // 폴더(id)의 상위 폴더와 루트 폴더 리렌더
+      // 어차피 루트 폴더 리렌더 하면 전체 리렌더
+      // refreshDrag();
+      refreshRoot();
+    } else {
+      // 파일(id)를 루트 폴더 내부로 옮길 때
+      const fileData = new FormData();
+      fileData.append('fileId', String(id));
+      fileData.append('folderId', String(rootFolderId));
+      await axios.put(`/v1/note/file/${id}`, fileData, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      // 파일(id)의 상위 폴더와 루트 폴더 리렌더
+      // 어차피 루트 폴더 리렌더 하면 전체 리렌더
+      // refreshDrag();
+      refreshRoot();
+    }
+  };
+
+  const onDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const onDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
   return (
     <BaseLayout grey>
       <Root>
@@ -254,6 +303,11 @@ const FolderPage: FC<Props> = () => {
             </TableRow>
           </div>
           <div>{notes}</div>
+          <DropZone
+            onDrop={onDrop}
+            onDragOver={onDragOver}
+            onDragLeave={onDragLeave}
+          />
         </Box>
         <BoxWrapper>
           <SmallBox onClick={() => onClickMode(NotesMode.All)}>
@@ -279,6 +333,12 @@ const FolderPage: FC<Props> = () => {
     </BaseLayout>
   );
 };
+
+const DropZone = styled.div`
+  height: 65px;
+  min-height: 65px;
+  height: 100%;
+`;
 
 const Root = styled.div`
   display: flex;

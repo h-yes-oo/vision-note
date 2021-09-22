@@ -13,6 +13,7 @@ interface Props {
   anchorPoint: { x: number; y: number };
   closeContextMenu: any;
   noteId: number;
+  starred: boolean;
   refreshNotes: () => void;
 }
 
@@ -21,6 +22,7 @@ const ContextMenu: FC<Props> = ({
   anchorPoint,
   closeContextMenu,
   noteId,
+  starred,
   refreshNotes,
 }) => {
   const authToken = useRecoilValue(authenticateToken);
@@ -30,9 +32,14 @@ const ContextMenu: FC<Props> = ({
     // event.stopPropagation();
   };
 
-  const starNote = () => {
-    console.log(`${noteId} star`);
-    // event.stopPropagation();
+  const starNote = async () => {
+    const fileData = new FormData();
+    fileData.append('fileId', String(noteId));
+    fileData.append('isImportant', String(starred ? 0 : 1));
+    await axios.put(`/v1/note/file/${noteId}`, fileData, {
+      headers: { Authorization: `Bearer ${authToken}` },
+    });
+    refreshNotes();
   };
 
   const deleteNote = async () => {
@@ -53,7 +60,7 @@ const ContextMenu: FC<Props> = ({
         </MenuList>
         <MenuList onClick={starNote}>
           <ContextImage src={ContextStar} />
-          중요 노트함
+          {starred ? '중요 노트 해제' : '중요 노트함'}
         </MenuList>
         <MenuList onClick={deleteNote}>
           <ContextImage src={ContextDelete} />

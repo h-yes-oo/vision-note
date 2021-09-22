@@ -34,10 +34,13 @@ export interface NoteResponse {
 interface Props {
   data: NoteResponse;
   depth: number;
-  refreshNotes: any;
+  // 해당 데이터가 들어 있는 폴더를 다시 렌더
+  refreshNotes: () => void;
+  // 아예 루트부터 다시 렌더
+  refreshRoot: () => void;
 }
 
-const ListData: FC<Props> = ({ data, depth, refreshNotes }) => {
+const ListData: FC<Props> = ({ data, depth, refreshNotes, refreshRoot }) => {
   const mode = useRecoilValue(notesMode);
 
   if (data.itemType === 'FILE') {
@@ -71,6 +74,7 @@ const ListData: FC<Props> = ({ data, depth, refreshNotes }) => {
       opened={mode === NotesMode.Star}
       folderId={folder.folderId}
       refreshNotes={refreshNotes}
+      refreshRoot={refreshRoot}
     />
   );
 };

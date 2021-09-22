@@ -40,3 +40,8 @@ export const notesMode = atom<NotesMode>({
   key: 'notesMode',
   default: NotesMode.All,
 });
+
+export const dragRefresh = atom<() => void>({
+  key: 'dragRefresh',
+  default: () => () => console.log('no refresh function'),
+});

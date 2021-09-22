@@ -8,7 +8,7 @@ import React, {
 } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useRecoilState } from 'recoil';
 
 import { NotesMode } from 'types';
 import ContextMenuFolder from 'components/ContextMenu/folder';
@@ -17,7 +17,7 @@ import FolderPurple from 'assets/icons/FolderPurple.svg';
 import FolderBlue from 'assets/icons/FolderBlue.svg';
 import FolderPurpleClosed from 'assets/icons/FolderPurpleClosed.svg';
 import FolderBlueClosed from 'assets/icons/FolderBlueClosed.svg';
-import { authenticateToken, notesMode, selectMode } from 'state';
+import { authenticateToken, dragRefresh, notesMode, selectMode } from 'state';
 import ListData, { NoteResponse } from './list';
 
 interface Props {
@@ -26,6 +26,7 @@ interface Props {
   depth: number;
   opened: boolean;
   refreshNotes: any;
+  refreshRoot: () => void;
 }
 
 const FolderData: FC<Props> = ({
@@ -34,6 +35,7 @@ const FolderData: FC<Props> = ({
   depth,
   opened,
   refreshNotes,
+  refreshRoot,
 }) => {
   const [open, setOpen] = useState<boolean>(opened);
   const [notes, setNotes] = useState<ReactNode>(<></>);
@@ -46,7 +48,9 @@ const FolderData: FC<Props> = ({
   // about editing folder name
   const [editing, setEditing] = useState<boolean>(false);
   const [newName, setNewName] = useState<string>('');
+  // about drag and drop
   const [dragOver, setDragOver] = useState<boolean>(false);
+  const [refreshDrag, setRefreshDrag] = useRecoilState<() => void>(dragRefresh);
 
   const folderNameRef: React.RefObject<HTMLInputElement> =
     useRef<HTMLInputElement>(null);
@@ -74,10 +78,12 @@ const FolderData: FC<Props> = ({
   const authToken = useRecoilValue(authenticateToken);
 
   useEffect(() => {
+    console.log(`reload folder ${title}`);
     const getFolderItems = async () => {
       const config = {
         headers: { Authorization: `Bearer ${authToken}` },
       };
+      setNotes(<>Loading...</>);
       const response = await axios.get(`/v1/note/folder/${folderId}`, config);
       let folderData: NoteResponse[] = response.data;
       if (mode === NotesMode.Star)
@@ -98,9 +104,11 @@ const FolderData: FC<Props> = ({
               data={value}
               depth={depth + 1}
               refreshNotes={refreshFolder}
+              refreshRoot={refreshRoot}
             />
           ))
         );
+      else setNotes(<></>);
     };
     if (authToken !== null) getFolderItems();
   }, [refresh, mode]);
@@ -124,16 +132,34 @@ const FolderData: FC<Props> = ({
       }
     }
   };
-  const onDrop = (e: React.DragEvent) => {
+  const onDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     setDragOver(false);
     const data = e.dataTransfer.getData('text');
     const type = data[0];
     const id = data.slice(1);
     if (type === 'f') {
-      console.log(`folder ${title} get folder id ${id}`);
+      // 폴더(id)를 폴더(folderId) 내부로 옮길 때
+      const fileData = new FormData();
+      fileData.append('folderId', String(id));
+      fileData.append('parentFolderId', String(folderId));
+      await axios.put(`/v1/note/folder/${id}`, fileData, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      // 폴더(id)의 상위 폴더와 폴더(folderId)의 상위 폴더 리렌더
+      refreshDrag();
+      refreshNotes();
     } else {
-      console.log(`folder ${title} get note id ${id}`);
+      // 파일(id)를 폴더(folderId) 내부로 옮길 때
+      const fileData = new FormData();
+      fileData.append('fileId', String(id));
+      fileData.append('folderId', String(folderId));
+      await axios.put(`/v1/note/file/${id}`, fileData, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      // 파일(id)의 상위 폴더와 폴더(folderId)의 상위 폴더 리렌더
+      refreshDrag();
+      refreshNotes();
     }
   };
 
@@ -151,6 +177,7 @@ const FolderData: FC<Props> = ({
   const onDragStart = (e: React.DragEvent) => {
     setOpen(false);
     e.dataTransfer.setData('text', `f${folderId}`);
+    setRefreshDrag(() => refreshNotes);
   };
 
   return (
@@ -160,7 +187,7 @@ const FolderData: FC<Props> = ({
         anchorPoint={anchorPoint}
         closeContextMenu={closeContextMenu}
         folderId={folderId}
-        refreshNotes={refreshNotes}
+        refreshNotes={refreshRoot}
         editFolderName={editFolderName}
       />
       <DataRow
