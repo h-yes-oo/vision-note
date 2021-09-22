@@ -2,9 +2,17 @@ import { atom, selector } from 'recoil';
 import axios from 'axios';
 import { NotesMode } from 'types';
 
+const getToken = () => {
+  try {
+    return JSON.parse(localStorage.getItem('user') ?? 'null');
+  } catch {
+    return null;
+  }
+};
+
 export const authenticateToken = atom<string | null>({
   key: 'authenticateToken',
-  default: JSON.parse(localStorage.getItem('user') ?? 'null'),
+  default: getToken(),
 });
 
 export const userInfo = selector({
@@ -12,10 +20,16 @@ export const userInfo = selector({
   get: async ({ get }) => {
     const token = get(authenticateToken);
     if (token === null) return '비회원';
-    const response = await axios.get('/v1/user', {
-      headers: { Authorization: `Bearer ${get(authenticateToken)}` },
-    });
-    return response.data;
+    try {
+      const response = await axios.get('/v1/user', {
+        headers: { Authorization: `Bearer ${get(authenticateToken)}` },
+      });
+      return response.data;
+    } catch {
+      // 기존에 저장되어 있던 토큰이 변경되어 인증이 불가한 경우
+      localStorage.removeItem('user');
+      return '비회원';
+    }
   },
 });
 
