@@ -79,13 +79,11 @@ const FolderData: FC<Props> = ({
   };
 
   useEffect(() => {
-    console.log(`reload folder ${folderTitle}`);
     const getFolderItems = async () => {
-      const config = {
+      // setNotes(<>Loading...</>);
+      const response = await axios.get(`/v1/note/folder/${folderId}`, {
         headers: { Authorization: `Bearer ${authToken}` },
-      };
-      setNotes(<>Loading...</>);
-      const response = await axios.get(`/v1/note/folder/${folderId}`, config);
+      });
       let folderData: NoteResponse[] = response.data;
       if (mode === NotesMode.Star)
         folderData = folderData.filter(
@@ -150,26 +148,28 @@ const FolderData: FC<Props> = ({
     const id = data.slice(1);
     if (type === 'f') {
       // 폴더(id)를 폴더(folderId) 내부로 옮길 때
-      const fileData = new FormData();
-      fileData.append('folderId', String(id));
-      fileData.append('parentFolderId', String(folderId));
-      await axios.put(`/v1/note/folder/${id}`, fileData, {
-        headers: { Authorization: `Bearer ${authToken}` },
-      });
-      // 폴더(id)의 상위 폴더와 폴더(folderId)의 상위 폴더 리렌더
-      refreshDrag();
-      refreshNotes();
+      if (parseInt(id, 10) !== folderId) {
+        const fileData = new FormData();
+        fileData.append('folderId', id);
+        fileData.append('parentFolderId', String(folderId));
+        await axios.put(`/v1/note/folder/${id}`, fileData, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+        // 폴더(id)의 상위 폴더와 옮겨 온 폴더(folderId) 리렌더
+        refreshDrag();
+        refreshFolder();
+      }
     } else {
       // 파일(id)를 폴더(folderId) 내부로 옮길 때
       const fileData = new FormData();
-      fileData.append('fileId', String(id));
+      fileData.append('fileId', id);
       fileData.append('folderId', String(folderId));
       await axios.put(`/v1/note/file/${id}`, fileData, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
-      // 파일(id)의 상위 폴더와 폴더(folderId)의 상위 폴더 리렌더
+      // 파일(id)의 상위 폴더와 옮겨 온 폴더(folderId) 리렌더
       refreshDrag();
-      refreshNotes();
+      refreshFolder();
     }
   };
 
@@ -223,10 +223,14 @@ const FolderData: FC<Props> = ({
           <TitleName visible={!editing}> {folderTitle} </TitleName>
         </TitleData>
       </DataRow>
-      {open && notes}
+      <NoteWrapper visible={open}>{notes}</NoteWrapper>
     </>
   );
 };
+
+const NoteWrapper = styled.div<{ visible: boolean }>`
+  display: ${(props) => (props.visible ? '' : 'none')};
+`;
 
 const DataRow = styled.div<{ dragOver: boolean }>`
   height: 65px;

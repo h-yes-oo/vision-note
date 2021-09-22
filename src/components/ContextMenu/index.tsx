@@ -7,6 +7,7 @@ import { authenticateToken } from 'state';
 import ContextDelete from 'assets/icons/ContextDelete.svg';
 import ContextDownload from 'assets/icons/ContextDownload.svg';
 import ContextStar from 'assets/icons/ContextStar.svg';
+import FilledStar from 'assets/icons/FilledStar.svg';
 
 interface Props {
   visible: boolean;
@@ -59,7 +60,7 @@ const ContextMenu: FC<Props> = ({
           노트 다운로드
         </MenuList>
         <MenuList onClick={starNote}>
-          <ContextImage src={ContextStar} />
+          <ContextImage src={starred ? FilledStar : ContextStar} />
           {starred ? '중요 노트 해제' : '중요 노트함'}
         </MenuList>
         <MenuList onClick={deleteNote}>

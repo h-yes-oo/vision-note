@@ -43,12 +43,10 @@ const FolderPage: FC<Props> = () => {
 
   useEffect(() => {
     const getRootItems = async () => {
-      console.log('reload root');
-      const config = {
-        headers: { Authorization: `Bearer ${authToken}` },
-      };
       setNotes(<div>loading...</div>);
-      const response = await axios.get('/v1/note/folder/root', config);
+      const response = await axios.get('/v1/note/folder/root', {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
       let data: NoteResponse[] = response.data.items;
       setRootFolderId(response.data.rootFolderId);
       if (mode === NotesMode.Star)
