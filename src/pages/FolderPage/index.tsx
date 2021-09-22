@@ -97,13 +97,21 @@ const FolderPage: FC<Props> = () => {
   };
 
   const starAll = () => {
-    console.log('star all');
+    selectedIds.map(async (noteId) => {
+      const fileData = new FormData();
+      fileData.append('fileId', String(noteId));
+      fileData.append('isImportant', '1');
+      await axios.put(`/v1/note/file/${noteId}`, fileData, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+    });
+    refreshRoot();
     setSelectedIds([]);
     setSelecting(false);
   };
 
   const deleteAll = async () => {
-    await selectedIds.map(async (noteId) => {
+    selectedIds.map(async (noteId) => {
       await axios.delete(`/v1/note/file/${noteId}`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });

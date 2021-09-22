@@ -42,6 +42,8 @@ const FolderData: FC<Props> = ({
   const [refresh, setRefresh] = useState<boolean>(false);
   const mode = useRecoilValue(notesMode);
   const selecting = useRecoilValue(selectMode);
+  const authToken = useRecoilValue(authenticateToken);
+  const [folderTitle, setFolderTitle] = useState<string>(title ?? '');
   // about context menu
   const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
   const [contextMode, setShowContextMenu] = useState<boolean>(false);
@@ -75,10 +77,9 @@ const FolderData: FC<Props> = ({
       return open || dragOver ? FolderPurple : FolderPurpleClosed;
     return open || dragOver ? FolderBlue : FolderBlueClosed;
   };
-  const authToken = useRecoilValue(authenticateToken);
 
   useEffect(() => {
-    console.log(`reload folder ${title}`);
+    console.log(`reload folder ${folderTitle}`);
     const getFolderItems = async () => {
       const config = {
         headers: { Authorization: `Bearer ${authToken}` },
@@ -123,12 +124,21 @@ const FolderData: FC<Props> = ({
       setTimeout(() => folderNameRef.current!.focus(), 10);
   };
 
-  const endEditing = (e: React.KeyboardEvent) => {
+  const endEditing = async (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       setEditing(false);
       if (newName !== '') {
-        // TODO : edit folder name with axios
-        console.log(newName);
+        try {
+          const folderData = new FormData();
+          folderData.append('folderId', String(folderId));
+          folderData.append('folderName', newName);
+          await axios.put(`/v1/note/folder/${folderId}`, folderData, {
+            headers: { Authorization: `Bearer ${authToken}` },
+          });
+          setFolderTitle(newName);
+        } catch {
+          alert('폴더 이름을 변경하지 못했습니다');
+        }
       }
     }
   };
@@ -210,7 +220,7 @@ const FolderData: FC<Props> = ({
             ref={folderNameRef}
             visible={editing}
           />
-          <TitleName visible={!editing}> {title} </TitleName>
+          <TitleName visible={!editing}> {folderTitle} </TitleName>
         </TitleData>
       </DataRow>
       {open && notes}
