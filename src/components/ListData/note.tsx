@@ -1,5 +1,6 @@
 import React, { FC, useState, useCallback, useEffect } from 'react';
 import styled from 'styled-components';
+import { withRouter, RouteComponentProps } from 'react-router-dom';
 
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { selectedNotes, selectMode, dragRefresh } from 'state';
@@ -17,7 +18,7 @@ interface Props {
   refreshNotes: any;
 }
 
-const NoteData: FC<Props> = ({
+const NoteData: FC<Props & RouteComponentProps> = ({
   title,
   depth,
   date,
@@ -25,6 +26,7 @@ const NoteData: FC<Props> = ({
   subject,
   noteId,
   refreshNotes,
+  history,
 }) => {
   const [selectedIds, setSelectedIds] = useRecoilState(selectedNotes);
   const selecting = useRecoilValue(selectMode);
@@ -55,7 +57,7 @@ const NoteData: FC<Props> = ({
   };
 
   const moveToNote = () => {
-    console.log(noteId);
+    history.push(`/note/${noteId}`);
   };
 
   const handleContextMenu = useCallback(
@@ -177,4 +179,4 @@ const TitleImage = styled(Image24)<{ depth: number }>`
   margin-left: ${(props) => `${props.depth * 20}px`};
 `;
 
-export default NoteData;
+export default withRouter(NoteData);

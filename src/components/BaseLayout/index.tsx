@@ -61,9 +61,8 @@ const BaseLayout: FC<Props & RouteComponentProps> = ({
               />
               <SearchBtn src={SearchIcon} onClick={search} />
             </SearchWrapper>
-            <StartBtn onClick={() => history.push('/notes')}>
-              {' '}
-              학습 시작하기{' '}
+            <StartBtn onClick={() => history.push('/startnote')}>
+              학습 시작하기
             </StartBtn>
           </FlexDiv>
           <UserDiv

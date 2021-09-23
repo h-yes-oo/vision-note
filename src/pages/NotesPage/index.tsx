@@ -1,9 +1,12 @@
 import { FC, useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
+import { RouteComponentProps } from 'react-router-dom';
+import axios from 'axios';
+import { useRecoilValue } from 'recoil';
 
+import { authenticateToken } from 'state';
 import BaseLayout from 'components/BaseLayout';
 import Paragraph from 'components/Paragraph';
-import StartNote from 'components/StartNote';
 
 import FolderSample from 'assets/images/FolderSample2.svg';
 import LookCloser from 'assets/icons/LookCloser.svg';
@@ -14,6 +17,200 @@ import ToggleUp from 'assets/icons/RecordingToggleUp.svg';
 import ToggleDown from 'assets/icons/RecordingToggleDown.svg';
 
 interface Props {}
+
+interface MatchParams {
+  noteId: string;
+}
+
+const checkTime = (i: number): string => {
+  return i < 10 ? `0${i}` : String(i);
+};
+
+const getDate = (date: Date) => {
+  const datetime = `${date.getFullYear()}.${
+    date.getMonth() + 1
+  }.${date.getDate()}`;
+  return datetime;
+};
+
+const displayMediaOptions = {
+  video: true,
+  audio: {
+    sampleRate: 16000,
+  },
+};
+
+const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
+  const [title, setTitle] = useState<string>('');
+  const [date, setDate] = useState<string>('');
+  const [recording, setRecording] = useState<boolean>(false);
+  const [showMemo, setShowMemo] = useState<boolean>(false);
+  const [showRecord, setShowRecord] = useState<boolean>(false);
+  const [recorder, setRecorder] = useState<MediaRecorder>();
+  const [stream, setStream] = useState<MediaStream>();
+  const [timer, setTimer] = useState<ReturnType<typeof setInterval>>();
+  const authToken = useRecoilValue(authenticateToken);
+  // temp start
+  const [content, setContent] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const contents = [
+    '노트 생성은 아직 준비중입니다\n',
+    '비전노트에 놀러와 주셔서 감사합니다 :)\n',
+  ];
+
+  const getNoteInfo = async () => {
+    try {
+      const { data } = await axios.get(`/v1/script/${match.params.noteId}`, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      setTitle(data.script.fileName);
+      setDate(data.script.createdAt.slice(0, 10));
+      setLoading(false);
+    } catch {
+      alert('노트 정보를 가져올 수 없습니다');
+    }
+  };
+
+  useEffect(() => {
+    setLoading(true);
+    setContent(contents.join(''));
+    getNoteInfo();
+  }, []);
+  // temp end
+
+  useEffect(() => {
+    if (recorder !== undefined && recorder.state === 'recording') {
+      setTimer(setInterval(onDownload, 5000));
+    }
+  }, [recorder]);
+
+  const onStart = async () => {
+    try {
+      // 공유 시작
+      const mediaDevices = navigator.mediaDevices as any;
+      if (mediaDevices !== undefined) {
+        mediaDevices
+          .getDisplayMedia(displayMediaOptions)
+          .then((mediaStream: any) => {
+            // 두번째 파라미터인 options 없어도 무방; mimeType에 audio/x-wav 불가
+            const options = {
+              audioBitsPerSecond: 16000,
+              mimeType: 'audio/webm;codecs=opus',
+            };
+            const mediaRecorder = new MediaRecorder(mediaStream, options);
+            mediaRecorder.start();
+
+            mediaRecorder.ondataavailable = (e) => {
+              const blob = new Blob([e.data], { type: e.data.type });
+              // const filename = getFileName();
+              // const downloadElem = window.document.createElement('a');
+              // downloadElem.href = window.URL.createObjectURL(blob);
+              // downloadElem.download = filename;
+              // document.body.appendChild(downloadElem);
+              // downloadElem.click();
+              // document.body.removeChild(downloadElem);
+            };
+
+            setStream(mediaStream);
+            setRecorder(mediaRecorder);
+            setRecording(true);
+          });
+      }
+    } catch (err) {
+      console.error(`Error: ${err}`);
+    }
+  };
+
+  function uploadToServer(dataArray: [Blob]) {
+    const blob = new Blob(dataArray, { type: dataArray[0].type });
+
+    const formdata = new FormData();
+    formdata.append('fname', 'audio.webm');
+    formdata.append('data', blob);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/upload', false);
+    xhr.send(formdata);
+  }
+
+  function stopCapture() {
+    // 공유 중지
+    const tracks = stream?.getTracks();
+    tracks?.forEach((track) => track.stop());
+  }
+
+  const onStop = useCallback(() => {
+    // 녹화 중지
+    recorder?.stop();
+    // 공유 중지
+    stopCapture();
+    if (timer) clearInterval(timer);
+    setRecording(false);
+  }, [timer]);
+
+  const onDownload = () => {
+    recorder?.stop();
+    recorder?.start();
+  };
+
+  return (
+    <BaseLayout grey={false}>
+      {loading ? (
+        <div>Loading...</div>
+      ) : (
+        <Root>
+          <NoteInfo>
+            <InfoTop>
+              <NoteFolder src={FolderSample} />
+              <ButtonWrapper>
+                <SearchBtn src={LookCloser} />
+                <MoreBtn src={More} />
+              </ButtonWrapper>
+            </InfoTop>
+            <InfoMiddle>
+              <NoteTitle>{title}</NoteTitle>
+            </InfoMiddle>
+            <InfoBottom>
+              <NoteDate>{date}</NoteDate>
+              <RecordingWrapper>
+                <RecordingStatus
+                  onClick={() => {
+                    if (recording) onStop();
+                    else onStart();
+                    setRecording(!recording);
+                  }}
+                >
+                  <RecordingBtn src={recording ? Recording : Mic} />
+                  {recording ? '녹음중' : '녹음하기'}
+                </RecordingStatus>
+                {recording ? (
+                  <></>
+                ) : (
+                  <ToggleBtn
+                    src={showRecord ? ToggleUp : ToggleDown}
+                    onClick={() => setShowRecord(!showRecord)}
+                  />
+                )}
+                <MemoBtn onClick={() => setShowMemo(!showMemo)}>
+                  {showMemo ? '전체 메모 닫기' : '전체 메모 보기'}
+                </MemoBtn>
+              </RecordingWrapper>
+            </InfoBottom>
+          </NoteInfo>
+          <NoteContents>
+            <Paragraph
+              bookmarked={false}
+              content={content}
+              time="00:00"
+              note=""
+            />
+          </NoteContents>
+        </Root>
+      )}
+    </BaseLayout>
+  );
+};
 
 const Root = styled.div`
   display: flex;
@@ -40,7 +237,7 @@ const InfoBottom = styled.div`
   justify-content: space-between;
 `;
 
-const NoteTitle = styled.input`
+const NoteTitle = styled.div`
   font-family: Pretendard;
   font-size: 30px;
   font-weight: bold;
@@ -69,8 +266,8 @@ const NoteFolder = styled.img`
   height: 20px;
 `;
 
-const ButtonWrapper = styled.div<{ visible: boolean }>`
-  display: ${(props) => (props.visible ? 'flex' : 'none')};
+const ButtonWrapper = styled.div`
+  display: flex;
 `;
 
 const SearchBtn = styled.img`
@@ -85,8 +282,8 @@ const MoreBtn = styled.img`
 
 const NoteContents = styled.div``;
 
-const RecordingWrapper = styled.div<{ visible: boolean }>`
-  display: ${(props) => (props.visible ? 'flex' : 'none')};
+const RecordingWrapper = styled.div`
+  display: flex;
   align-items: center;
 `;
 
@@ -133,211 +330,5 @@ const ToggleBtn = styled.img`
   height: 12px;
   margin-left: 8px;
 `;
-
-function checkTime(i: number): string {
-  return i < 10 ? `0${i}` : String(i);
-}
-
-const getDate = () => {
-  const currentdate = new Date();
-  const datetime = `${currentdate.getFullYear()}.${
-    currentdate.getMonth() + 1
-  }.${currentdate.getDate()} ${checkTime(currentdate.getHours())}:${checkTime(
-    currentdate.getMinutes()
-  )}`;
-  return datetime;
-};
-
-const getFileName = () => {
-  const today = new Date();
-  const mon = checkTime(today.getMonth() + 1);
-  const day = checkTime(today.getDay() + 1);
-  const h = checkTime(today.getHours());
-  const m = checkTime(today.getMinutes());
-  const s = checkTime(today.getSeconds());
-  return String(mon + day + h + m + s);
-};
-
-const displayMediaOptions = {
-  video: true,
-  audio: {
-    sampleRate: 16000,
-  },
-};
-
-const NotesPage: FC<Props> = () => {
-  const [title, setTitle] = useState<string>(getDate());
-  const [date, setDate] = useState<string>(getDate());
-  const [recording, setRecording] = useState<boolean>(false);
-  const [showMemo, setShowMemo] = useState<boolean>(false);
-  const [showRecord, setShowRecord] = useState<boolean>(false);
-  const [ready, setReady] = useState<boolean>(false);
-  const [recorder, setRecorder] = useState<MediaRecorder>();
-  const [stream, setStream] = useState<MediaStream>();
-  const [timer, setTimer] = useState<ReturnType<typeof setInterval>>();
-  // temp start
-  const [index, setIndex] = useState<number>(0);
-  const [content, setContent] = useState<string>('');
-
-  const contents = [
-    '너무 익숙한 이야기죠?\n',
-    '곰이 나오고 호랑이가 나오고 그죠 단군 왕검이 나오고 우리 건국 신화입니다\n',
-    '신화라는 것은 믿을 수 없는 이야기인데, 믿을 수 없는 이야기가 도대체 고조선과 어떤 관계가 있을까\n',
-    '신화는 역사인가라는 물음을 여러분에게 던지고 싶었어요\n',
-    '자 조금 다르게 선생님이 줄게요\n',
-    '환웅이라는 것에 노란색으로 칠해졌고, 내려왔다\n',
-  ];
-  const addContent = (i: number) => {
-    setContent(content + contents[i]);
-  };
-
-  useEffect(() => {
-    if (ready)
-      document.addEventListener('keydown', () => {
-        addContent(index);
-        setIndex(index + 1);
-      });
-  }, [content, index, ready]);
-
-  // temp end
-
-  useEffect(() => {
-    if (recorder !== undefined && recorder.state === 'recording') {
-      setTimer(setInterval(onDownload, 5000));
-    }
-  }, [recorder]);
-
-  const onTitleChange = (e: any) => {
-    const html = e.target.innerHTML;
-    if (html !== '') setTitle(html);
-  };
-
-  const onStart = async () => {
-    try {
-      // 공유 시작
-      const mediaDevices = navigator.mediaDevices as any;
-      if (mediaDevices !== undefined) {
-        mediaDevices
-          .getDisplayMedia(displayMediaOptions)
-          .then((mediaStream: any) => {
-            // 두번째 파라미터인 options 없어도 무방; mimeType에 audio/x-wav 불가
-            const options = {
-              audioBitsPerSecond: 16000,
-              mimeType: 'audio/webm;codecs=opus',
-            };
-            const mediaRecorder = new MediaRecorder(mediaStream, options);
-            mediaRecorder.start();
-
-            mediaRecorder.ondataavailable = (e) => {
-              const blob = new Blob([e.data], { type: e.data.type });
-              // const filename = getFileName();
-              // const downloadElem = window.document.createElement('a');
-              // downloadElem.href = window.URL.createObjectURL(blob);
-              // downloadElem.download = filename;
-              // document.body.appendChild(downloadElem);
-              // downloadElem.click();
-              // document.body.removeChild(downloadElem);
-            };
-
-            setStream(mediaStream);
-            setRecorder(mediaRecorder);
-            setRecording(true);
-            setReady(true);
-          });
-      }
-    } catch (err) {
-      console.error(`Error: ${err}`);
-    }
-  };
-
-  function uploadToServer(dataArray: [Blob]) {
-    const blob = new Blob(dataArray, { type: dataArray[0].type });
-
-    const formdata = new FormData();
-    formdata.append('fname', 'audio.webm');
-    formdata.append('data', blob);
-
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', '/upload', false);
-    xhr.send(formdata);
-  }
-
-  function stopCapture() {
-    // 공유 중지
-    const tracks = stream?.getTracks();
-    tracks?.forEach((track) => track.stop());
-  }
-
-  const onStop = useCallback(() => {
-    // 녹화 중지
-    recorder?.stop();
-    // 공유 중지
-    stopCapture();
-    if (timer) clearInterval(timer);
-    setRecording(false);
-  }, [timer]);
-
-  const onDownload = () => {
-    recorder?.stop();
-    recorder?.start();
-  };
-
-  return (
-    <BaseLayout grey={false}>
-      <Root>
-        <NoteInfo>
-          <InfoTop>
-            <NoteFolder src={FolderSample} />
-            <ButtonWrapper visible={ready}>
-              <SearchBtn src={LookCloser} />
-              <MoreBtn src={More} />
-            </ButtonWrapper>
-          </InfoTop>
-          <InfoMiddle>
-            <NoteTitle placeholder={title} />
-          </InfoMiddle>
-          <InfoBottom>
-            <NoteDate>{date}</NoteDate>
-            <RecordingWrapper visible={ready}>
-              <RecordingStatus
-                onClick={() => {
-                  if (recording) onStop();
-                  else onStart();
-                  setRecording(!recording);
-                }}
-              >
-                <RecordingBtn src={recording ? Recording : Mic} />
-                {recording ? '녹음중' : '녹음하기'}
-              </RecordingStatus>
-              {recording ? (
-                <></>
-              ) : (
-                <ToggleBtn
-                  src={showRecord ? ToggleUp : ToggleDown}
-                  onClick={() => setShowRecord(!showRecord)}
-                />
-              )}
-              <MemoBtn onClick={() => setShowMemo(!showMemo)}>
-                {showMemo ? '전체 메모 닫기' : '전체 메모 보기'}
-              </MemoBtn>
-            </RecordingWrapper>
-          </InfoBottom>
-        </NoteInfo>
-        <NoteContents>
-          {ready ? (
-            <Paragraph
-              bookmarked={false}
-              content={content}
-              time="00:00"
-              note=""
-            />
-          ) : (
-            <StartNote startRec={onStart} setReady={setReady} />
-          )}
-        </NoteContents>
-      </Root>
-    </BaseLayout>
-  );
-};
 
 export default NotesPage;

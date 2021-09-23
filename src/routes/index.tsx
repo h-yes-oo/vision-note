@@ -7,6 +7,7 @@ import RecordingPage from 'pages/RecordingPage';
 import MainPage from 'pages/MainPage';
 import NotesPage from 'pages/NotesPage';
 import FolderPage from 'pages/FolderPage';
+import StartNotePage from 'pages/StartNotePage';
 
 interface Props {}
 
@@ -20,8 +21,9 @@ const Root: FC<Props> = () => {
           path="/"
           component={authToken === null ? MainPage : FolderPage}
         />
-        <Route path="/notes" component={NotesPage} />
+        <Route path="/note/:noteId" component={NotesPage} />
         <Route path="/recording" component={RecordingPage} />
+        <Route path="/startnote" component={StartNotePage} />
       </Switch>
     </BrowserRouter>
   );

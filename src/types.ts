@@ -1,9 +1,10 @@
 export enum Subject {
-  Korean,
-  Math,
-  Social,
-  Science,
-  General,
+  Korean = 1,
+  Math = 2,
+  Social = 3,
+  Science = 4,
+  Englist = 5,
+  General = 6,
 }
 
 export enum ModalType {
