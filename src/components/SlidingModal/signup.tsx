@@ -312,6 +312,8 @@ const SignUp: FC<Props> = ({ toLogin }) => {
     if (password !== confirm) alert('비밀번호가 같지 않습니다');
     else if (!privacy) alert('개인정보 처리방침에 동의해주세요');
     else if (!agreement) alert('이용약관에 동의해주세요');
+    else if (!/^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/.test(email))
+      alert('이메일 형식을 확인해주세요');
     else if (email === '' || nickname === '' || password === '')
       alert('필수 정보를 입력해주세요');
     else {
