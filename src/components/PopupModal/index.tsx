@@ -15,16 +15,20 @@ const PopupModal: FC<ModalProps> = ({ onClose, visible, children }) => {
   };
 
   return (
-    <>
+    <Visible visible={visible}>
       <ModalOverlay visible={visible} />
       <ModalWrapper onClick={onMaskClick} tabIndex={-1} visible={visible}>
         <Root visible={visible}>
           {React.cloneElement(children, { onClose, visible })}
         </Root>
       </ModalWrapper>
-    </>
+    </Visible>
   );
 };
+
+const Visible = styled.div<{ visible: boolean }>`
+  ${(props) => (props.visible ? '' : 'display: none;')}
+`;
 
 const Root = styled.div<{ visible: boolean }>`
   display: flex;

@@ -22,17 +22,6 @@ interface MatchParams {
   noteId: string;
 }
 
-const checkTime = (i: number): string => {
-  return i < 10 ? `0${i}` : String(i);
-};
-
-const getDate = (date: Date) => {
-  const datetime = `${date.getFullYear()}.${
-    date.getMonth() + 1
-  }.${date.getDate()}`;
-  return datetime;
-};
-
 const displayMediaOptions = {
   video: true,
   audio: {

@@ -10,7 +10,7 @@ interface ModalProps {
 
 const Alert: FC<ModalProps> = ({ cancle, confirm, visible, children }) => {
   return (
-    <>
+    <Visible visible={visible}>
       <ModalOverlay visible={visible} />
       <ModalWrapper tabIndex={-1} visible={visible}>
         <Root visible={visible}>
@@ -21,9 +21,13 @@ const Alert: FC<ModalProps> = ({ cancle, confirm, visible, children }) => {
           </ButtonWrapper>
         </Root>
       </ModalWrapper>
-    </>
+    </Visible>
   );
 };
+
+const Visible = styled.div<{ visible: boolean }>`
+  ${(props) => (props.visible ? '' : 'display: none;')}
+`;
 
 const ButtonWrapper = styled.div`
   display: flex;

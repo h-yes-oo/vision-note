@@ -1,4 +1,4 @@
-import { FC, ReactNode, useState } from 'react';
+import React, { FC, ReactNode, useState } from 'react';
 import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
@@ -38,7 +38,11 @@ const BaseLayout: FC<Props & RouteComponentProps> = ({
     setShowSearch(false);
   };
 
-  const handleMouseEnter = () => setShowUserMenu(true);
+  const handleMouseEnter = (e: React.MouseEvent) => {
+    console.log('mouse enter');
+    console.log(e);
+    setShowUserMenu(true);
+  };
   const handleMouseLeave = () => setShowUserMenu(false);
 
   return (
