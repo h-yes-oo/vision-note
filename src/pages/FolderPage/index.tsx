@@ -377,8 +377,10 @@ const ButtonWrapper = styled.div`
 `;
 
 const HoverAnchor = styled.a`
+  border-radius: 5px;
   &:hover {
     cursor: pointer;
+    background-color: #f1f3f4;
   }
 `;
 

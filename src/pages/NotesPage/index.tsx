@@ -54,7 +54,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setTitle(data.script.fileName);
-      setDate(data.script.createdAt.slice(0, 10));
+      setDate(data.script.createdAt.slice(0, 10).replace(/-/gi, '.'));
       setLoading(false);
     } catch {
       alert('노트 정보를 가져올 수 없습니다');

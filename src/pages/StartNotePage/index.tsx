@@ -111,7 +111,9 @@ const StartNotePage: FC<Props & RouteComponentProps> = ({ history }) => {
   };
 
   const goToNote = async (fileToSend: File) => {
+    // setLoading(true);
     const id = await makeNote(fileToSend);
+    // setLoading(false);
     if (id !== null) history.push(`/note/${id}`);
   };
 
