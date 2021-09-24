@@ -94,29 +94,57 @@ const FolderPage: FC<Props> = () => {
     setSelecting(false);
   };
 
-  const starAll = () => {
-    selectedIds.map(async (noteId) => {
+  const starNote = async (noteId: number) => {
+    try {
       const fileData = new FormData();
       fileData.append('fileId', String(noteId));
       fileData.append('isImportant', '1');
       await axios.put(`/v1/note/file/${noteId}`, fileData, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
-    });
-    refreshRoot();
-    setSelectedIds([]);
-    setSelecting(false);
+      return true;
+    } catch {
+      alert('문제가 발생했습니다');
+      return false;
+    }
   };
 
-  const deleteAll = async () => {
-    selectedIds.map(async (noteId) => {
+  const starAll = async () => {
+    const response = await Promise.all(
+      selectedIds.map((noteId) => {
+        return starNote(noteId);
+      })
+    );
+    if (response) {
+      refreshRoot();
+      setSelectedIds([]);
+      setSelecting(false);
+    }
+  };
+
+  const deleteNote = async (noteId: number) => {
+    try {
       await axios.delete(`/v1/note/file/${noteId}`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
-    });
-    refreshRoot();
-    setSelectedIds([]);
-    setSelecting(false);
+      return true;
+    } catch {
+      alert('문제가 발생했습니다');
+      return false;
+    }
+  };
+
+  const deleteAll = async () => {
+    const response = await Promise.all(
+      selectedIds.map((noteId) => {
+        return deleteNote(noteId);
+      })
+    );
+    if (response) {
+      refreshRoot();
+      setSelectedIds([]);
+      setSelecting(false);
+    }
   };
 
   const onClickMode = (mode: NotesMode) => {
