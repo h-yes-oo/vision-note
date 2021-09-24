@@ -108,7 +108,7 @@ const NoteData: FC<Props & RouteComponentProps> = ({
 };
 
 const DataRow = styled.div<{ selected: boolean }>`
-  height: 65px;
+  min-height: 65px;
   border-bottom: #e6e6e6 1px solid;
   padding: 0 30px;
 

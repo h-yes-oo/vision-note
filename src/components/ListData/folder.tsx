@@ -233,7 +233,7 @@ const NoteWrapper = styled.div<{ visible: boolean }>`
 `;
 
 const DataRow = styled.div<{ dragOver: boolean }>`
-  height: 65px;
+  min-height: 65px;
   border-bottom: #e6e6e6 1px solid;
   padding: 0 30px;
 

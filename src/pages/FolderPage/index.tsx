@@ -344,14 +344,7 @@ const FolderPage: FC<Props> = () => {
               <SubjectHeader>분류</SubjectHeader>
             </TableRow>
           </div>
-          <NoteWrapper>
-            {notes}
-            {/* <DropZone
-              onDrop={onDrop}
-              onDragOver={onDragOver}
-              onDragLeave={onDragLeave}
-            /> */}
-          </NoteWrapper>
+          <NoteWrapper>{notes}</NoteWrapper>
         </Box>
         <BoxWrapper>
           <SmallBox onClick={() => onClickMode(NotesMode.All)}>
@@ -379,13 +372,15 @@ const FolderPage: FC<Props> = () => {
 };
 
 const NoteWrapper = styled.div`
-  min-height: calc(100% - 49px);
+  height: calc(100% - 49px);
+  display: flex;
+  flex-direction: column;
+  overflow: scroll;
 `;
 
 const DropZone = styled.div`
-  height: 65px;
   min-height: 65px;
-  height: 100%;
+  flex: 1;
 `;
 
 const Root = styled.div`
@@ -474,7 +469,6 @@ const Box = styled.div`
   object-fit: contain;
   box-shadow: 0 3px 16px 0 rgba(0, 0, 0, 0.08);
   background-color: #fff;
-  overflow: scroll;
   display: flex;
   flex-direction: column;
   border-radius: 15px;
