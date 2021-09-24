@@ -6,6 +6,7 @@ import { useRecoilValue, useRecoilState } from 'recoil';
 import { NotesMode } from 'types';
 import BaseLayout from 'components/BaseLayout';
 import ListData, { NoteResponse } from 'components/ListData/list';
+import Loading from 'components/Loading';
 import {
   authenticateToken,
   selectMode,
@@ -43,7 +44,7 @@ const FolderPage: FC<Props> = () => {
 
   useEffect(() => {
     const getRootItems = async () => {
-      setNotes(<div>loading...</div>);
+      setNotes(<Loading notes />);
       const response = await axios.get('/v1/note/folder/root', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
@@ -56,19 +57,26 @@ const FolderPage: FC<Props> = () => {
             (value.itemType === 'FILE' && value.noteFile!.isImportant === 1)
         );
       setNotes(
-        data.map((value) => (
-          <ListData
-            key={`${value.itemType}.${
-              value.noteFile
-                ? value.noteFile!.fileId
-                : value.noteFolder!.folderId
-            }`}
-            data={value}
-            depth={0}
-            refreshNotes={refreshRoot}
-            refreshRoot={refreshRoot}
+        <>
+          {data.map((value) => (
+            <ListData
+              key={`${value.itemType}.${
+                value.noteFile
+                  ? value.noteFile!.fileId
+                  : value.noteFolder!.folderId
+              }`}
+              data={value}
+              depth={0}
+              refreshNotes={refreshRoot}
+              refreshRoot={refreshRoot}
+            />
+          ))}
+          <DropZone
+            onDrop={onDrop}
+            onDragOver={onDragOver}
+            onDragLeave={onDragLeave}
           />
-        ))
+        </>
       );
     };
     if (authToken !== null) getRootItems();
@@ -110,15 +118,15 @@ const FolderPage: FC<Props> = () => {
   };
 
   const starAll = async () => {
-    const response = await Promise.all(
-      selectedIds.map((noteId) => {
-        return starNote(noteId);
-      })
+    const responses = await Promise.all(
+      selectedIds.map((noteId) => starNote(noteId))
     );
-    if (response) {
+    if (responses.every((res) => res)) {
       refreshRoot();
       setSelectedIds([]);
       setSelecting(false);
+    } else {
+      alert('문제가 발생했습니다');
     }
   };
 
@@ -135,15 +143,15 @@ const FolderPage: FC<Props> = () => {
   };
 
   const deleteAll = async () => {
-    const response = await Promise.all(
-      selectedIds.map((noteId) => {
-        return deleteNote(noteId);
-      })
+    const responses = await Promise.all(
+      selectedIds.map((noteId) => deleteNote(noteId))
     );
-    if (response) {
+    if (responses.every((res) => res)) {
       refreshRoot();
       setSelectedIds([]);
       setSelecting(false);
+    } else {
+      alert('문제가 발생했습니다');
     }
   };
 
@@ -336,12 +344,14 @@ const FolderPage: FC<Props> = () => {
               <SubjectHeader>분류</SubjectHeader>
             </TableRow>
           </div>
-          <div>{notes}</div>
-          <DropZone
-            onDrop={onDrop}
-            onDragOver={onDragOver}
-            onDragLeave={onDragLeave}
-          />
+          <NoteWrapper>
+            {notes}
+            {/* <DropZone
+              onDrop={onDrop}
+              onDragOver={onDragOver}
+              onDragLeave={onDragLeave}
+            /> */}
+          </NoteWrapper>
         </Box>
         <BoxWrapper>
           <SmallBox onClick={() => onClickMode(NotesMode.All)}>
@@ -367,6 +377,10 @@ const FolderPage: FC<Props> = () => {
     </BaseLayout>
   );
 };
+
+const NoteWrapper = styled.div`
+  min-height: calc(100% - 49px);
+`;
 
 const DropZone = styled.div`
   height: 65px;

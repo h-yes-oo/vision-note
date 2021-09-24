@@ -15,6 +15,7 @@ import Recording from 'assets/icons/Recording.svg';
 import Mic from 'assets/icons/Mic.svg';
 import ToggleUp from 'assets/icons/RecordingToggleUp.svg';
 import ToggleDown from 'assets/icons/RecordingToggleDown.svg';
+import Loading from 'components/Loading';
 
 interface Props {}
 
@@ -146,7 +147,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
   return (
     <BaseLayout grey={false}>
       {loading ? (
-        <div>Loading...</div>
+        <Loading notes={false} />
       ) : (
         <Root>
           <NoteInfo>
