@@ -39,11 +39,20 @@ const BaseLayout: FC<Props & RouteComponentProps> = ({
   };
 
   const handleMouseEnter = (e: React.MouseEvent) => {
-    console.log('mouse enter');
-    console.log(e);
     setShowUserMenu(true);
   };
+
   const handleMouseLeave = () => setShowUserMenu(false);
+
+  const isMobile = () =>
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
+
+  const startNote = () => {
+    if (isMobile()) alert('노트 생성은 pc에서만 가능합니다');
+    else history.push('/startnote');
+  };
 
   return (
     <Root grey={grey}>
@@ -65,9 +74,7 @@ const BaseLayout: FC<Props & RouteComponentProps> = ({
               />
               <SearchBtn src={SearchIcon} onClick={search} />
             </SearchWrapper>
-            <StartBtn onClick={() => history.push('/startnote')}>
-              학습 시작하기
-            </StartBtn>
+            <StartBtn onClick={startNote}>학습 시작하기</StartBtn>
           </FlexDiv>
           <UserDiv
             onMouseEnter={handleMouseEnter}

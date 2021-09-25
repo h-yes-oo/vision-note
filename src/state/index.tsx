@@ -1,4 +1,4 @@
-import { atom, selector } from 'recoil';
+import { atom, selector, useSetRecoilState } from 'recoil';
 import axios from 'axios';
 import { NotesMode } from 'types';
 
@@ -27,7 +27,9 @@ export const userInfo = selector({
       return response.data;
     } catch {
       // 기존에 저장되어 있던 토큰이 변경되어 인증이 불가한 경우
+      const setAuthToken = useSetRecoilState(authenticateToken);
       localStorage.removeItem('user');
+      setAuthToken(null);
       return '비회원';
     }
   },
