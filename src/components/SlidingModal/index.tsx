@@ -46,10 +46,6 @@ const Root = styled.div<{ visible: boolean }>`
 
   display: flex;
   flex-direction: column;
-
-  > * {
-    user-select: none !important;
-  }
 `;
 
 const ClostBtn = styled.a`

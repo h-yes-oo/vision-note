@@ -46,9 +46,6 @@ const Root = styled.div<{ visible: boolean }>`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  > * {
-    user-select: none !important;
-  }
 `;
 
 const ModalWrapper = styled.div<{ visible: boolean }>`
