@@ -246,7 +246,7 @@ const UserModal: FC<Props & RouteComponentProps> = ({
         cancle={cancleSignOut}
         confirm={confirmSignOut}
         visible={showSignOutAlert}
-        message={`탈퇴하시면 그동안 작성하신 학습 노트가 모두 사라집니다.\n 계속하시겠습니까?`}
+        message={`탈퇴하시면 그동안 작성하신 학습 노트가 모두 사라집니다.\n 탈퇴하시겠습니까?`}
       />
       <Alert
         cancle={cancleNewPassword}

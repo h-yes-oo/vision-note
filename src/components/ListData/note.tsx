@@ -86,7 +86,8 @@ const NoteData: FC<Props & RouteComponentProps> = ({
         closeContextMenu={closeContextMenu}
         noteId={noteId}
         starred={starred}
-        refreshNotes={refreshNotes}
+        afterDelete={refreshNotes}
+        afterStar={refreshNotes}
       />
       <DataRow
         selected={selectedIds.includes(noteId)}

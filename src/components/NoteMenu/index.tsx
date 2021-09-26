@@ -1,38 +1,38 @@
 import { FC } from 'react';
 import styled from 'styled-components';
-import axios from 'axios';
+import { withRouter, RouteComponentProps } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
+import axios from 'axios';
 
-import { authenticateToken } from 'state';
-import ContextDelete from 'assets/icons/ContextDelete.svg';
 import ContextDownload from 'assets/icons/ContextDownload.svg';
+import Edit from 'assets/icons/Edit.svg';
 import ContextStar from 'assets/icons/ContextStar.svg';
 import FilledStar from 'assets/icons/FilledStar.svg';
+import ContextDelete from 'assets/icons/ContextDelete.svg';
+
+import { authenticateToken } from 'state';
 
 interface Props {
-  visible: boolean;
-  anchorPoint: { x: number; y: number };
-  closeContextMenu: any;
-  noteId: number;
+  show: boolean;
+  closeMenu: () => void;
   starred: boolean;
-  afterDelete: () => void;
-  afterStar: () => void;
+  noteId: number;
+  editNoteTitle: () => void;
 }
 
-const ContextMenu: FC<Props> = ({
-  visible,
-  anchorPoint,
-  closeContextMenu,
-  noteId,
+const NoteMenu: FC<Props & RouteComponentProps> = ({
+  show,
+  closeMenu,
+  history,
   starred,
-  afterDelete,
-  afterStar,
+  noteId,
+  editNoteTitle,
 }) => {
   const authToken = useRecoilValue(authenticateToken);
 
-  const downloadNote = () => {
-    console.log(`${noteId} download`);
-    // event.stopPropagation();
+  const download = () => {
+    console.log(`download ${noteId}`);
+    closeMenu();
   };
 
   const starNote = async () => {
@@ -42,7 +42,7 @@ const ContextMenu: FC<Props> = ({
     await axios.put(`/v1/note/file/${noteId}`, fileData, {
       headers: { Authorization: `Bearer ${authToken}` },
     });
-    afterStar();
+    closeMenu();
   };
 
   const deleteNote = async () => {
@@ -50,14 +50,18 @@ const ContextMenu: FC<Props> = ({
     await axios.delete(`/v1/note/file/${noteId}`, {
       headers: { Authorization: `Bearer ${authToken}` },
     });
-    afterDelete();
+    history.push('/');
+    closeMenu();
   };
 
   return (
-    <Root visible={visible}>
-      <PreventClick onClick={closeContextMenu} />
-      <Menu top={anchorPoint.y} left={anchorPoint.x} onClick={closeContextMenu}>
-        <MenuList onClick={downloadNote}>
+    <>
+      <Menu show={show}>
+        <MenuList onClick={editNoteTitle}>
+          <ContextImage src={Edit} />
+          노트 제목 변경
+        </MenuList>
+        <MenuList onClick={download}>
           <ContextImage src={ContextDownload} />
           노트 다운로드
         </MenuList>
@@ -70,24 +74,11 @@ const ContextMenu: FC<Props> = ({
           노트 삭제하기
         </MenuList>
       </Menu>
-    </Root>
+    </>
   );
 };
 
-const Root = styled.div<{ visible: boolean }>`
-  display: ${(props) => (props.visible ? '' : 'none')};
-`;
-
-const PreventClick = styled.div`
-  width: 100vw;
-  height: 100vh;
-  position: fixed;
-  z-index: 99;
-  left: 0;
-  top: 0;
-`;
-
-const Menu = styled.div<{ top: number; left: number }>`
+const Menu = styled.div<{ show: boolean }>`
   width: 150px;
   border-radius: 5px;
   box-shadow: 3px 5px 16px 0 rgba(0, 0, 0, 0.12);
@@ -98,11 +89,12 @@ const Menu = styled.div<{ top: number; left: number }>`
   margin: 0;
 
   position: absolute;
-  opacity: 1;
+  right: 0;
+  top: 24px;
+
+  ${(props) => (props.show ? '' : 'display: none;')}
+  opacity: ${(props) => (props.show ? '1' : '0')};
   transition: opacity 0.5s linear;
-  top: ${(props) => props.top}px;
-  left: ${(props) => props.left}px;
-  z-index: 100;
 `;
 
 const MenuList = styled.button`
@@ -136,4 +128,4 @@ const ContextImage = styled.img`
   margin: 0 10px 0 20px;
 `;
 
-export default ContextMenu;
+export default withRouter(NoteMenu);

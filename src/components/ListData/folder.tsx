@@ -73,8 +73,8 @@ const FolderData: FC<Props> = ({
   const refreshFolder = () => setRefresh(!refresh);
 
   const folderImage = () => {
-    if (depth % 2 === 0)
-      return open || dragOver ? FolderPurple : FolderPurpleClosed;
+    // if (depth % 2 === 0)
+    //   return open || dragOver ? FolderPurple : FolderPurpleClosed;
     return open || dragOver ? FolderBlue : FolderBlueClosed;
   };
 

@@ -1,12 +1,13 @@
-import { FC, useState, useEffect, useCallback } from 'react';
+import React, { FC, useState, useEffect, useCallback, useRef } from 'react';
 import styled from 'styled-components';
-import { RouteComponentProps } from 'react-router-dom';
+import { withRouter, RouteComponentProps } from 'react-router-dom';
 import axios from 'axios';
 import { useRecoilValue } from 'recoil';
 
 import { authenticateToken } from 'state';
 import BaseLayout from 'components/BaseLayout';
 import Paragraph from 'components/Paragraph';
+import NoteMenu from 'components/NoteMenu';
 
 import FolderSample from 'assets/images/FolderSample2.svg';
 import LookCloser from 'assets/icons/LookCloser.svg';
@@ -30,7 +31,10 @@ const displayMediaOptions = {
   },
 };
 
-const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
+const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
+  match,
+  history,
+}) => {
   const [title, setTitle] = useState<string>('');
   const [date, setDate] = useState<string>('');
   const [recording, setRecording] = useState<boolean>(false);
@@ -40,6 +44,12 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
   const [stream, setStream] = useState<MediaStream>();
   const [timer, setTimer] = useState<ReturnType<typeof setInterval>>();
   const authToken = useRecoilValue(authenticateToken);
+  const [showContextMenu, setShowContextMenu] = useState<boolean>(false);
+  // about editing title
+  const [editing, setEditing] = useState<boolean>(false);
+  const [newName, setNewName] = useState<string>('');
+  const noteNameRef: React.RefObject<HTMLInputElement> =
+    useRef<HTMLInputElement>(null);
   // temp start
   const [content, setContent] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
@@ -54,6 +64,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
       const { data } = await axios.get(`/v1/script/${match.params.noteId}`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
+      console.log(data);
       setTitle(data.script.fileName);
       setDate(data.script.createdAt.slice(0, 10).replace(/-/gi, '.'));
       setLoading(false);
@@ -144,6 +155,39 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
     recorder?.start();
   };
 
+  const handleMouseEnter = useCallback(
+    (event: React.MouseEvent) => {
+      event.preventDefault();
+      setShowContextMenu(true);
+    },
+    [setShowContextMenu]
+  );
+
+  const editNoteTitle = () => {
+    setEditing(true);
+    if (noteNameRef.current !== null)
+      setTimeout(() => noteNameRef.current!.focus(), 10);
+  };
+
+  const endEditing = async (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      setEditing(false);
+      if (newName !== '') {
+        try {
+          const noteData = new FormData();
+          noteData.append('fileId', String(match.params.noteId));
+          noteData.append('fileName', newName);
+          await axios.put(`/v1/note/file/${match.params.noteId}`, noteData, {
+            headers: { Authorization: `Bearer ${authToken}` },
+          });
+          setTitle(newName);
+        } catch {
+          alert('노트 제목을 변경하지 못했습니다');
+        }
+      }
+    }
+  };
+
   return (
     <BaseLayout grey={false}>
       {loading ? (
@@ -155,11 +199,31 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
               <NoteFolder src={FolderSample} />
               <ButtonWrapper>
                 <SearchBtn src={LookCloser} />
-                <MoreBtn src={More} />
+                <Relative
+                  onMouseEnter={handleMouseEnter}
+                  onMouseLeave={() => setShowContextMenu(false)}
+                >
+                  <MoreBtn src={More} />
+                  <NoteMenu
+                    noteId={Number(match.params.noteId)}
+                    starred={false}
+                    show={showContextMenu}
+                    closeMenu={() => setShowContextMenu(false)}
+                    editNoteTitle={editNoteTitle}
+                  />
+                </Relative>
               </ButtonWrapper>
             </InfoTop>
             <InfoMiddle>
-              <NoteTitle>{title}</NoteTitle>
+              <NoteTitle visible={!editing}>{title}</NoteTitle>
+              <EditNoteTitle
+                type="text"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                onKeyPress={endEditing}
+                ref={noteNameRef}
+                visible={editing}
+              />
             </InfoMiddle>
             <InfoBottom>
               <NoteDate>{date}</NoteDate>
@@ -202,6 +266,10 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
   );
 };
 
+const Relative = styled.div`
+  position: relative;
+`;
+
 const Root = styled.div`
   display: flex;
   flex-direction: column;
@@ -227,7 +295,8 @@ const InfoBottom = styled.div`
   justify-content: space-between;
 `;
 
-const NoteTitle = styled.div`
+const NoteTitle = styled.div<{ visible: boolean }>`
+  display: ${(props) => (props.visible ? '' : 'none')};
   font-family: Pretendard;
   font-size: 30px;
   font-weight: bold;
@@ -238,6 +307,20 @@ const NoteTitle = styled.div`
   text-align: left;
   color: #000;
   border: none;
+`;
+
+const EditNoteTitle = styled.input<{ visible: boolean }>`
+  display: ${(props) => (props.visible ? '' : 'none')};
+  font-family: Pretendard;
+  font-size: 30px;
+  font-weight: bold;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.2;
+  letter-spacing: normal;
+  text-align: left;
+  color: #000;
+  border: 2px solid #06cc80;
 `;
 
 const NoteDate = styled.div`
@@ -268,6 +351,9 @@ const SearchBtn = styled.img`
 
 const MoreBtn = styled.img`
   height: 24px;
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 const NoteContents = styled.div``;
@@ -321,4 +407,4 @@ const ToggleBtn = styled.img`
   margin-left: 8px;
 `;
 
-export default NotesPage;
+export default withRouter(NotesPage);
