@@ -46,8 +46,13 @@ module.exports = {
       },
     ],
     'react/prop-types': ['off'], 
-    "no-shadow": "off",
-    'camelcase': 'off'
+    'no-shadow': 'off',
+    'camelcase': 'off',
+    'no-multi-str': 'off',
+    'prefer-template': 'off',
+    'no-param-reassign': 'off',
+    'no-plusplus': 'off',
+    'no-new-func': 'off',
   },
   settings: {
     'import/resolver': {

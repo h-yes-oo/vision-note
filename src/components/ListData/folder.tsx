@@ -75,7 +75,7 @@ const FolderData: FC<Props> = ({
   const folderImage = () => {
     // if (depth % 2 === 0)
     //   return open || dragOver ? FolderPurple : FolderPurpleClosed;
-    return open || dragOver ? FolderBlue : FolderBlueClosed;
+    return open || dragOver ? FolderPurple : FolderPurpleClosed;
   };
 
   useEffect(() => {
