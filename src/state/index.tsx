@@ -27,9 +27,9 @@ export const userInfo = selector({
       return response.data;
     } catch {
       // 기존에 저장되어 있던 토큰이 변경되어 인증이 불가한 경우
-      const setAuthToken = useSetRecoilState(authenticateToken);
+      // const setAuthToken = useSetRecoilState(authenticateToken);
       localStorage.removeItem('user');
-      setAuthToken(null);
+      // setAuthToken(null);
       return '비회원';
     }
   },
@@ -60,4 +60,9 @@ export const notesMode = atom<NotesMode>({
 export const dragRefresh = atom<() => void>({
   key: 'dragRefresh',
   default: () => () => console.log('no refresh function'),
+});
+
+export const status = atom<string>({
+  key: 'status',
+  default: '',
 });

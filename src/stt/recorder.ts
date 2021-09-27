@@ -1,3 +1,5 @@
+import worker_script from './recorderWorker.js';
+
 const WORKER_PATH = 'recorderWorker.js';
 
 interface Recorder {
@@ -19,7 +21,7 @@ export const Recorder = function (this: Recorder, source, cfg) {
   const bufferLen = config.bufferLen || 4096;
   this.context = source.context;
   this.node = this.context.createScriptProcessor(bufferLen, 1, 1);
-  const worker = new Worker(config.workerPath || WORKER_PATH);
+  const worker = new Worker(worker_script);
   worker.postMessage({
     command: 'init',
     config: {

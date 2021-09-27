@@ -22,43 +22,6 @@ interface Config {
   content_id?: any;
 }
 
-interface ConfigInput {
-  server?: any;
-  // audioSourceId = audioSourceId;
-  serverStatus?: any;
-  referenceHandler?: any;
-  contentType?: any;
-  interval?: any;
-  recorderWorkerPath?: any;
-  onReadyForSpeech?: () => void;
-  onEndOfSpeech?: () => void;
-  onPartialResults?: (data: any) => void;
-  onResults?: (data: any) => void;
-  onEndOfSession?: () => void;
-  onEvent?: (e: any, data: any) => void;
-  onError?: (e: any, data: any) => void;
-  rafCallback?: (time?: any) => void;
-  onServerStatus?: any;
-  audioSourceId?: any;
-  user_id?: any;
-  content_id?: any;
-}
-
-interface Dictate {
-  getConfig: () => Config;
-  init: () => void;
-  startListening: () => void;
-  stopListening: () => void;
-  cancel: () => void;
-  setServer: (server: any) => void;
-  setServerStatus: (serverStatus: any) => void;
-  submitReference: (
-    text: any,
-    successCallback: any,
-    errorCallback: any
-  ) => void;
-}
-
 interface AudioSourceConstraints {
   audio?: any;
 }
@@ -114,386 +77,386 @@ interface CustomWindow {
   Recorder?: any;
 }
 
-let window: Window & CustomWindow & typeof globalThis;
+export class Dictate {
+  getConfig: () => Config;
 
-export const Dictate = function (this: Dictate, cfg: Config) {
-  const config: Config = cfg || {};
-  config.server = config.server || SERVER;
-  // config.audioSourceId = config.audioSourceId;
-  config.serverStatus = config.serverStatus || SERVER_STATUS;
-  config.referenceHandler = config.referenceHandler || REFERENCE_HANDLER;
-  config.contentType = config.contentType || CONTENT_TYPE;
-  config.interval = config.interval || INTERVAL;
-  config.recorderWorkerPath = config.recorderWorkerPath || RECORDER_WORKER_PATH;
-  config.onReadyForSpeech =
-    config.onReadyForSpeech ||
-    function () {
-      console.log('empty');
-    };
-  config.onEndOfSpeech =
-    config.onEndOfSpeech ||
-    function () {
-      console.log('empty');
-    };
-  config.onPartialResults =
-    config.onPartialResults ||
-    function (data: any) {
-      console.log('empty');
-    };
-  config.onResults =
-    config.onResults ||
-    function (data: any) {
-      console.log('empty');
-    };
-  config.onEndOfSession =
-    config.onEndOfSession ||
-    function () {
-      console.log('empty');
-    };
-  config.onEvent =
-    config.onEvent ||
-    function (e: any, data: any) {
-      console.log('empty');
-    };
-  config.onError =
-    config.onError ||
-    function (e: any, data: any) {
-      console.log('empty');
-    };
-  config.rafCallback =
-    config.rafCallback ||
-    function (time) {
-      console.log('empty');
-    };
+  init: () => void;
 
-  // Initialized by init()
-  let audioContext: any;
-  let recorder: any;
-  // Initialized by startListening()
-  let ws: WebSocket | null;
-  let intervalKey: any;
-  // Initialized during construction
-  let wsServerStatus: any;
-  if (config.onServerStatus) {
-    monitorServerStatus();
-  }
+  startListening: () => void;
 
-  // Returns the configuration
-  this.getConfig = function () {
-    return config;
-  };
+  stopListening: () => void;
 
-  // Set up the recorder (incl. asking permission)
-  // Initializes audioContext
-  // Can be called multiple times.
-  // TODO: call something on success (MSG_INIT_RECORDER is currently called)
-  this.init = function () {
-    const audioSourceConstraints: AudioSourceConstraints = {};
-    config.onEvent(
-      MSG_WAITING_MICROPHONE,
-      'Waiting for approval to access your microphone ...'
-    );
-    try {
-      // window.AudioContext = window.AudioContext || window.webkitAudioContext;
-      // navigator.mediaDevices.getUserMedia = navigator.mediaDevices.getUserMedia || navigator.mediaDevices.webkitGetUserMedia || navigator.mediaDevices.mozGetUserMedia;
-      audioContext = new AudioContext();
+  cancel: () => void;
 
-      if (navigator.mediaDevices.getUserMedia) {
-        if (config.audioSourceId) {
-          audioSourceConstraints.audio = {
-            optional: [{ sourceId: config.audioSourceId }],
-          };
-        } else {
-          audioSourceConstraints.audio = true;
-        }
-        navigator.mediaDevices
-          .getUserMedia(audioSourceConstraints)
-          .then(function (stream) {
-            /* use the stream */
-            const input = audioContext.createMediaStreamSource(stream);
-            config.onEvent(MSG_MEDIA_STREAM_CREATED, 'Media stream created');
-            // Firefox loses the audio input stream every five seconds
-            // To fix added the input to window.source
-            window.source = input;
-            window.userSpeechAnalyser = audioContext.createAnalyser();
-            input.connect(window.userSpeechAnalyser);
+  setServer: (server: any) => void;
 
-            config.rafCallback();
-            recorder = new Recorder(input, {
-              workerPath: config.recorderWorkerPath,
-            });
-            config.onEvent(MSG_INIT_RECORDER, 'Recorder initialized');
-          });
-      } else {
-        config.onError(ERR_CLIENT, 'No user media support');
-      }
-    } catch (e) {
-      // Firefox 24: TypeError: AudioContext is not a constructor
-      // Set media.webaudio.enabled = true (in about:config) to fix this.
-      config.onError(ERR_CLIENT, `Error initializing Web Audio browser: ${e}`);
-    }
-  };
+  setServerStatus: (serverStatus: any) => void;
 
-  // Start recording and transcribing
-  this.startListening = function () {
-    if (!recorder) {
-      config.onError(ERR_AUDIO, 'Recorder undefined');
-      return;
-    }
+  submitReference: (
+    text: any,
+    successCallback: any,
+    errorCallback: any
+  ) => void;
 
-    if (ws) {
-      this.cancel();
-    }
+  constructor(cfg: any) {
+    const config: Config = cfg || {};
+    config.server = config.server || SERVER;
+    // config.audioSourceId = config.audioSourceId;
+    config.serverStatus = config.serverStatus || SERVER_STATUS;
+    config.referenceHandler = config.referenceHandler || REFERENCE_HANDLER;
+    config.contentType = config.contentType || CONTENT_TYPE;
+    config.interval = config.interval || INTERVAL;
+    config.recorderWorkerPath =
+      config.recorderWorkerPath || RECORDER_WORKER_PATH;
+    config.onReadyForSpeech =
+      config.onReadyForSpeech ||
+      function () {
+        console.log('empty');
+      };
+    config.onEndOfSpeech =
+      config.onEndOfSpeech ||
+      function () {
+        console.log('empty');
+      };
+    config.onPartialResults =
+      config.onPartialResults ||
+      function (data: any) {
+        console.log('empty');
+      };
+    config.onResults =
+      config.onResults ||
+      function (data: any) {
+        console.log('empty');
+      };
+    config.onEndOfSession =
+      config.onEndOfSession ||
+      function () {
+        console.log('empty');
+      };
+    config.onEvent =
+      config.onEvent ||
+      function (e: any, data: any) {
+        console.log('empty');
+      };
+    config.onError =
+      config.onError ||
+      function (e: any, data: any) {
+        console.log('empty');
+      };
+    config.rafCallback =
+      config.rafCallback ||
+      function (time) {
+        console.log('empty');
+      };
 
-    try {
-      ws = createWebSocket();
-      audioContext.resume().then(() => {
-        config.onEvent(MSG_AUDIOCONTEXT_RESUMED, 'Audio context resumed');
-      });
-    } catch (e) {
-      config.onError(ERR_CLIENT, 'No web socket support in this browser!');
-    }
-  };
-
-  // Stop listening, i.e. recording and sending of new input.
-  this.stopListening = function () {
-    // Stop the regular sending of audio
-    clearInterval(intervalKey);
-    // Stop recording
-    if (recorder) {
-      recorder.stop();
-      config.onEvent(MSG_STOP, 'Stopped recording');
-      // Push the remaining audio to the server
-      recorder.export16kMono(function (blob) {
-        socketSend(blob);
-        socketSend(TAG_END_OF_SENTENCE);
-        recorder.clear();
-      }, 'audio/x-raw');
-      config.onEndOfSpeech();
-    } else {
-      config.onError(ERR_AUDIO, 'Recorder undefined');
-    }
-  };
-
-  // Cancel everything without waiting on the server
-  this.cancel = function () {
-    // Stop the regular sending of audio (if present)
-    clearInterval(intervalKey);
-    if (recorder) {
-      recorder.stop();
-      recorder.clear();
-      config.onEvent(MSG_STOP, 'Stopped recording');
-    }
-    if (ws) {
-      ws.close();
-      ws = null;
-    }
-  };
-
-  // Sets the URL of the speech server
-  this.setServer = function (server) {
-    config.server = server;
-    config.onEvent(MSG_SERVER_CHANGED, `Server changed: ${server}`);
-  };
-
-  // Sets the URL of the speech server status server
-  this.setServerStatus = function (serverStatus) {
-    config.serverStatus = serverStatus;
-
+    // Initialized by init()
+    let audioContext: any;
+    let recorder: any;
+    // Initialized by startListening()
+    let ws: WebSocket | null;
+    let intervalKey: any;
+    // Initialized during construction
+    let wsServerStatus: any;
     if (config.onServerStatus) {
       monitorServerStatus();
     }
 
-    config.onEvent(
-      MSG_SERVER_CHANGED,
-      `Server status server changed: ${serverStatus}`
-    );
-  };
+    // Returns the configuration
+    this.getConfig = () => {
+      return config;
+    };
 
-  // Sends reference text to speech server
-  this.submitReference = function submitReference(
-    text,
-    successCallback,
-    errorCallback
-  ) {
-    const headers = {};
-    if (config.user_id) {
-      headers['User-Id'] = config.user_id;
-    }
-    if (config.content_id) {
-      headers['Content-Id'] = config.content_id;
-    }
-    // $.ajax({
-    //   url: config.referenceHandler,
-    //   type: "POST",
-    //   headers: headers,
-    //   data: text,
-    //   dataType: "text",
-    //   success: successCallback,
-    //   error: errorCallback,
-    // });
-    fetch(config.referenceHandler, {
-      method: 'POST',
-      body: text,
-      headers,
-    })
-      .then(successCallback)
-      .catch(errorCallback);
-  };
+    // Set up the recorder (incl. asking permission)
+    // Initializes audioContext
+    // Can be called multiple times.
+    // TODO: call something on success (MSG_INIT_RECORDER is currently called)
+    this.init = function () {
+      const audioSourceConstraints: AudioSourceConstraints = {};
+      config.onEvent(
+        MSG_WAITING_MICROPHONE,
+        'Waiting for approval to access your microphone ...'
+      );
+      try {
+        // window.AudioContext = window.AudioContext || window.webkitAudioContext;
+        // navigator.mediaDevices.getUserMedia = navigator.mediaDevices.getUserMedia || navigator.mediaDevices.webkitGetUserMedia || navigator.mediaDevices.mozGetUserMedia;
+        audioContext = new AudioContext();
 
-  // Private methods
-  function socketSend(item) {
-    if (ws) {
-      const state = ws.readyState;
-      if (state === 1) {
-        // If item is an audio blob
-        if (item instanceof Blob) {
-          if (item.size > 0) {
-            ws.send(item);
-            config.onEvent(MSG_SEND, `Send: blob: ${item.type}, ${item.size}`);
+        if (navigator.mediaDevices.getUserMedia) {
+          if (config.audioSourceId) {
+            audioSourceConstraints.audio = {
+              optional: [{ sourceId: config.audioSourceId }],
+            };
           } else {
-            config.onEvent(MSG_SEND_EMPTY, `Send: blob: ${item.type}, EMPTY`);
+            audioSourceConstraints.audio = true;
           }
-          // Otherwise it's the EOS tag (string)
+          navigator.mediaDevices
+            .getUserMedia(audioSourceConstraints)
+            .then(function (stream) {
+              /* use the stream */
+              const input = audioContext.createMediaStreamSource(stream);
+              config.onEvent(MSG_MEDIA_STREAM_CREATED, 'Media stream created');
+              // Firefox loses the audio input stream every five seconds
+              // To fix added the input to window.source
+              let window: Window & CustomWindow & typeof globalThis;
+              if (document.defaultView !== null) {
+                window = document.defaultView;
+                window.source = input;
+                window.userSpeechAnalyser = audioContext.createAnalyser();
+                input.connect(window.userSpeechAnalyser);
+              }
+              config.rafCallback();
+              recorder = new Recorder(input, {
+                workerPath: config.recorderWorkerPath,
+              });
+              config.onEvent(MSG_INIT_RECORDER, 'Recorder initialized');
+            });
         } else {
-          ws.send(item);
-          config.onEvent(MSG_SEND_EOS, `Send tag: ${item}`);
+          config.onError(ERR_CLIENT, 'No user media support');
         }
-      } else {
+      } catch (e) {
+        // Firefox 24: TypeError: AudioContext is not a constructor
+        // Set media.webaudio.enabled = true (in about:config) to fix this.
         config.onError(
-          ERR_NETWORK,
-          `WebSocket: readyState!=1: ${state} : failed to send: ${item}`
+          ERR_CLIENT,
+          `Error initializing Web Audio browser: ${e}`
         );
       }
-    } else {
-      config.onError(
-        ERR_CLIENT,
-        `No web socket connection: failed to send: ${item}`
-      );
-    }
-  }
+    };
 
-  function createWebSocket() {
-    // TODO: do we need to use a protocol?
-    // let ws = new WebSocket("ws://127.0.0.1:8081", "echo-protocol");
-    let url = `${config.server}?${config.contentType}`;
-    if (config.user_id) {
-      url += `&user-id=${config.user_id}`;
-    }
-    if (config.content_id) {
-      url += `&content-id=${config.content_id}`;
-    }
-    const ws = new WebSocket(url);
+    // Start recording and transcribing
+    this.startListening = function () {
+      if (!recorder) {
+        config.onError(ERR_AUDIO, 'Recorder undefined');
+        return;
+      }
 
-    ws.onmessage = function (e) {
-      const { data } = e;
-      config.onEvent(MSG_WEB_SOCKET, data);
-      if (data instanceof Object && !(data instanceof Blob)) {
-        config.onError(
-          ERR_SERVER,
-          'WebSocket: onEvent: got Object that is not a Blob'
-        );
-      } else if (data instanceof Blob) {
-        config.onError(ERR_SERVER, 'WebSocket: got Blob');
+      if (ws) {
+        this.cancel();
+      }
+
+      try {
+        ws = createWebSocket();
+        audioContext.resume().then(() => {
+          config.onEvent(MSG_AUDIOCONTEXT_RESUMED, 'Audio context resumed');
+        });
+      } catch (e) {
+        config.onError(ERR_CLIENT, 'No web socket support in this browser!');
+      }
+    };
+
+    // Stop listening, i.e. recording and sending of new input.
+    this.stopListening = function () {
+      // Stop the regular sending of audio
+      clearInterval(intervalKey);
+      // Stop recording
+      if (recorder) {
+        recorder.stop();
+        config.onEvent(MSG_STOP, 'Stopped recording');
+        // Push the remaining audio to the server
+        recorder.export16kMono(function (blob) {
+          socketSend(blob);
+          socketSend(TAG_END_OF_SENTENCE);
+          recorder.clear();
+        }, 'audio/x-raw');
+        config.onEndOfSpeech();
       } else {
-        const res = JSON.parse(data);
-        if (res.status === 0) {
-          if (res.result) {
-            if (res.result.final) {
-              config.onResults(res.result.hypotheses);
+        config.onError(ERR_AUDIO, 'Recorder undefined');
+      }
+    };
+
+    // Cancel everything without waiting on the server
+    this.cancel = function () {
+      // Stop the regular sending of audio (if present)
+      clearInterval(intervalKey);
+      if (recorder) {
+        recorder.stop();
+        recorder.clear();
+        config.onEvent(MSG_STOP, 'Stopped recording');
+      }
+      if (ws) {
+        ws.close();
+        ws = null;
+      }
+    };
+
+    // Sets the URL of the speech server
+    this.setServer = function (server) {
+      config.server = server;
+      config.onEvent(MSG_SERVER_CHANGED, `Server changed: ${server}`);
+    };
+
+    // Sets the URL of the speech server status server
+    this.setServerStatus = function (serverStatus) {
+      config.serverStatus = serverStatus;
+
+      if (config.onServerStatus) {
+        monitorServerStatus();
+      }
+
+      config.onEvent(
+        MSG_SERVER_CHANGED,
+        `Server status server changed: ${serverStatus}`
+      );
+    };
+
+    // Sends reference text to speech server
+    this.submitReference = function submitReference(
+      text,
+      successCallback,
+      errorCallback
+    ) {
+      const headers = {};
+      if (config.user_id) {
+        headers['User-Id'] = config.user_id;
+      }
+      if (config.content_id) {
+        headers['Content-Id'] = config.content_id;
+      }
+      // $.ajax({
+      //   url: config.referenceHandler,
+      //   type: "POST",
+      //   headers: headers,
+      //   data: text,
+      //   dataType: "text",
+      //   success: successCallback,
+      //   error: errorCallback,
+      // });
+      fetch(config.referenceHandler, {
+        method: 'POST',
+        body: text,
+        headers,
+      })
+        .then(successCallback)
+        .catch(errorCallback);
+    };
+
+    // Private methods
+    function socketSend(item) {
+      if (ws) {
+        const state = ws.readyState;
+        if (state === 1) {
+          // If item is an audio blob
+          if (item instanceof Blob) {
+            if (item.size > 0) {
+              ws.send(item);
+              config.onEvent(
+                MSG_SEND,
+                `Send: blob: ${item.type}, ${item.size}`
+              );
             } else {
-              config.onPartialResults(res.result.hypotheses);
+              config.onEvent(MSG_SEND_EMPTY, `Send: blob: ${item.type}, EMPTY`);
             }
+            // Otherwise it's the EOS tag (string)
+          } else {
+            ws.send(item);
+            config.onEvent(MSG_SEND_EOS, `Send tag: ${item}`);
           }
         } else {
           config.onError(
-            ERR_SERVER,
-            `Server error: ${res.status}:${getDescription(res.status)}`
+            ERR_NETWORK,
+            `WebSocket: readyState!=1: ${state} : failed to send: ${item}`
           );
         }
+      } else {
+        config.onError(
+          ERR_CLIENT,
+          `No web socket connection: failed to send: ${item}`
+        );
       }
-    };
-
-    // Start recording only if the socket becomes open
-    ws.onopen = function (e) {
-      intervalKey = setInterval(function () {
-        recorder.export16kMono(function (blob) {
-          socketSend(blob);
-          recorder.clear();
-        }, 'audio/x-raw');
-      }, config.interval);
-      // Start recording
-      recorder.record();
-      config.onReadyForSpeech();
-      config.onEvent(MSG_WEB_SOCKET_OPEN, e);
-    };
-
-    // This can happen if the blob was too big
-    // E.g. "Frame size of 65580 bytes exceeds maximum accepted frame size"
-    // Status codes
-    // http://tools.ietf.org/html/rfc6455#section-7.4.1
-    // 1005:
-    // 1006:
-    ws.onclose = function (e) {
-      const { code, reason, wasClean } = e;
-      // The server closes the connection (only?)
-      // when its endpointer triggers.
-      config.onEndOfSession();
-      config.onEvent(MSG_WEB_SOCKET_CLOSE, `${code}/${reason}/${wasClean}`);
-    };
-
-    ws.onerror = function (e: any) {
-      const { data } = e;
-      config.onError(ERR_NETWORK, data);
-    };
-
-    return ws;
-  }
-
-  function monitorServerStatus() {
-    if (wsServerStatus) {
-      wsServerStatus.close();
     }
-    wsServerStatus = new WebSocket(config.serverStatus);
-    wsServerStatus.onmessage = function (evt) {
-      config.onServerStatus(JSON.parse(evt.data));
-    };
-  }
 
-  function getDescription(code) {
-    if (code in SERVER_STATUS_CODE) {
-      return SERVER_STATUS_CODE[code];
+    function createWebSocket() {
+      // TODO: do we need to use a protocol?
+      // let ws = new WebSocket("ws://127.0.0.1:8081", "echo-protocol");
+      let url = `${config.server}?${config.contentType}`;
+      if (config.user_id) {
+        url += `&user-id=${config.user_id}`;
+      }
+      if (config.content_id) {
+        url += `&content-id=${config.content_id}`;
+      }
+      const ws = new WebSocket(url);
+
+      ws.onmessage = function (e) {
+        const { data } = e;
+        config.onEvent(MSG_WEB_SOCKET, data);
+        if (data instanceof Object && !(data instanceof Blob)) {
+          config.onError(
+            ERR_SERVER,
+            'WebSocket: onEvent: got Object that is not a Blob'
+          );
+        } else if (data instanceof Blob) {
+          config.onError(ERR_SERVER, 'WebSocket: got Blob');
+        } else {
+          const res = JSON.parse(data);
+          if (res.status === 0) {
+            if (res.result) {
+              if (res.result.final) {
+                config.onResults(res.result.hypotheses);
+              } else {
+                config.onPartialResults(res.result.hypotheses);
+              }
+            }
+          } else {
+            config.onError(
+              ERR_SERVER,
+              `Server error: ${res.status}:${getDescription(res.status)}`
+            );
+          }
+        }
+      };
+
+      // Start recording only if the socket becomes open
+      ws.onopen = function (e) {
+        intervalKey = setInterval(function () {
+          recorder.export16kMono(function (blob) {
+            socketSend(blob);
+            recorder.clear();
+          }, 'audio/x-raw');
+        }, config.interval);
+        // Start recording
+        recorder.record();
+        config.onReadyForSpeech();
+        config.onEvent(MSG_WEB_SOCKET_OPEN, e);
+      };
+
+      // This can happen if the blob was too big
+      // E.g. "Frame size of 65580 bytes exceeds maximum accepted frame size"
+      // Status codes
+      // http://tools.ietf.org/html/rfc6455#section-7.4.1
+      // 1005:
+      // 1006:
+      ws.onclose = function (e) {
+        const { code, reason, wasClean } = e;
+        // The server closes the connection (only?)
+        // when its endpointer triggers.
+        config.onEndOfSession();
+        config.onEvent(MSG_WEB_SOCKET_CLOSE, `${code}/${reason}/${wasClean}`);
+      };
+
+      ws.onerror = function (e: any) {
+        const { data } = e;
+        config.onError(ERR_NETWORK, data);
+      };
+
+      return ws;
     }
-    return 'Unknown error';
-  }
-};
 
-// Simple class for persisting the transcription.
-// If isFinal==true then a new line is started in the transcription list
-// (which only keeps the final transcriptions).
-
-interface Transcription {
-  add: (text: any, isFinal: boolean) => void;
-}
-
-export const Transcription = function (this: Transcription, cfg) {
-  let index = 0;
-  const list: any[] = [];
-
-  this.add = function (text, isFinal) {
-    list[index] = text;
-    if (isFinal) {
-      index += 1;
+    function monitorServerStatus() {
+      if (wsServerStatus) {
+        wsServerStatus.close();
+      }
+      wsServerStatus = new WebSocket(config.serverStatus);
+      wsServerStatus.onmessage = function (evt) {
+        config.onServerStatus(JSON.parse(evt.data));
+      };
     }
-  };
 
-  this.toString = function () {
-    return list.join('. ');
-  };
-};
-
-if (document.defaultView !== null) {
-  window = document.defaultView;
-  window.Dictate = Dictate;
-  window.Transcription = Transcription;
+    function getDescription(code) {
+      if (code in SERVER_STATUS_CODE) {
+        return SERVER_STATUS_CODE[code];
+      }
+      return 'Unknown error';
+    }
+  }
 }
