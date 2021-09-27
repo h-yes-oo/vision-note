@@ -398,6 +398,7 @@ export class Dictate {
               }
             }
           } else {
+            console.log(ws);
             config.onError(
               ERR_SERVER,
               `Server error: ${res.status}:${getDescription(res.status)}`

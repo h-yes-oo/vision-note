@@ -19,7 +19,7 @@ export const userInfo = selector({
   key: 'UserInfo',
   get: async ({ get }) => {
     const token = get(authenticateToken);
-    if (token === null) return '비회원';
+    if (token === null) return null;
     try {
       const response = await axios.get('/v1/user', {
         headers: { Authorization: `Bearer ${get(authenticateToken)}` },
@@ -27,10 +27,8 @@ export const userInfo = selector({
       return response.data;
     } catch {
       // 기존에 저장되어 있던 토큰이 변경되어 인증이 불가한 경우
-      // const setAuthToken = useSetRecoilState(authenticateToken);
       localStorage.removeItem('user');
-      // setAuthToken(null);
-      return '비회원';
+      return null;
     }
   },
 });
@@ -38,7 +36,8 @@ export const userInfo = selector({
 export const userName = selector({
   key: 'UserName',
   get: ({ get }) => {
-    return get(userInfo).nickname ?? '비회원';
+    const user = get(userInfo);
+    return user ? user.nickname : '비회원';
   },
 });
 

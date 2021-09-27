@@ -1,9 +1,9 @@
 import { FC, useState, useEffect, useRef, useCallback } from 'react';
 import styled from 'styled-components';
 import { Dictate } from 'stt/dictate';
-import { useRecoilState } from 'recoil';
+import { useRecoilValue } from 'recoil';
 
-import { status } from 'state';
+import { userInfo } from 'state';
 
 interface Props {}
 
@@ -13,6 +13,9 @@ const SttDemoPage: FC<Props> = () => {
   const logRef: React.RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null);
   const transcriptRef: React.RefObject<HTMLDivElement> =
     useRef<HTMLDivElement>(null);
+  const startRef: React.RefObject<HTMLButtonElement> =
+    useRef<HTMLButtonElement>(null);
+  const user = useRecoilValue(userInfo);
 
   const addToTranscription = (text) => {
     const prevTrans = transcriptRef.current;
@@ -37,10 +40,13 @@ const SttDemoPage: FC<Props> = () => {
   }
 
   useEffect(() => {
+    console.log(user ?? 'user 정보 없음');
     const dictate = new Dictate({
       server: 'ws://stt.visionnote.io/client/ws/speech',
       serverStatus: 'ws://stt.visionnote.io/client/ws/status',
       recorderWorkerPath: './recorderWorker.js',
+      user_id: String(user ? user.userId : '1003'),
+      content_id: String(Date.now()),
       onReadyForSpeech: () => {
         addToLogs('READY FOR SPEECH\n');
       },
@@ -55,10 +61,14 @@ const SttDemoPage: FC<Props> = () => {
           json.num_workers_available + ':' + json.num_requests_processed
         );
         if (json.num_workers_available === 0) {
+          const startBtn = startRef.current;
+          if (startBtn !== null) startBtn.disabled = true;
           // $("#buttonStart").prop("disabled", true);
           // $("#serverStatusBar").addClass("highlight");
           addToLogs('unable to start\n');
         } else {
+          const startBtn = startRef.current;
+          if (startBtn !== null) startBtn.disabled = false;
           // $("#buttonStart").prop("disabled", false);
           // $("#serverStatusBar").removeClass("highlight");
           addToLogs('can start\n');
@@ -76,7 +86,7 @@ const SttDemoPage: FC<Props> = () => {
         console.log(`result : ${result}`);
       },
       onError: (code, data) => {
-        addToLogs(`Error: ${code}\n`);
+        addToLogs(`Error: ${code}: ${data}\n`);
         dictate.cancel();
       },
       onEvent: (code, data) => {
@@ -109,13 +119,15 @@ const SttDemoPage: FC<Props> = () => {
   return (
     <Root>
       <PurpleButton onClick={init}>Init</PurpleButton>
-      <PurpleButton onClick={startListening}>startListening</PurpleButton>
+      <PurpleButton ref={startRef} onClick={startListening}>
+        startListening
+      </PurpleButton>
       <PurpleButton onClick={stopListening}>stopListening</PurpleButton>
       <PurpleButton onClick={cancel}>cancel</PurpleButton>
-      <Logs>Log : </Logs>
-      <Logs ref={logRef} />
-      <Logs>Transcript : </Logs>
+      <Title>Transcript : </Title>
       <Logs ref={transcriptRef} />
+      <Title>Log : </Title>
+      <Logs ref={logRef} />
     </Root>
   );
 };
@@ -130,10 +142,13 @@ const Root = styled.div`
   }
 `;
 
+const Title = styled.div``;
+
 const Logs = styled.div`
   white-space: break-spaces;
   overflow: scroll;
-  height: 100px;
+  height: 500px;
+  width: 1000px;
 `;
 
 const Button = styled.button`

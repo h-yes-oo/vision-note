@@ -78,7 +78,7 @@ const MainPage: FC<Props & RouteComponentProps> = ({ history }) => {
             <SmallText>
               비전노트는 모두를 위한 자동 강의록 서비스입니다
             </SmallText>
-            <GetStarted onClick={goToNotes}>Get Started</GetStarted>
+            <GetStarted onClick={loginModal}>Get Started</GetStarted>
           </Info>
           <MainImage src={MainImage1} />
         </TopDiv>
