@@ -36,8 +36,8 @@ const SttDemoPage: FC<Props> = () => {
     console.log(decodeUnicode(`%uCF54%uCF54`));
     console.log(user ?? 'user 정보 없음');
     const dictate = new Dictate({
-      server: 'ws://stt.visionnote.io/client/ws/speech',
-      serverStatus: 'ws://stt.visionnote.io/client/ws/status',
+      server: 'wss://stt.visionnote.io/client/ws/speech',
+      serverStatus: 'wss://stt.visionnote.io/client/ws/status',
       recorderWorkerPath: './recorderWorker.js',
       user_id: String(user ? user.userId : '1003'),
       content_id: String(Date.now()),

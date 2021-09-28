@@ -27,9 +27,8 @@ interface AudioSourceConstraints {
 }
 
 // Defaults
-const SERVER = 'ws://bark.phon.ioc.ee:82/dev/duplex-speech-api/ws/speech';
-const SERVER_STATUS =
-  'ws://bark.phon.ioc.ee:82/dev/duplex-speech-api/ws/status';
+const SERVER = 'wss://stt.visionnote.io/client/ws/speech';
+const SERVER_STATUS = 'wss://stt.visionnote.io/client/ws/status';
 const REFERENCE_HANDLER =
   'http://bark.phon.ioc.ee:82/dev/duplex-speech-api/dynamic/reference';
 const CONTENT_TYPE =
