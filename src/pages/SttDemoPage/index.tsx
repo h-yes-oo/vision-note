@@ -2,6 +2,7 @@ import { FC, useState, useEffect, useRef, useCallback } from 'react';
 import styled from 'styled-components';
 import { Dictate } from 'stt/dictate';
 import { useRecoilValue } from 'recoil';
+import { decodeUnicode } from 'functions';
 
 import { userInfo } from 'state';
 
@@ -31,15 +32,8 @@ const SttDemoPage: FC<Props> = () => {
     if (el !== null) el.innerHTML += text;
   };
 
-  function decodeUnicode(unicodeString) {
-    const r = /\\u([\d\w]{4})/gi;
-    unicodeString = unicodeString.replace(r, function (match, grp) {
-      return String.fromCharCode(parseInt(grp, 16));
-    });
-    return unescape(unicodeString);
-  }
-
   useEffect(() => {
+    console.log(decodeUnicode(`%uCF54%uCF54`));
     console.log(user ?? 'user 정보 없음');
     const dictate = new Dictate({
       server: 'ws://stt.visionnote.io/client/ws/speech',
