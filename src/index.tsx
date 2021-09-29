@@ -5,7 +5,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-axios.defaults.baseURL = 'http://api.visionnote.io';
+axios.defaults.baseURL = 'https://api.visionnote.io';
 axios.defaults.headers.post['Content-Type'] = 'multipart/form-data';
 axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
 

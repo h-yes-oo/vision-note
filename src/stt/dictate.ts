@@ -192,7 +192,8 @@ export class Dictate {
             .getUserMedia(audioSourceConstraints)
             .then(function (stream) {
               /* use the stream */
-              const input = audioContext.createMediaStreamSource(stream);
+              const input: MediaStreamAudioSourceNode =
+                audioContext.createMediaStreamSource(stream);
               config.onEvent(MSG_MEDIA_STREAM_CREATED, 'Media stream created');
               // Firefox loses the audio input stream every five seconds
               // To fix added the input to window.source

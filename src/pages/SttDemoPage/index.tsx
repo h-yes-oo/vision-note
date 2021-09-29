@@ -1,4 +1,4 @@
-import { FC, useState, useEffect, useRef, useCallback } from 'react';
+import { FC, useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { Dictate } from 'stt/dictate';
 import { useRecoilValue } from 'recoil';
@@ -10,7 +10,6 @@ interface Props {}
 
 const SttDemoPage: FC<Props> = () => {
   const [dictate, setDictate] = useState<Dictate>();
-  const [tlist, setTlist] = useState<string[]>([]);
   const logRef: React.RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null);
   const transcriptRef: React.RefObject<HTMLDivElement> =
     useRef<HTMLDivElement>(null);
@@ -23,18 +22,12 @@ const SttDemoPage: FC<Props> = () => {
     if (prevTrans !== null) prevTrans.innerHTML += `${text}\n`;
   };
 
-  const tlistToString = () => {
-    return tlist.join('.');
-  };
-
   const addToLogs = (text) => {
     const el = logRef.current;
     if (el !== null) el.innerHTML += text;
   };
 
   useEffect(() => {
-    console.log(decodeUnicode(`%uCF54%uCF54`));
-    console.log(user ?? 'user 정보 없음');
     const dictate = new Dictate({
       server: 'wss://stt.visionnote.io/client/ws/speech',
       serverStatus: 'wss://stt.visionnote.io/client/ws/status',
@@ -57,24 +50,17 @@ const SttDemoPage: FC<Props> = () => {
         if (json.num_workers_available === 0) {
           const startBtn = startRef.current;
           if (startBtn !== null) startBtn.disabled = true;
-          // $("#buttonStart").prop("disabled", true);
-          // $("#serverStatusBar").addClass("highlight");
           addToLogs('unable to start\n');
         } else {
           const startBtn = startRef.current;
           if (startBtn !== null) startBtn.disabled = false;
-          // $("#buttonStart").prop("disabled", false);
-          // $("#serverStatusBar").removeClass("highlight");
           addToLogs('can start\n');
         }
       },
       onPartialResults: (hypos) => {
-        // TODO: demo the case where there are more hypos
-        // addToTranscription(hypos[0].transcript);
         console.log(`partial result : ${decodeUnicode(hypos[0].transcript)}`);
       },
       onResults: (hypos) => {
-        // TODO: demo the case where there are more results
         const result = decodeUnicode(hypos[0].transcript);
         addToTranscription(result);
         console.log(`result : ${result}`);
@@ -89,6 +75,10 @@ const SttDemoPage: FC<Props> = () => {
     });
     setDictate(dictate);
   }, []);
+
+  useEffect(() => {
+    dictate?.init();
+  }, [dictate]);
 
   const startListening = () => {
     if (dictate !== undefined) dictate.startListening();
@@ -106,25 +96,27 @@ const SttDemoPage: FC<Props> = () => {
     if (dictate !== undefined) dictate.init();
   };
 
-  window.onload = () => {
-    init();
-  };
-
   return (
     <Root>
-      <PurpleButton onClick={init}>Init</PurpleButton>
-      <PurpleButton ref={startRef} onClick={startListening}>
-        startListening
-      </PurpleButton>
-      <PurpleButton onClick={stopListening}>stopListening</PurpleButton>
-      <PurpleButton onClick={cancel}>cancel</PurpleButton>
-      <Title>Transcript : </Title>
+      <ButtonWrapper>
+        <PurpleButton onClick={init}>데모 시작하기</PurpleButton>
+        <PurpleButton ref={startRef} onClick={startListening}>
+          녹음 시작하기
+        </PurpleButton>
+        <PurpleButton onClick={stopListening}>녹음 끝내기</PurpleButton>
+        <PurpleButton onClick={cancel}>데모 끝내기</PurpleButton>
+      </ButtonWrapper>
+      <Title>음성 인식 결과 : </Title>
       <Logs ref={transcriptRef} />
-      <Title>Log : </Title>
+      <Title>실행 로그 : </Title>
       <Logs ref={logRef} />
     </Root>
   );
 };
+
+const ButtonWrapper = styled.div`
+  display: flex;
+`;
 
 const Root = styled.div`
   display: flex;
@@ -156,6 +148,8 @@ const Button = styled.button`
   text-align: left;
   color: #fff;
   border: none;
+  margin: 20px;
+  padding: 10px 20px;
 
   display: flex;
   align-items: center;

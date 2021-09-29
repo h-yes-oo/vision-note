@@ -3,8 +3,8 @@ import worker_script from './recorderWorker.js';
 const WORKER_PATH = 'recorderWorker.js';
 
 interface Recorder {
-  context: any;
-  node: any;
+  context: BaseAudioContext;
+  node: ScriptProcessorNode;
   configure: (cfg: any) => void;
   record: () => void;
   stop: () => void;
@@ -16,12 +16,16 @@ interface Recorder {
   exportSpeex: (cb: any, type: any) => void;
 }
 
-export const Recorder = function (this: Recorder, source, cfg) {
+export const Recorder = function (
+  this: Recorder,
+  source: MediaStreamAudioSourceNode,
+  cfg
+) {
   const config = cfg || {};
   const bufferLen = config.bufferLen || 4096;
   this.context = source.context;
   this.node = this.context.createScriptProcessor(bufferLen, 1, 1);
-  const worker = new Worker(worker_script);
+  const worker: Worker = new Worker(worker_script);
   worker.postMessage({
     command: 'init',
     config: {
