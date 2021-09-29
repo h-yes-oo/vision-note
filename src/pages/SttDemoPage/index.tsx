@@ -78,6 +78,10 @@ const SttDemoPage: FC<Props> = () => {
 
   useEffect(() => {
     dictate?.init();
+    return () => {
+      console.log('close websokcet');
+      dictate?.cancel();
+    };
   }, [dictate]);
 
   const startListening = () => {
