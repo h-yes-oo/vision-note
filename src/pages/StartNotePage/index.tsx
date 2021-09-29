@@ -4,7 +4,7 @@ import styled, { keyframes } from 'styled-components';
 import axios from 'axios';
 import { useRecoilValue } from 'recoil';
 import { authenticateToken } from 'state';
-
+import { isChrome, isWindows } from 'functions';
 import { Subject } from 'types';
 
 import BaseLayout from 'components/BaseLayout';
@@ -166,6 +166,12 @@ const StartNotePage: FC<Props & RouteComponentProps> = ({ history }) => {
     }
   };
 
+  const onClickStart = async () => {
+    if (isChrome()) await startRec();
+    else alert('녹음은 크롬 브라우저에서만 가능합니다');
+    console.log(`is windows : ${isWindows()}`);
+  };
+
   return (
     <BaseLayout grey={false}>
       <Root>
@@ -241,7 +247,7 @@ const StartNotePage: FC<Props & RouteComponentProps> = ({ history }) => {
               <StartBtn
                 onMouseOver={() => setOnRec(true)}
                 onMouseOut={() => setOnRec(false)}
-                onClick={() => startRec()}
+                onClick={onClickStart}
               >
                 <BtnImage src={onRec ? MicWhite : MicGrey} />
                 녹음 시작하기

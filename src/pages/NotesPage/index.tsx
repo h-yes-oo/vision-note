@@ -405,6 +405,9 @@ const ToggleBtn = styled.img`
   width: 12px;
   height: 12px;
   margin-left: 8px;
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 export default withRouter(NotesPage);

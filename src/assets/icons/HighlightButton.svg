@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="147" height="68" viewBox="0 0 147 68">
+    <defs>
+        <filter id="pfr7pmxh4a" width="147" height="68" x="0" y="0" filterUnits="userSpaceOnUse">
+            <feOffset dy="1"/>
+            <feGaussianBlur result="blur" stdDeviation="6"/>
+            <feFlood flood-opacity=".161"/>
+            <feComposite in2="blur" operator="in"/>
+            <feComposite in="SourceGraphic"/>
+        </filter>
+    </defs>
+    <g>
+        <g filter="url(#pfr7pmxh4a)" transform="translate(-1567 -413) matrix(1, 0, 0, 1, 1567, 413)">
+            <rect width="111" height="32" fill="#fff" rx="5" transform="translate(18 17)"/>
+        </g>
+        <g>
+            <text font-family="AppleSDGothicNeo-Regular, Apple SD Gothic Neo" font-size="14px" transform="translate(-1567 -413) translate(-31 -15) translate(1656 466)">
+                <tspan x="0" y="0">하이라이팅</tspan>
+            </text>
+            <g>
+                <path fill="none" d="M0 0h24v24H0z" transform="translate(-1567 -413) translate(-31 -15) translate(1136 104) translate(490 345)"/>
+                <path fill="#7b68ee" d="M12.877 4.1L7.3 9.682l-.586 1.757-.862.862 2.343 2.344.862-.862 1.753-.583 5.581-5.582zm5.272 2.928a.828.828 0 0 1 0 1.171L11.7 14.645l-1.756.586L8.776 16.4a.828.828 0 0 1-1.171 0L4.09 12.887a.828.828 0 0 1 0-1.171l1.171-1.171.586-1.757 6.444-6.444a.828.828 0 0 1 1.171 0l4.686 4.686zm-5.272-.586l1.171 1.171-4.1 4.1-1.172-1.169 4.1-4.1zM3.8 14.352L6.14 16.7l-1.171 1.167L1.454 16.7 3.8 14.352z" transform="translate(-1567 -413) translate(-31 -15) translate(1136 104) translate(492.077 347.017)"/>
+            </g>
+        </g>
+    </g>
+</svg>

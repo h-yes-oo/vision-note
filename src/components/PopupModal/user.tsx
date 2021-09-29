@@ -35,9 +35,9 @@ const UserModal: FC<Props & RouteComponentProps> = ({
   const [editNickname, setEditNickname] = useState<boolean>(false);
   const [editType, setEditType] = useState<boolean>(false);
   // edited values
-  const [nickname, setNickname] = useState<string>(user.nickname);
-  const [type, setType] = useState<number>(user.typeId);
-  const [avatar, setAvatar] = useState<string>(user.avatar);
+  const [nickname, setNickname] = useState<string>(user?.nickname);
+  const [type, setType] = useState<number>(user?.typeId);
+  const [avatar, setAvatar] = useState<string>(user?.avatar);
   const [newPassword, setNewPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   // loading status

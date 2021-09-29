@@ -2,6 +2,7 @@ import React, { FC, ReactNode, useState } from 'react';
 import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
+import { isMobile } from 'functions';
 
 import SampleLogo from 'assets/icons/SampleLogo15.png';
 import SearchIcon from 'assets/icons/SearchIcon.svg';
@@ -43,11 +44,6 @@ const BaseLayout: FC<Props & RouteComponentProps> = ({
   };
 
   const handleMouseLeave = () => setShowUserMenu(false);
-
-  const isMobile = () =>
-    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-      navigator.userAgent
-    );
 
   const startNote = () => {
     if (isMobile()) alert('노트 생성은 pc에서만 가능합니다');

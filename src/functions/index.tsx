@@ -5,3 +5,40 @@ export const decodeUnicode = (unicodeString: string): string => {
   });
   return unescape(unicodeString);
 };
+
+export const isChrome = () => {
+  const isChromium = window.chrome;
+  const winNav = window.navigator;
+  const vendorName = winNav.vendor;
+  const isOpera = typeof window.opr !== 'undefined';
+  const isIEedge = winNav.userAgent.indexOf('Edg') > -1;
+  const isIOSChrome = winNav.userAgent.match('CriOS');
+
+  if (isIOSChrome) {
+    // is Google Chrome on IOS
+    return true;
+  }
+  if (
+    isChromium !== null &&
+    typeof isChromium !== 'undefined' &&
+    vendorName === 'Google Inc.' &&
+    isOpera === false &&
+    isIEedge === false
+  ) {
+    // is Google Chrome
+    return true;
+  }
+  // not Google Chrome
+  return false;
+};
+
+export const isMobile = () => {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent
+  );
+};
+
+export const isWindows = () => {
+  if (navigator.appVersion.indexOf('Win') !== -1) return true;
+  return false;
+};
