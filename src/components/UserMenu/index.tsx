@@ -81,6 +81,7 @@ const Menu = styled.div<{ show: boolean }>`
   ${(props) => (props.show ? '' : 'display: none;')}
   opacity: ${(props) => (props.show ? '1' : '0')};
   transition: opacity 0.5s linear;
+  z-index: 10;
 `;
 
 const MenuList = styled.button`
