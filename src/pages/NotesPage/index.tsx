@@ -274,14 +274,17 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
               </RecordingWrapper>
             </InfoBottom>
           </NoteInfo>
-          <NoteContents>
-            <Paragraph
-              bookmarked={false}
-              content={content}
-              time="00:00"
-              note=""
-            />
-          </NoteContents>
+          <ContentWrapper>
+            <NoteContents half={showMemo}>
+              <Paragraph
+                bookmarked={false}
+                content={content}
+                time="00:00"
+                note=""
+              />
+            </NoteContents>
+            <Memos visible={showMemo} />
+          </ContentWrapper>
         </Root>
       )}
     </BaseLayout>
@@ -297,6 +300,10 @@ const Root = styled.div`
   flex-direction: column;
   margin-top: 32px;
   width: 1000px;
+`;
+
+const ContentWrapper = styled.div`
+  display: flex;
 `;
 
 const FolderName = styled.div`
@@ -389,7 +396,13 @@ const MoreBtn = styled.img`
   }
 `;
 
-const NoteContents = styled.div``;
+const NoteContents = styled.div<{ half: boolean }>`
+  width: ${(props) => (props.half ? '50%' : '100%')};
+`;
+
+const Memos = styled.div<{ visible: boolean }>`
+  ${(props) => (props.visible ? 'width: 50%;' : 'display: none;')};
+`;
 
 const RecordingWrapper = styled.div`
   display: flex;
