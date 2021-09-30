@@ -81,7 +81,7 @@ const FolderData: FC<Props> = ({
   useEffect(() => {
     const getFolderItems = async () => {
       // setNotes(<>Loading...</>);
-      const response = await axios.get(`/v1/note/folder/${folderId}`, {
+      const response = await axios.get(`/v1/note/folder/childs/${folderId}`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       let folderData: NoteResponse[] = response.data;

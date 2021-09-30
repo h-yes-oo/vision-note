@@ -18,6 +18,7 @@ interface Props {
   starred: boolean;
   noteId: number;
   editNoteTitle: () => void;
+  starNote: () => Promise<void>;
 }
 
 const NoteMenu: FC<Props & RouteComponentProps> = ({
@@ -27,6 +28,7 @@ const NoteMenu: FC<Props & RouteComponentProps> = ({
   starred,
   noteId,
   editNoteTitle,
+  starNote,
 }) => {
   const authToken = useRecoilValue(authenticateToken);
 
@@ -35,13 +37,8 @@ const NoteMenu: FC<Props & RouteComponentProps> = ({
     closeMenu();
   };
 
-  const starNote = async () => {
-    const fileData = new FormData();
-    fileData.append('fileId', String(noteId));
-    fileData.append('isImportant', String(starred ? 0 : 1));
-    await axios.put(`/v1/note/file/${noteId}`, fileData, {
-      headers: { Authorization: `Bearer ${authToken}` },
-    });
+  const onClickStarNote = async () => {
+    await starNote();
     closeMenu();
   };
 
@@ -54,10 +51,15 @@ const NoteMenu: FC<Props & RouteComponentProps> = ({
     closeMenu();
   };
 
+  const onClickEditTitle = () => {
+    editNoteTitle();
+    closeMenu();
+  };
+
   return (
     <>
       <Menu show={show}>
-        <MenuList onClick={editNoteTitle}>
+        <MenuList onClick={onClickEditTitle}>
           <ContextImage src={Edit} />
           노트 제목 변경
         </MenuList>
@@ -65,7 +67,7 @@ const NoteMenu: FC<Props & RouteComponentProps> = ({
           <ContextImage src={ContextDownload} />
           노트 다운로드
         </MenuList>
-        <MenuList onClick={starNote}>
+        <MenuList onClick={onClickStarNote}>
           <ContextImage src={starred ? FilledStar : ContextStar} />
           {starred ? '중요 노트 해제' : '중요 노트함'}
         </MenuList>

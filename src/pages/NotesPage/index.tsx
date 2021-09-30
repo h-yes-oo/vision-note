@@ -9,7 +9,7 @@ import BaseLayout from 'components/BaseLayout';
 import Paragraph from 'components/Paragraph';
 import NoteMenu from 'components/NoteMenu';
 
-import FolderSample from 'assets/images/FolderSample2.svg';
+import GreyFolder from 'assets/icons/GreyFolder.svg';
 import LookCloser from 'assets/icons/LookCloser.svg';
 import More from 'assets/icons/More.svg';
 import Recording from 'assets/icons/Recording.svg';
@@ -45,6 +45,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
   const [timer, setTimer] = useState<ReturnType<typeof setInterval>>();
   const authToken = useRecoilValue(authenticateToken);
   const [showContextMenu, setShowContextMenu] = useState<boolean>(false);
+  const [folderName, setFolderName] = useState<string>('');
   // about editing title
   const [editing, setEditing] = useState<boolean>(false);
   const [newName, setNewName] = useState<string>('');
@@ -53,6 +54,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
   // temp start
   const [content, setContent] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
+  const [starred, setStarred] = useState<boolean>(false);
 
   const contents = [
     '노트 생성은 아직 준비중입니다\n',
@@ -65,6 +67,8 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
         headers: { Authorization: `Bearer ${authToken}` },
       });
       console.log(data);
+      setFolderName(data.parentFolder.folderName);
+      setStarred(data.script.isImportant);
       setTitle(data.script.fileName);
       setDate(data.script.createdAt.slice(0, 10).replace(/-/gi, '.'));
       setLoading(false);
@@ -188,6 +192,20 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
     }
   };
 
+  const starNote = async () => {
+    const fileData = new FormData();
+    fileData.append('fileId', String(match.params.noteId));
+    fileData.append('isImportant', String(starred ? 0 : 1));
+    try {
+      await axios.put(`/v1/note/file/${match.params.noteId}`, fileData, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      setStarred(!starred);
+    } catch {
+      alert('중요 표시 변경에 실패했습니다');
+    }
+  };
+
   return (
     <BaseLayout grey={false}>
       {loading ? (
@@ -196,7 +214,10 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
         <Root>
           <NoteInfo>
             <InfoTop>
-              <NoteFolder src={FolderSample} />
+              <FolderName>
+                <NoteFolder src={GreyFolder} />
+                {folderName}
+              </FolderName>
               <ButtonWrapper>
                 <SearchBtn src={LookCloser} />
                 <Relative
@@ -206,10 +227,11 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
                   <MoreBtn src={More} />
                   <NoteMenu
                     noteId={Number(match.params.noteId)}
-                    starred={false}
+                    starred={starred}
                     show={showContextMenu}
                     closeMenu={() => setShowContextMenu(false)}
                     editNoteTitle={editNoteTitle}
+                    starNote={starNote}
                   />
                 </Relative>
               </ButtonWrapper>
@@ -277,6 +299,16 @@ const Root = styled.div`
   width: 1000px;
 `;
 
+const FolderName = styled.div`
+  font-family: Pretendard;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 16px;
+  max-height: 20px;
+  display: flex;
+  color: #656565;
+`;
+
 const NoteInfo = styled.div``;
 
 const InfoTop = styled.div`
@@ -337,6 +369,7 @@ const NoteDate = styled.div`
 
 const NoteFolder = styled.img`
   height: 20px;
+  margin-right: 8px;
 `;
 
 const ButtonWrapper = styled.div`
