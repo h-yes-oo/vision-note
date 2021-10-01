@@ -1,17 +1,28 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useState, useCallback } from 'react';
 import styled from 'styled-components';
+
+import ParagraphMenu from 'components/ParagraphMenu';
 
 import BookMarkEmpty from 'assets/icons/BookMarkEmpty.svg';
 import BookMarkFull from 'assets/icons/BookMarkFull.svg';
 import NoteEmpty from 'assets/icons/NoteEmpty.svg';
 import NoteFull from 'assets/icons/NoteFull.svg';
 import HighlightButton from 'assets/icons/HighlightButton.svg';
+import MoreHorizontal from 'assets/icons/MoreHorizontal.svg';
 
 const Root = styled.div`
   display: flex;
   align-itmes: flex-start;
   justify-content: space-between;
   margin-top: 80px;
+`;
+
+const MoreBtn = styled.img`
+  height: 18px;
+  margin-left: 12px;
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 const Contents = styled.div<{ bookmarked: boolean }>`
@@ -88,24 +99,35 @@ const PreventClick = styled.div<{ visible: boolean }>`
   top: 0;
 `;
 
+const Relative = styled.div`
+  position: relative;
+`;
+
 interface Props {
+  paragraphId: number;
   bookmarked: boolean;
   content: string;
   time: string;
   note: string;
 }
 
-const Paragraph: FC<Props> = ({ bookmarked, content, time, note }) => {
+const Paragraph: FC<Props> = ({
+  paragraphId,
+  bookmarked,
+  content,
+  time,
+  note,
+}) => {
   const [bookmark, setBookmark] = useState<boolean>(bookmarked);
   const [noted, setNoted] = useState<boolean>(note !== '');
   const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
   const [selectedRange, setSelectedRange] = useState<Range | null>(null);
   const [showHighlightBtn, setShowHighlightBtn] = useState<boolean>(false);
+  const [showMenu, setShowMenu] = useState<boolean>(false);
 
-  const onClickBookMark = () => {
-    // TODO : 해당 문단 북마크 요청 보내기
+  const bookmarkParagraph = () => {
+    // TODO : 해당 문단 북마크 요청 보내기 & props type () => void로 바꾸기
     setBookmark(!bookmark);
-    console.log('hi');
   };
 
   const highlightSelection = (event: React.MouseEvent) => {
@@ -144,6 +166,22 @@ const Paragraph: FC<Props> = ({ bookmarked, content, time, note }) => {
     window.getSelection()?.removeAllRanges();
   };
 
+  const editMemo = () => {
+    console.log('edit Memo');
+  };
+
+  const editParagraph = () => {
+    console.log('edit Paragraph');
+  };
+
+  const handleMouseEnter = useCallback(
+    (event: React.MouseEvent) => {
+      event.preventDefault();
+      setShowMenu(true);
+    },
+    [setShowMenu]
+  );
+
   return (
     <Root>
       <PreventClick visible={showHighlightBtn} onClick={onClickOther}>
@@ -159,11 +197,27 @@ const Paragraph: FC<Props> = ({ bookmarked, content, time, note }) => {
       </Contents>
       <BtnWrapper>
         <TimeStamp>{time}</TimeStamp>
-        <BookMark
+        {/* <BookMark
           src={bookmark ? BookMarkFull : BookMarkEmpty}
-          onClick={onClickBookMark}
+          onClick={bookmarkParagraph}
         />
-        <Note src={noted ? NoteFull : NoteEmpty} />
+        <Note src={noted ? NoteFull : NoteEmpty} /> */}
+        <Relative
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={() => setShowMenu(false)}
+        >
+          <MoreBtn src={MoreHorizontal} />
+          <ParagraphMenu
+            show={showMenu}
+            closeMenu={() => setShowMenu(false)}
+            bookmarked={bookmark}
+            noted={noted}
+            paragraphId={paragraphId}
+            editMemo={editMemo}
+            editParagraph={editParagraph}
+            bookmarkParagraph={bookmarkParagraph}
+          />
+        </Relative>
       </BtnWrapper>
     </Root>
   );

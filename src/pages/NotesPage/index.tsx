@@ -277,6 +277,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
           <ContentWrapper>
             <NoteContents half={showMemo}>
               <Paragraph
+                paragraphId={0}
                 bookmarked={false}
                 content={content}
                 time="00:00"
