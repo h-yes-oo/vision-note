@@ -30,6 +30,7 @@ interface Props {}
 
 const FolderPage: FC<Props> = () => {
   // about notes
+  const [folders, setFolders] = useState<ReactNode>(<></>);
   const [notes, setNotes] = useState<ReactNode>(<></>);
   const [rootFolderId, setRootFolderId] = useState<number>(1);
   const authToken = useRecoilValue(authenticateToken);
@@ -38,47 +39,93 @@ const FolderPage: FC<Props> = () => {
   const [mode, setMode] = useRecoilState(notesMode);
   const [selecting, setSelecting] = useRecoilState(selectMode);
   const [selectedIds, setSelectedIds] = useRecoilState(selectedNotes);
-  // const refreshDrag = useRecoilValue<() => void>(dragRefresh);
+  const refreshDrag = useRecoilValue<() => void>(dragRefresh);
 
-  const refreshRoot = () => setRefresh(!refresh);
+  // const refreshRoot = () => setRefresh(!refresh);
+
+  const getRootItems = async () => {
+    setNotes(<Loading notes />);
+    const response = await axios.get('/v1/note/folder/root', {
+      headers: { Authorization: `Bearer ${authToken}` },
+    });
+    let data: NoteResponse[] = response.data.items;
+    setRootFolderId(response.data.rootFolderId);
+    if (mode === NotesMode.Star)
+      data = data.filter(
+        (value) =>
+          value.itemType === 'FOLDER' ||
+          (value.itemType === 'FILE' && value.noteFile!.isImportant === 1)
+      );
+    setFolders(
+      data
+        .filter((value) => value.itemType === 'FOLDER')
+        .map((value) => (
+          <ListData
+            key={`${value.itemType}.${
+              value.noteFile
+                ? value.noteFile!.fileId
+                : value.noteFolder!.folderId
+            }`}
+            data={value}
+            depth={0}
+            refreshNotes={getRootItems}
+            refreshRoot={getRootItems}
+          />
+        ))
+    );
+    setNotes(
+      data
+        .filter((value) => value.itemType === 'FILE')
+        .map((value) => (
+          <ListData
+            key={`${value.itemType}.${
+              value.noteFile
+                ? value.noteFile!.fileId
+                : value.noteFolder!.folderId
+            }`}
+            data={value}
+            depth={0}
+            refreshNotes={getRootItems}
+            refreshRoot={getRootItems}
+          />
+        ))
+    );
+  };
+
+  const getOnlyNotes = async () => {
+    setNotes(<Loading notes />);
+    const response = await axios.get('/v1/note/folder/root', {
+      headers: { Authorization: `Bearer ${authToken}` },
+    });
+    let data: NoteResponse[] = response.data.items;
+    setRootFolderId(response.data.rootFolderId);
+    if (mode === NotesMode.Star)
+      data = data.filter(
+        (value) =>
+          value.itemType === 'FOLDER' ||
+          (value.itemType === 'FILE' && value.noteFile!.isImportant === 1)
+      );
+    setNotes(
+      data
+        .filter((value) => value.itemType === 'FILE')
+        .map((value) => (
+          <ListData
+            key={`${value.itemType}.${
+              value.noteFile
+                ? value.noteFile!.fileId
+                : value.noteFolder!.folderId
+            }`}
+            data={value}
+            depth={0}
+            refreshNotes={getRootItems}
+            refreshRoot={getRootItems}
+          />
+        ))
+    );
+  };
 
   useEffect(() => {
-    const getRootItems = async () => {
-      setNotes(<Loading notes />);
-      const response = await axios.get('/v1/note/folder/root', {
-        headers: { Authorization: `Bearer ${authToken}` },
-      });
-      let data: NoteResponse[] = response.data.items;
-      setRootFolderId(response.data.rootFolderId);
-      if (mode === NotesMode.Star)
-        data = data.filter(
-          (value) =>
-            value.itemType === 'FOLDER' ||
-            (value.itemType === 'FILE' && value.noteFile!.isImportant === 1)
-        );
-      setNotes(
-        <>
-          {data.map((value) => (
-            <ListData
-              key={`${value.itemType}.${
-                value.noteFile
-                  ? value.noteFile!.fileId
-                  : value.noteFolder!.folderId
-              }`}
-              data={value}
-              depth={0}
-              refreshNotes={refreshRoot}
-              refreshRoot={refreshRoot}
-            />
-          ))}
-          <DropZone
-            onDrop={onDrop}
-            onDragOver={onDragOver}
-            onDragLeave={onDragLeave}
-          />
-        </>
-      );
-    };
+    console.log('use effect');
     if (authToken !== null) getRootItems();
   }, [refresh, mode]);
 
@@ -90,7 +137,7 @@ const FolderPage: FC<Props> = () => {
       await axios.post('/v1/note/folder', folderData, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
-      refreshRoot();
+      getRootItems();
     } catch {
       alert('새 폴더를 생성하지 못했습니다');
     }
@@ -122,7 +169,7 @@ const FolderPage: FC<Props> = () => {
       selectedIds.map((noteId) => starNote(noteId))
     );
     if (responses.every((res) => res)) {
-      refreshRoot();
+      getRootItems();
       setSelectedIds([]);
       setSelecting(false);
     } else {
@@ -147,7 +194,7 @@ const FolderPage: FC<Props> = () => {
       selectedIds.map((noteId) => deleteNote(noteId))
     );
     if (responses.every((res) => res)) {
-      refreshRoot();
+      getRootItems();
       setSelectedIds([]);
       setSelecting(false);
     } else {
@@ -159,7 +206,7 @@ const FolderPage: FC<Props> = () => {
     setMode(mode);
     setSelectedIds([]);
     setSelecting(false);
-    refreshRoot();
+    getRootItems();
   };
 
   const getTitle = () => {
@@ -303,8 +350,8 @@ const FolderPage: FC<Props> = () => {
       });
       // 폴더(id)의 상위 폴더와 루트 폴더 리렌더
       // 어차피 루트 폴더 리렌더 하면 전체 리렌더
-      // refreshDrag();
-      refreshRoot();
+      refreshDrag();
+      getOnlyNotes();
     } else {
       // 파일(id)를 루트 폴더 내부로 옮길 때
       const fileData = new FormData();
@@ -315,8 +362,8 @@ const FolderPage: FC<Props> = () => {
       });
       // 파일(id)의 상위 폴더와 루트 폴더 리렌더
       // 어차피 루트 폴더 리렌더 하면 전체 리렌더
-      // refreshDrag();
-      refreshRoot();
+      refreshDrag();
+      getOnlyNotes();
     }
   };
 
@@ -344,7 +391,17 @@ const FolderPage: FC<Props> = () => {
               <SubjectHeader>분류</SubjectHeader>
             </TableRow>
           </div>
-          <NoteWrapper>{notes}</NoteWrapper>
+          <NoteWrapper>
+            <>
+              {folders}
+              {notes}
+              <DropZone
+                onDrop={onDrop}
+                onDragOver={onDragOver}
+                onDragLeave={onDragLeave}
+              />
+            </>
+          </NoteWrapper>
         </Box>
         <BoxWrapper>
           <SmallBox onClick={() => onClickMode(NotesMode.All)}>
