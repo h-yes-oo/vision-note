@@ -124,6 +124,38 @@ const FolderPage: FC<Props> = () => {
     );
   };
 
+  const getOnlyFolders = async () => {
+    setNotes(<Loading notes />);
+    const response = await axios.get('/v1/note/folder/root', {
+      headers: { Authorization: `Bearer ${authToken}` },
+    });
+    let data: NoteResponse[] = response.data.items;
+    setRootFolderId(response.data.rootFolderId);
+    if (mode === NotesMode.Star)
+      data = data.filter(
+        (value) =>
+          value.itemType === 'FOLDER' ||
+          (value.itemType === 'FILE' && value.noteFile!.isImportant === 1)
+      );
+    setFolders(
+      data
+        .filter((value) => value.itemType === 'FOLDER')
+        .map((value) => (
+          <ListData
+            key={`${value.itemType}.${
+              value.noteFile
+                ? value.noteFile!.fileId
+                : value.noteFolder!.folderId
+            }`}
+            data={value}
+            depth={0}
+            refreshNotes={getRootItems}
+            refreshRoot={getRootItems}
+          />
+        ))
+    );
+  };
+
   useEffect(() => {
     console.log('use effect');
     if (authToken !== null) getRootItems();
@@ -351,7 +383,7 @@ const FolderPage: FC<Props> = () => {
       // 폴더(id)의 상위 폴더와 루트 폴더 리렌더
       // 어차피 루트 폴더 리렌더 하면 전체 리렌더
       refreshDrag();
-      getOnlyNotes();
+      getOnlyFolders();
     } else {
       // 파일(id)를 루트 폴더 내부로 옮길 때
       const fileData = new FormData();
