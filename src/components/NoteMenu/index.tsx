@@ -86,6 +86,7 @@ const Menu = styled.div<{ show: boolean }>`
   box-shadow: 3px 5px 16px 0 rgba(0, 0, 0, 0.12);
   background-color: #fff;
   padding: 13px 0;
+  z-index: 2;
 
   height: auto;
   margin: 0;

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { selectedNotes, selectMode, dragRefresh } from 'state';
+import { selectedNotes, selectMode, dragRefresh, selectedRefresh } from 'state';
 import ContextMenu from 'components/ContextMenu';
 import Note from 'assets/icons/Note.svg';
 import Star from 'assets/icons/Star.svg';
@@ -34,6 +34,8 @@ const NoteData: FC<Props & RouteComponentProps> = ({
     selectedIds.includes(noteId)
   );
   const setRefreshDrag = useSetRecoilState(dragRefresh);
+  const [selectedRefreshList, setSelectedRefresh] =
+    useRecoilState(selectedRefresh);
   // about context menu
   const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
   const [showContextMenu, setShowContextMenu] = useState<boolean>(false);
@@ -44,10 +46,14 @@ const NoteData: FC<Props & RouteComponentProps> = ({
 
   const addToSelectedIds = (noteId: number) => {
     setSelectedIds([...selectedIds, noteId]);
+    setSelectedRefresh([...selectedRefreshList, refreshNotes]);
   };
 
   const removeFromSelectedIds = (noteId: number) => {
     setSelectedIds(selectedIds.filter((value) => value !== noteId));
+    setSelectedRefresh(
+      selectedRefreshList.filter((value) => value !== refreshNotes)
+    );
   };
 
   const toggleSelected = () => {

@@ -87,7 +87,6 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
       const { data } = await axios.get(`/v1/note/folder/parents/${folderId}`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
-      console.log(data);
       if (data.length <= 1) {
         setFolderElement(
           <FolderName>
@@ -114,7 +113,6 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
           </FolderName>
         );
       }
-      setLoading(false);
     } catch {
       alert('노트 정보를 가져올 수 없습니다');
     }

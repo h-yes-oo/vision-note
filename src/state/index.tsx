@@ -65,3 +65,8 @@ export const status = atom<string>({
   key: 'status',
   default: '',
 });
+
+export const selectedRefresh = atom<(() => void)[]>({
+  key: 'selectedRefresh',
+  default: [],
+});

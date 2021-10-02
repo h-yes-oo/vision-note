@@ -80,7 +80,6 @@ const FolderData: FC<Props> = ({
 
   useEffect(() => {
     const getFolderItems = async () => {
-      // setNotes(<>Loading...</>);
       const response = await axios.get(`/v1/note/folder/childs/${folderId}`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
@@ -93,19 +92,25 @@ const FolderData: FC<Props> = ({
         );
       if (folderData !== undefined)
         setNotes(
-          folderData.map((value) => (
-            <ListData
-              key={`${value.itemType}.${
-                value.noteFile
-                  ? value.noteFile!.fileId
-                  : value.noteFolder!.folderId
-              }`}
-              data={value}
-              depth={depth + 1}
-              refreshNotes={refreshFolder}
-              refreshRoot={refreshRoot}
-            />
-          ))
+          folderData.map((value) => {
+            let key = '';
+            if (value.itemType === 'FOLDER') {
+              key = `FOLDER.${value.noteFolder!.folderId}`;
+            } else {
+              key = `FILE.${value.noteFile!.fileId}.${
+                value.noteFile!.isImportant
+              }`;
+            }
+            return (
+              <ListData
+                key={key}
+                data={value}
+                depth={depth + 1}
+                refreshNotes={refreshFolder}
+                refreshRoot={refreshRoot}
+              />
+            );
+          })
         );
       else setNotes(<></>);
     };

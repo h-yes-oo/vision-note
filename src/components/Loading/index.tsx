@@ -10,7 +10,6 @@ const Root = styled.div<{ notes: boolean }>`
   border: none;
   width: ${(props) => (props.notes ? '100%' : '100vw')};
   min-height: ${(props) => (props.notes ? '100%' : '100vh')};
-  z-index: -100;
 `;
 
 const dotFalling = keyframes`

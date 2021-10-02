@@ -13,6 +13,7 @@ import {
   selectedNotes,
   notesMode,
   dragRefresh,
+  selectedRefresh,
 } from 'state';
 
 import Check from 'assets/icons/Check.svg';
@@ -30,7 +31,7 @@ interface Props {}
 
 const FolderPage: FC<Props> = () => {
   // about notes
-  const [folders, setFolders] = useState<ReactNode>(<></>);
+  const [loading, setLoading] = useState<boolean>(true);
   const [notes, setNotes] = useState<ReactNode>(<></>);
   const [rootFolderId, setRootFolderId] = useState<number>(1);
   const authToken = useRecoilValue(authenticateToken);
@@ -39,61 +40,13 @@ const FolderPage: FC<Props> = () => {
   const [mode, setMode] = useRecoilState(notesMode);
   const [selecting, setSelecting] = useRecoilState(selectMode);
   const [selectedIds, setSelectedIds] = useRecoilState(selectedNotes);
+  const [selectedRefreshList, setSelectedRefresh] =
+    useRecoilState(selectedRefresh);
   const refreshDrag = useRecoilValue<() => void>(dragRefresh);
 
-  // const refreshRoot = () => setRefresh(!refresh);
+  const refreshNotes = () => setRefresh(!refresh);
 
   const getRootItems = async () => {
-    setNotes(<Loading notes />);
-    const response = await axios.get('/v1/note/folder/root', {
-      headers: { Authorization: `Bearer ${authToken}` },
-    });
-    let data: NoteResponse[] = response.data.items;
-    setRootFolderId(response.data.rootFolderId);
-    if (mode === NotesMode.Star)
-      data = data.filter(
-        (value) =>
-          value.itemType === 'FOLDER' ||
-          (value.itemType === 'FILE' && value.noteFile!.isImportant === 1)
-      );
-    setFolders(
-      data
-        .filter((value) => value.itemType === 'FOLDER')
-        .map((value) => (
-          <ListData
-            key={`${value.itemType}.${
-              value.noteFile
-                ? value.noteFile!.fileId
-                : value.noteFolder!.folderId
-            }`}
-            data={value}
-            depth={0}
-            refreshNotes={getRootItems}
-            refreshRoot={getRootItems}
-          />
-        ))
-    );
-    setNotes(
-      data
-        .filter((value) => value.itemType === 'FILE')
-        .map((value) => (
-          <ListData
-            key={`${value.itemType}.${
-              value.noteFile
-                ? value.noteFile!.fileId
-                : value.noteFolder!.folderId
-            }`}
-            data={value}
-            depth={0}
-            refreshNotes={getRootItems}
-            refreshRoot={getRootItems}
-          />
-        ))
-    );
-  };
-
-  const getOnlyNotes = async () => {
-    setNotes(<Loading notes />);
     const response = await axios.get('/v1/note/folder/root', {
       headers: { Authorization: `Bearer ${authToken}` },
     });
@@ -106,59 +59,30 @@ const FolderPage: FC<Props> = () => {
           (value.itemType === 'FILE' && value.noteFile!.isImportant === 1)
       );
     setNotes(
-      data
-        .filter((value) => value.itemType === 'FILE')
-        .map((value) => (
+      data.map((value) => {
+        let key = '';
+        if (value.itemType === 'FOLDER') {
+          key = `FOLDER.${value.noteFolder!.folderId}`;
+        } else {
+          key = `FILE.${value.noteFile!.fileId}.${value.noteFile!.isImportant}`;
+        }
+        return (
           <ListData
-            key={`${value.itemType}.${
-              value.noteFile
-                ? value.noteFile!.fileId
-                : value.noteFolder!.folderId
-            }`}
+            key={key}
             data={value}
             depth={0}
             refreshNotes={getRootItems}
             refreshRoot={getRootItems}
           />
-        ))
-    );
-  };
-
-  const getOnlyFolders = async () => {
-    setNotes(<Loading notes />);
-    const response = await axios.get('/v1/note/folder/root', {
-      headers: { Authorization: `Bearer ${authToken}` },
-    });
-    let data: NoteResponse[] = response.data.items;
-    setRootFolderId(response.data.rootFolderId);
-    if (mode === NotesMode.Star)
-      data = data.filter(
-        (value) =>
-          value.itemType === 'FOLDER' ||
-          (value.itemType === 'FILE' && value.noteFile!.isImportant === 1)
-      );
-    setFolders(
-      data
-        .filter((value) => value.itemType === 'FOLDER')
-        .map((value) => (
-          <ListData
-            key={`${value.itemType}.${
-              value.noteFile
-                ? value.noteFile!.fileId
-                : value.noteFolder!.folderId
-            }`}
-            data={value}
-            depth={0}
-            refreshNotes={getRootItems}
-            refreshRoot={getRootItems}
-          />
-        ))
+        );
+      })
     );
   };
 
   useEffect(() => {
-    console.log('use effect');
+    setLoading(true);
     if (authToken !== null) getRootItems();
+    setLoading(false);
   }, [refresh, mode]);
 
   const onClickNewFolder = async () => {
@@ -201,7 +125,8 @@ const FolderPage: FC<Props> = () => {
       selectedIds.map((noteId) => starNote(noteId))
     );
     if (responses.every((res) => res)) {
-      getRootItems();
+      selectedRefreshList.map((refreshFunction) => refreshFunction());
+      setSelectedRefresh([]);
       setSelectedIds([]);
       setSelecting(false);
     } else {
@@ -226,7 +151,8 @@ const FolderPage: FC<Props> = () => {
       selectedIds.map((noteId) => deleteNote(noteId))
     );
     if (responses.every((res) => res)) {
-      getRootItems();
+      selectedRefreshList.map((refreshFunction) => refreshFunction());
+      setSelectedRefresh([]);
       setSelectedIds([]);
       setSelecting(false);
     } else {
@@ -383,7 +309,7 @@ const FolderPage: FC<Props> = () => {
       // 폴더(id)의 상위 폴더와 루트 폴더 리렌더
       // 어차피 루트 폴더 리렌더 하면 전체 리렌더
       refreshDrag();
-      getOnlyFolders();
+      getRootItems();
     } else {
       // 파일(id)를 루트 폴더 내부로 옮길 때
       const fileData = new FormData();
@@ -395,7 +321,7 @@ const FolderPage: FC<Props> = () => {
       // 파일(id)의 상위 폴더와 루트 폴더 리렌더
       // 어차피 루트 폴더 리렌더 하면 전체 리렌더
       refreshDrag();
-      getOnlyNotes();
+      getRootItems();
     }
   };
 
@@ -424,15 +350,18 @@ const FolderPage: FC<Props> = () => {
             </TableRow>
           </div>
           <NoteWrapper>
-            <>
-              {folders}
-              {notes}
-              <DropZone
-                onDrop={onDrop}
-                onDragOver={onDragOver}
-                onDragLeave={onDragLeave}
-              />
-            </>
+            {loading ? (
+              <Loading notes />
+            ) : (
+              <>
+                {notes}
+                <DropZone
+                  onDrop={onDrop}
+                  onDragOver={onDragOver}
+                  onDragLeave={onDragLeave}
+                />
+              </>
+            )}
           </NoteWrapper>
         </Box>
         <BoxWrapper>
