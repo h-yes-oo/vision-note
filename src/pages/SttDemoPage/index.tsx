@@ -139,6 +139,7 @@ const Logs = styled.div`
   overflow: scroll;
   height: 500px;
   width: 1000px;
+  user-select: text !important;
 `;
 
 const Button = styled.button`

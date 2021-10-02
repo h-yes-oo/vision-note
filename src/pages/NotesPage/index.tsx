@@ -10,6 +10,9 @@ import Paragraph from 'components/Paragraph';
 import NoteMenu from 'components/NoteMenu';
 
 import GreyFolder from 'assets/icons/GreyFolder.svg';
+import PurpleFolder from 'assets/icons/PurpleFolder.svg';
+import BlueFolder from 'assets/icons/BlueFolder.svg';
+import FolderArrow from 'assets/icons/FolderArrow.svg';
 import LookCloser from 'assets/icons/LookCloser.svg';
 import More from 'assets/icons/More.svg';
 import Recording from 'assets/icons/Recording.svg';
@@ -35,6 +38,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
   match,
   history,
 }) => {
+  const [noteId, setNoteId] = useState<string>('');
   const [title, setTitle] = useState<string>('');
   const [date, setDate] = useState<string>('');
   const [recording, setRecording] = useState<boolean>(false);
@@ -46,6 +50,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
   const authToken = useRecoilValue(authenticateToken);
   const [showContextMenu, setShowContextMenu] = useState<boolean>(false);
   const [folderName, setFolderName] = useState<string>('');
+  const [folderElement, setFolderElement] = useState<JSX.Element>(<></>);
   // about editing title
   const [editing, setEditing] = useState<boolean>(false);
   const [newName, setNewName] = useState<string>('');
@@ -61,26 +66,72 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
     '비전노트에 놀러와 주셔서 감사합니다 :)\n',
   ];
 
-  const getNoteInfo = async () => {
+  const getNoteInfo = async (noteId) => {
     try {
-      const { data } = await axios.get(`/v1/script/${match.params.noteId}`, {
+      const { data } = await axios.get(`/v1/script/${noteId}`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
-      console.log(data);
       setFolderName(data.parentFolder.folderName);
       setStarred(data.script.isImportant);
       setTitle(data.script.fileName);
       setDate(data.script.createdAt.slice(0, 10).replace(/-/gi, '.'));
+      return data.parentFolder.folderId;
+    } catch {
+      alert('노트 정보를 가져올 수 없습니다');
+      return null;
+    }
+  };
+
+  const getParentFolders = async (folderId) => {
+    try {
+      const { data } = await axios.get(`/v1/note/folder/parents/${folderId}`, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      console.log(data);
+      if (data.length <= 1) {
+        setFolderElement(
+          <FolderName>
+            <NoteFolder src={GreyFolder} />
+            전체 폴더
+          </FolderName>
+        );
+      } else {
+        const lastIndex = data.length - 2;
+        setFolderElement(
+          <FolderName>
+            {data
+              .slice(0, -1)
+              .reverse()
+              .map((folder, index) => (
+                <FolderWrapper key={folder.folderId}>
+                  <NoteFolder
+                    src={index % 2 === 0 ? PurpleFolder : BlueFolder}
+                  />
+                  {folder.folderName}
+                  {index !== lastIndex && <FolderNext src={FolderArrow} />}
+                </FolderWrapper>
+              ))}
+          </FolderName>
+        );
+      }
       setLoading(false);
     } catch {
       alert('노트 정보를 가져올 수 없습니다');
     }
   };
 
-  useEffect(() => {
+  const getStarted = async () => {
+    const { noteId } = match.params;
+    setNoteId(noteId);
     setLoading(true);
     setContent(contents.join(''));
-    getNoteInfo();
+    const folderId = await getNoteInfo(noteId);
+    if (folderId !== null) await getParentFolders(folderId);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    getStarted();
   }, []);
   // temp end
 
@@ -179,9 +230,9 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
       if (newName !== '') {
         try {
           const noteData = new FormData();
-          noteData.append('fileId', String(match.params.noteId));
+          noteData.append('fileId', String(noteId));
           noteData.append('fileName', newName);
-          await axios.put(`/v1/note/file/${match.params.noteId}`, noteData, {
+          await axios.put(`/v1/note/file/${noteId}`, noteData, {
             headers: { Authorization: `Bearer ${authToken}` },
           });
           setTitle(newName);
@@ -194,10 +245,10 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
 
   const starNote = async () => {
     const fileData = new FormData();
-    fileData.append('fileId', String(match.params.noteId));
+    fileData.append('fileId', String(noteId));
     fileData.append('isImportant', String(starred ? 0 : 1));
     try {
-      await axios.put(`/v1/note/file/${match.params.noteId}`, fileData, {
+      await axios.put(`/v1/note/file/${noteId}`, fileData, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setStarred(!starred);
@@ -214,10 +265,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
         <Root>
           <NoteInfo>
             <InfoTop>
-              <FolderName>
-                <NoteFolder src={GreyFolder} />
-                {folderName}
-              </FolderName>
+              {folderElement}
               <ButtonWrapper>
                 <SearchBtn src={LookCloser} />
                 <Relative
@@ -226,7 +274,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
                 >
                   <MoreBtn src={More} />
                   <NoteMenu
-                    noteId={Number(match.params.noteId)}
+                    noteId={Number(noteId)}
                     starred={starred}
                     show={showContextMenu}
                     closeMenu={() => setShowContextMenu(false)}
@@ -291,6 +339,11 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
     </BaseLayout>
   );
 };
+
+const FolderWrapper = styled.div`
+  display: flex;
+  align-items: center;
+`;
 
 const Relative = styled.div`
   position: relative;
@@ -455,6 +508,10 @@ const ToggleBtn = styled.img`
   &:hover {
     cursor: pointer;
   }
+`;
+
+const FolderNext = styled.img`
+  margin: 0 10px 0 3px;
 `;
 
 export default withRouter(NotesPage);
