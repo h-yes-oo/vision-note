@@ -79,6 +79,20 @@ const FolderData: FC<Props> = ({
   };
 
   useEffect(() => {
+    const sortFolder = (a, b) => {
+      // 한글 오름차순
+      if (a.noteFolder!.folderName < b.noteFolder!.folderName) return -1;
+      if (a.noteFolder!.folderName > b.noteFolder!.folderName) return 1;
+      return 0;
+    };
+
+    const sortNote = (a, b) => {
+      // 한글 오름차순
+      if (a.noteFile!.fileName < b.noteFile!.fileName) return -1;
+      if (a.noteFile!.fileName > b.noteFile!.fileName) return 1;
+      return 0;
+    };
+
     const getFolderItems = async () => {
       const response = await axios.get(`/v1/note/folder/childs/${folderId}`, {
         headers: { Authorization: `Bearer ${authToken}` },
@@ -90,17 +104,12 @@ const FolderData: FC<Props> = ({
             value.itemType === 'FOLDER' ||
             (value.itemType === 'FILE' && value.noteFile!.isImportant === 1)
         );
-      if (folderData !== undefined)
-        setNotes(
-          folderData.map((value) => {
-            let key = '';
-            if (value.itemType === 'FOLDER') {
-              key = `FOLDER.${value.noteFolder!.folderId}`;
-            } else {
-              key = `FILE.${value.noteFile!.fileId}.${
-                value.noteFile!.isImportant
-              }`;
-            }
+      if (folderData !== undefined) {
+        const folders = folderData
+          .filter((value) => value.itemType === 'FOLDER')
+          .sort(sortFolder)
+          .map((value) => {
+            const key = `FOLDER.${value.noteFolder!.folderId}`;
             return (
               <ListData
                 key={key}
@@ -110,9 +119,53 @@ const FolderData: FC<Props> = ({
                 refreshRoot={refreshRoot}
               />
             );
-          })
+          });
+
+        const notes = folderData
+          .filter((value) => value.itemType === 'FILE')
+          .sort(sortNote)
+          .map((value) => {
+            const key = `FILE.${value.noteFile!.fileId}.${
+              value.noteFile!.isImportant
+            }`;
+            return (
+              <ListData
+                key={key}
+                data={value}
+                depth={depth + 1}
+                refreshNotes={refreshFolder}
+                refreshRoot={refreshRoot}
+              />
+            );
+          });
+
+        const mixed = folderData.map((value) => {
+          let key = '';
+          if (value.itemType === 'FOLDER') {
+            key = `FOLDER.${value.noteFolder!.folderId}`;
+          } else {
+            key = `FILE.${value.noteFile!.fileId}.${
+              value.noteFile!.isImportant
+            }`;
+          }
+          return (
+            <ListData
+              key={key}
+              data={value}
+              depth={depth + 1}
+              refreshNotes={refreshFolder}
+              refreshRoot={refreshRoot}
+            />
+          );
+        });
+
+        setNotes(
+          <>
+            {folders}
+            {notes}
+          </>
         );
-      else setNotes(<></>);
+      } else setNotes(<></>);
     };
     if (authToken !== null) getFolderItems();
   }, [refresh, mode]);
