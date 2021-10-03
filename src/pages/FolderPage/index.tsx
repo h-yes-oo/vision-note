@@ -1,12 +1,13 @@
-import { FC, useState, ReactNode, useEffect } from 'react';
+import { FC, useState, ReactNode, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { useRecoilValue, useRecoilState } from 'recoil';
 
-import { NotesMode } from 'types';
+import { NotesMode, SortMode } from 'types';
 import BaseLayout from 'components/BaseLayout';
 import ListData, { NoteResponse } from 'components/ListData/list';
 import Loading from 'components/Loading';
+import SortMenu from 'components/SortMenu';
 import {
   authenticateToken,
   selectMode,
@@ -14,10 +15,12 @@ import {
   notesMode,
   dragRefresh,
   selectedRefresh,
+  sortMode,
 } from 'state';
 
 import Check from 'assets/icons/Check.svg';
 import SortToggleDown from 'assets/icons/SortToggleDown.svg';
+import SortToggleUp from 'assets/icons/SortToggleUp.svg';
 import NewFolder from 'assets/icons/NewFolder.svg';
 import Star from 'assets/icons/Star.svg';
 import EmptyTrashCan from 'assets/icons/EmptyTrashCan.svg';
@@ -38,6 +41,8 @@ const FolderPage: FC<Props> = () => {
   const [refresh, setRefresh] = useState<boolean>(false);
   // about folder page mode
   const [mode, setMode] = useRecoilState(notesMode);
+  const [sortBy, setSortBy] = useRecoilState(sortMode);
+  const [showSortMenu, setShowSortMenu] = useState<boolean>(false);
   const [selecting, setSelecting] = useRecoilState(selectMode);
   const [selectedIds, setSelectedIds] = useRecoilState(selectedNotes);
   const [selectedRefreshList, setSelectedRefresh] =
@@ -46,15 +51,39 @@ const FolderPage: FC<Props> = () => {
 
   const sortFolder = (a, b) => {
     // 한글 오름차순
-    if (a.noteFolder!.folderName < b.noteFolder!.folderName) return -1;
-    if (a.noteFolder!.folderName > b.noteFolder!.folderName) return 1;
+    if (sortBy === SortMode.Alphabetically) {
+      if (a.noteFolder!.folderName < b.noteFolder!.folderName) return -1;
+      if (a.noteFolder!.folderName > b.noteFolder!.folderName) return 1;
+      return 0;
+    }
+    // 오래된 순
+    if (sortBy === SortMode.Oldest) {
+      if (a.noteFolder!.createdAt < b.noteFolder!.createdAt) return -1;
+      if (a.noteFolder!.createdAt > b.noteFolder!.createdAt) return 1;
+      return 0;
+    }
+    // 새로 만든 순
+    if (a.noteFolder!.createdAt > b.noteFolder!.createdAt) return -1;
+    if (a.noteFolder!.createdAt < b.noteFolder!.createdAt) return 1;
     return 0;
   };
 
   const sortNote = (a, b) => {
     // 한글 오름차순
-    if (a.noteFile!.fileName < b.noteFile!.fileName) return -1;
-    if (a.noteFile!.fileName > b.noteFile!.fileName) return 1;
+    if (sortBy === SortMode.Alphabetically) {
+      if (a.noteFile!.fileName < b.noteFile!.fileName) return -1;
+      if (a.noteFile!.fileName > b.noteFile!.fileName) return 1;
+      return 0;
+    }
+    // 오래된 순
+    if (sortBy === SortMode.Oldest) {
+      if (a.noteFile!.createdAt < b.noteFile!.createdAt) return -1;
+      if (a.noteFile!.createdAt > b.noteFile!.createdAt) return 1;
+      return 0;
+    }
+    // 새로 만든 순
+    if (a.noteFile!.createdAt > b.noteFile!.createdAt) return -1;
+    if (a.noteFile!.createdAt < b.noteFile!.createdAt) return 1;
     return 0;
   };
 
@@ -136,6 +165,10 @@ const FolderPage: FC<Props> = () => {
     if (authToken !== null) getRootItems();
     setLoading(false);
   }, [refresh, mode]);
+
+  useEffect(() => {
+    getRootItems();
+  }, [sortBy]);
 
   const onClickNewFolder = async () => {
     const folderData = new FormData();
@@ -235,6 +268,25 @@ const FolderPage: FC<Props> = () => {
     setSelectedIds([]);
   };
 
+  const handleMouseEnter = useCallback(
+    (event: React.MouseEvent) => {
+      event.preventDefault();
+      setShowSortMenu(true);
+    },
+    [setShowSortMenu]
+  );
+
+  const SortElement = (
+    <Button
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={() => setShowSortMenu(false)}
+    >
+      <Sort>정렬 기준</Sort>
+      <ButtonImage src={showSortMenu ? SortToggleUp : SortToggleDown} />
+      <SortMenu show={showSortMenu} closeMenu={() => setShowSortMenu(false)} />
+    </Button>
+  );
+
   const getTopMenu = () => {
     // 중요 노트함 기본 모드
     if (mode === NotesMode.Star && !selecting)
@@ -244,10 +296,7 @@ const FolderPage: FC<Props> = () => {
             <ButtonImage src={Check} />
             <ButtonName onClick={startSelectMode}>파일 선택하기</ButtonName>
           </Button>
-          <Button>
-            <Sort>정렬 기준</Sort>
-            <ButtonImage src={SortToggleDown} />
-          </Button>
+          {SortElement}
         </ButtonWrapper>
       );
     // 중요 노트함 파일 선택 모드
@@ -282,10 +331,7 @@ const FolderPage: FC<Props> = () => {
               휴지통 비우기
             </ButtonName>
           </Button>
-          <Button>
-            <Sort>정렬 기준</Sort>
-            <ButtonImage src={SortToggleDown} />
-          </Button>
+          {SortElement}
         </ButtonWrapper>
       );
     // 휴지통 파일 선택 모드
@@ -337,10 +383,7 @@ const FolderPage: FC<Props> = () => {
           <ButtonImage src={Check} />
           <ButtonName onClick={startSelectMode}>파일 선택하기</ButtonName>
         </Button>
-        <Button>
-          <Sort>정렬 기준</Sort>
-          <ButtonImage src={SortToggleDown} />
-        </Button>
+        {SortElement}
       </ButtonWrapper>
     );
   };
@@ -495,6 +538,8 @@ const Button = styled(HoverAnchor)`
   display: flex;
   align-items: center;
   margin-left: 40px;
+  position: relative;
+  height: 100%;
 `;
 
 const ButtonName = styled.div`

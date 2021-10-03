@@ -24,3 +24,9 @@ export enum NotesMode {
   Star,
   Trash,
 }
+
+export enum SortMode {
+  Alphabetically,
+  Oldest,
+  Newest,
+}

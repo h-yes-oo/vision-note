@@ -1,6 +1,6 @@
-import { atom, selector, useSetRecoilState } from 'recoil';
+import { atom, selector } from 'recoil';
 import axios from 'axios';
-import { NotesMode } from 'types';
+import { NotesMode, SortMode } from 'types';
 
 const getToken = () => {
   try {
@@ -69,4 +69,9 @@ export const status = atom<string>({
 export const selectedRefresh = atom<(() => void)[]>({
   key: 'selectedRefresh',
   default: [],
+});
+
+export const sortMode = atom<SortMode>({
+  key: 'sortMode',
+  default: SortMode.Alphabetically,
 });
