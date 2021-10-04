@@ -134,23 +134,23 @@ const FolderPage: FC<Props> = () => {
         );
       });
 
-    const mixed = data.map((value) => {
-      let key = '';
-      if (value.itemType === 'FOLDER') {
-        key = `FOLDER.${value.noteFolder!.folderId}`;
-      } else {
-        key = `FILE.${value.noteFile!.fileId}.${value.noteFile!.isImportant}`;
-      }
-      return (
-        <ListData
-          key={key}
-          data={value}
-          depth={0}
-          refreshNotes={getRootItems}
-          refreshRoot={getRootItems}
-        />
-      );
-    });
+    // const mixed = data.map((value) => {
+    //   let key = '';
+    //   if (value.itemType === 'FOLDER') {
+    //     key = `FOLDER.${value.noteFolder!.folderId}`;
+    //   } else {
+    //     key = `FILE.${value.noteFile!.fileId}.${value.noteFile!.isImportant}`;
+    //   }
+    //   return (
+    //     <ListData
+    //       key={key}
+    //       data={value}
+    //       depth={0}
+    //       refreshNotes={getRootItems}
+    //       refreshRoot={getRootItems}
+    //     />
+    //   );
+    // });
 
     setNotes(
       <>
@@ -160,12 +160,14 @@ const FolderPage: FC<Props> = () => {
     );
   };
 
+  // refresh 되거나 mode 바뀌면 로딩닷과 함께 리렌더
   useEffect(() => {
     setLoading(true);
     if (authToken !== null) getRootItems();
     setLoading(false);
   }, [refresh, mode]);
 
+  // 정렬 기준 바뀌면 로딩닷 없이 리렌더
   useEffect(() => {
     getRootItems();
   }, [sortBy]);
@@ -249,7 +251,6 @@ const FolderPage: FC<Props> = () => {
     setMode(mode);
     setSelectedIds([]);
     setSelecting(false);
-    getRootItems();
   };
 
   const getTitle = () => {
@@ -485,22 +486,22 @@ const FolderPage: FC<Props> = () => {
 };
 
 const NoteWrapper = styled.div`
-  height: calc(100% - 49px);
+  height: calc(100% - 49rem);
   display: flex;
   flex-direction: column;
   overflow: scroll;
 `;
 
 const DropZone = styled.div`
-  min-height: 65px;
+  min-height: 65rem;
   flex: 1;
 `;
 
 const Root = styled.div`
   display: flex;
   flex-direction: column;
-  margin-top: 33px;
-  width: 1000px;
+  margin-top: 33rem;
+  width: 1000rem;
 
   > * {
     user-select: none !important;
@@ -511,7 +512,7 @@ const Top = styled.div`
   display: flex;
   justify-content: space-between;
   font-family: Pretendard;
-  font-size: 24px;
+  font-size: 24rem;
   font-weight: bold;
   font-stretch: normal;
   font-style: normal;
@@ -527,7 +528,7 @@ const ButtonWrapper = styled.div`
 `;
 
 const HoverAnchor = styled.a`
-  border-radius: 5px;
+  border-radius: 5rem;
   &:hover {
     cursor: pointer;
     background-color: #f1f3f4;
@@ -537,14 +538,14 @@ const HoverAnchor = styled.a`
 const Button = styled(HoverAnchor)`
   display: flex;
   align-items: center;
-  margin-left: 40px;
+  margin-left: 40rem;
   position: relative;
   height: 100%;
 `;
 
 const ButtonName = styled.div`
   font-family: Pretendard;
-  font-size: 16px;
+  font-size: 16rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -552,12 +553,12 @@ const ButtonName = styled.div`
   letter-spacing: normal;
   text-align: left;
   color: #000;
-  margin-left: 8px;
+  margin-left: 8rem;
 `;
 
 const Sort = styled.div`
   font-family: Pretendard;
-  font-size: 16px;
+  font-size: 16rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -565,37 +566,37 @@ const Sort = styled.div`
   letter-spacing: normal;
   text-align: left;
   color: #000;
-  margin-right: 8px;
+  margin-right: 8rem;
 `;
 
 const ButtonImage = styled.img`
-  height: 12px;
-  width: 12px;
+  height: 12rem;
+  width: 12rem;
 `;
 
 const FolderImage = styled.img`
-  height: 18px;
-  width: 18px;
+  height: 18rem;
+  width: 18rem;
 `;
 
 const Box = styled.div`
-  width: 1000px;
-  height: 719px;
+  width: 1000rem;
+  height: 719rem;
   object-fit: contain;
-  box-shadow: 0 3px 16px 0 rgba(0, 0, 0, 0.08);
+  box-shadow: 0 3rem 16rem 0 rgba(0, 0, 0, 0.08);
   background-color: #fff;
   display: flex;
   flex-direction: column;
-  border-radius: 15px;
-  margin: 19px 0 41px;
+  border-radius: 15rem;
+  margin: 19rem 0 41rem;
 
   table-layout: fixed;
 `;
 
 const TableRow = styled.div`
-  height: 48px;
-  border-bottom: #e6e6e6 1px solid;
-  padding: 0 30px;
+  height: 48rem;
+  border-bottom: #e6e6e6 1rem solid;
+  padding: 0 30rem;
 
   display: flex;
   align-items: center;
@@ -608,7 +609,7 @@ const TableRow = styled.div`
 
 const TableHeader = styled.div`
   font-family: Pretendard;
-  font-size: 14px;
+  font-size: 14rem;
   font-weight: 500;
   font-stretch: normal;
   font-style: normal;
@@ -623,35 +624,35 @@ const TableHeader = styled.div`
 `;
 
 const TitleHeader = styled(TableHeader)`
-  width: 570px;
+  width: 570rem;
 `;
 
 const StarHeader = styled(TableHeader)`
-  width: 52px;
+  width: 52rem;
 `;
 
 const DateHeader = styled(TableHeader)`
-  width: 280px;
+  width: 280rem;
   display: flex;
   justify-content: center;
 `;
 
 const SubjectHeader = styled(TableHeader)`
-  width: 28px;
+  width: 28rem;
 `;
 
 const BoxWrapper = styled.div`
   display: flex;
   justify-content: space-between;
-  margin-bottom: 41px;
+  margin-bottom: 41rem;
 `;
 
 const SmallBox = styled(HoverAnchor)`
-  width: 310px;
-  height: 70px;
+  width: 310rem;
+  height: 70rem;
   object-fit: contain;
-  border-radius: 8px;
-  box-shadow: 0 3px 16px 0 rgba(0, 0, 0, 0.08);
+  border-radius: 8rem;
+  box-shadow: 0 3rem 16rem 0 rgba(0, 0, 0, 0.08);
   background-color: #fff;
   display: flex;
   justify-content: center;
@@ -660,7 +661,7 @@ const SmallBox = styled(HoverAnchor)`
 
 const BoxTitle = styled.div`
   font-family: Pretendard;
-  font-size: 20px;
+  font-size: 20rem;
   font-weight: 500;
   font-stretch: normal;
   font-style: normal;
@@ -668,14 +669,14 @@ const BoxTitle = styled.div`
   letter-spacing: normal;
   text-align: left;
   color: #000;
-  margin-left: -20px;
+  margin-left: -20rem;
   display: flex;
   align-items: center;
 `;
 
 const BoxImage = styled.img`
-  width: 40px;
-  margin-right: 10px;
+  width: 40rem;
+  margin-right: 10rem;
 `;
 
 export default FolderPage;

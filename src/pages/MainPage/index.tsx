@@ -22,6 +22,10 @@ const MainPage: FC<Props & RouteComponentProps> = ({ history }) => {
     setModalType(T.ModalType.Login);
   };
 
+  const goToDemo = () => {
+    history.push('/demo');
+  };
+
   const signUpModal = () => {
     setModalType(T.ModalType.SignUp);
   };
@@ -78,7 +82,7 @@ const MainPage: FC<Props & RouteComponentProps> = ({ history }) => {
             <SmallText>
               비전노트는 모두를 위한 자동 강의록 서비스입니다
             </SmallText>
-            <GetStarted onClick={loginModal}>Get Started</GetStarted>
+            <GetStarted onClick={goToDemo}>Get Started</GetStarted>
           </Info>
           <MainImage src={MainImage1} />
         </TopDiv>
@@ -165,8 +169,8 @@ const HeaderViewWidth = styled.div`
 `;
 
 const Header = styled.div`
-  width: 1000px;
-  height: 130px;
+  width: 1000rem;
+  height: 130rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -174,7 +178,7 @@ const Header = styled.div`
 `;
 
 const TopDiv = styled.div`
-  width: 1000px;
+  width: 1000rem;
   display: flex;
   justify-content: space-between;
 `;
@@ -187,7 +191,7 @@ const Info = styled.div`
 
 const BigText = styled.div`
   font-family: Pretendard;
-  font-size: 50px;
+  font-size: 50rem;
   font-weight: 800;
   font-stretch: normal;
   font-style: normal;
@@ -196,15 +200,15 @@ const BigText = styled.div`
   text-align: left;
   color: #000;
   white-space: pre-wrap;
-  margin-bottom: 18px;
+  margin-bottom: 18rem;
 `;
 
 const SmallText = styled.div`
-  width: 357px;
-  height: 21px;
+  width: 357rem;
+  height: 21rem;
   object-fit: contain;
   font-family: Pretendard;
-  font-size: 18px;
+  font-size: 18rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -215,7 +219,7 @@ const SmallText = styled.div`
 `;
 
 const MainImage = styled.img`
-  height: 400px;
+  height: 400rem;
 `;
 
 const BtnWrapper = styled.div`
@@ -224,7 +228,7 @@ const BtnWrapper = styled.div`
 
 const Button = styled.button`
   font-family: Pretendard;
-  font-size: 18px;
+  font-size: 18rem;
   font-weight: 500;
   font-stretch: normal;
   font-style: normal;
@@ -242,7 +246,7 @@ const Button = styled.button`
 const PurpleButton = styled(Button)`
   background-color: #7b68ee;
   color: #fff;
-  border-radius: 6px;
+  border-radius: 6rem;
 
   &:hover {
     cursor: pointer;
@@ -251,15 +255,15 @@ const PurpleButton = styled(Button)`
 `;
 
 const GetStarted = styled(PurpleButton)`
-  width: 183px;
-  height: 60px;
-  margin: 59px 0 45px;
+  width: 183rem;
+  height: 60rem;
+  margin: 59rem 0 45rem;
 `;
 
 const LoginButton = styled(PurpleButton)`
-  width: 129px;
-  height: 50px;
-  margin: 0 0 0 50px;
+  width: 129rem;
+  height: 50rem;
+  margin: 0 0 0 50rem;
 `;
 
 const SignupButton = styled(Button)`
@@ -279,7 +283,7 @@ const ViewHeight = styled.div`
 `;
 
 const About = styled.div`
-  width: 1000px;
+  width: 1000rem;
   display: flex;
   flex-direction: column;
 `;
@@ -287,7 +291,7 @@ const About = styled.div`
 const AboutText = styled.div`
   object-fit: contain;
   font-family: Pretendard;
-  font-size: 40px;
+  font-size: 40rem;
   font-weight: 800;
   font-stretch: normal;
   font-style: normal;
@@ -295,19 +299,19 @@ const AboutText = styled.div`
   letter-spacing: normal;
   text-align: center;
   color: #000;
-  margin: 82px 0 117px;
+  margin: 82rem 0 117rem;
 `;
 
 const Feature = styled.div`
-  margin-bottom: 120px;
+  margin-bottom: 120rem;
   display: flex;
-  width: 1000px;
+  width: 1000rem;
   justify-content: space-between;
   align-items: center;
 `;
 
 const Illust = styled.img`
-  height: 338px;
+  height: 338rem;
 `;
 
 const Advantage = styled.div`
@@ -318,7 +322,7 @@ const Advantage = styled.div`
 
 const Title = styled.div`
   font-family: Pretendard;
-  font-size: 36px;
+  font-size: 36rem;
   font-weight: bold;
   font-stretch: normal;
   font-style: normal;
@@ -330,7 +334,7 @@ const Title = styled.div`
 
 const Description = styled.div`
   font-family: Pretendard;
-  font-size: 18px;
+  font-size: 18rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -347,12 +351,12 @@ const FAQ = styled.div`
   flex-direction: column;
   align-items: center;
   background-color: #f7f9fc;
-  padding-bottom: 100px;
+  padding-bottom: 100rem;
 `;
 
 const FAQTitle = styled.div`
   font-family: Pretendard;
-  font-size: 40px;
+  font-size: 40rem;
   font-weight: bold;
   font-stretch: normal;
   font-style: normal;
@@ -360,19 +364,19 @@ const FAQTitle = styled.div`
   letter-spacing: normal;
   text-align: center;
   color: #000;
-  margin: 82px 0 57px;
+  margin: 82rem 0 57rem;
 `;
 
 const Footer = styled.div`
-  width: 1000px;
-  padding: 40px 0;
+  width: 1000rem;
+  padding: 40rem 0;
   display: flex;
   justify-content: space-between;
 `;
 
 const FooterTitle = styled.div`
   font-family: ProximaNova-Extrabld;
-  font-size: 24px;
+  font-size: 24rem;
   font-weight: 900;
   font-stretch: normal;
   font-style: normal;
@@ -384,7 +388,7 @@ const FooterTitle = styled.div`
 
 const FooterInfo = styled.div`
   font-family: Pretendard;
-  font-size: 14px;
+  font-size: 14rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -397,7 +401,7 @@ const FooterInfo = styled.div`
 
 const Copyright = styled.div`
   font-family: Pretendard;
-  font-size: 12px;
+  font-size: 12rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -405,7 +409,7 @@ const Copyright = styled.div`
   letter-spacing: normal;
   text-align: left;
   color: #9c9c9c;
-  margin-top: 21px;
+  margin-top: 21rem;
 `;
 
 const FooterLeft = styled.div`
@@ -421,7 +425,7 @@ const FooterRight = styled.div`
 
 const FooterBtn = styled.a`
   font-family: Pretendard;
-  font-size: 14px;
+  font-size: 14rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -429,11 +433,11 @@ const FooterBtn = styled.a`
   letter-spacing: normal;
   text-align: left;
   color: #9c9c9c;
-  margin-left: 60px;
+  margin-left: 60rem;
 `;
 
 const Logo = styled.img`
-  height: 90px;
+  height: 90rem;
 `;
 
 export default MainPage;

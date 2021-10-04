@@ -115,9 +115,9 @@ const NoteData: FC<Props & RouteComponentProps> = ({
 };
 
 const DataRow = styled.div<{ selected: boolean }>`
-  min-height: 65px;
-  border-bottom: #e6e6e6 1px solid;
-  padding: 0 30px;
+  min-height: 65rem;
+  border-bottom: #e6e6e6 1rem solid;
+  padding: 0 30rem;
 
   display: flex;
   align-items: center;
@@ -132,7 +132,7 @@ const DataRow = styled.div<{ selected: boolean }>`
 
 const TableData = styled.div`
   font-family: Pretendard;
-  font-size: 16px;
+  font-size: 16rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -152,8 +152,8 @@ const TableData = styled.div`
 `;
 
 const TitleData = styled(TableData)`
-  max-width: 570px;
-  width: 570px;
+  max-width: 570rem;
+  width: 570rem;
   justify-content: flex-start;
 `;
 
@@ -164,26 +164,26 @@ const TitleName = styled.p`
 `;
 
 const DateData = styled(TableData)`
-  width: 280px;
+  width: 280rem;
 `;
 
 const StarData = styled(TableData)`
-  width: 52px;
+  width: 52rem;
 `;
 
 const SubjectData = styled(TableData)`
-  width: 28px;
+  width: 28rem;
 `;
 
 const Image24 = styled.img`
-  width: 24px;
+  width: 24rem;
 
   user-select: none !important;
 `;
 
 const TitleImage = styled(Image24)<{ depth: number }>`
-  margin-right: 11px;
-  margin-left: ${(props) => `${props.depth * 20}px`};
+  margin-right: 11rem;
+  margin-left: ${(props) => `${props.depth * 20}rem`};
 `;
 
 export default withRouter(NoteData);

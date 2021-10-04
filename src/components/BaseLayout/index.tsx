@@ -97,6 +97,7 @@ const Root = styled.div<{ grey: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;
+  height: 100vh;
   > * {
     user-select: none !important;
   }
@@ -104,25 +105,25 @@ const Root = styled.div<{ grey: boolean }>`
 
 const Header = styled.div`
   width: 100vw;
-  height: 90px;
-  padding-top: 15px;
+  height: 90rem;
+  padding-top: 15rem;
   object-fit: contain;
-  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.08);
+  box-shadow: 0 3rem 6rem 0 rgba(0, 0, 0, 0.08);
   background-color: #fff;
   display: flex;
   justify-content: center;
 `;
 
 const HeaderInside = styled.div`
-  width: 1000px;
+  width: 1000rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
 `;
 
 const Logo = styled.img`
-  width: 240px;
-  height: 90px;
+  width: 240rem;
+  height: 90rem;
   object-fit: contain;
   &:hover {
     cursor: pointer;
@@ -131,7 +132,7 @@ const Logo = styled.img`
 
 const SearchWrapper = styled.div`
   position: relative;
-  margin-right: 20px;
+  margin-right: 20rem;
   display: flex;
   align-items: center;
 `;
@@ -139,17 +140,17 @@ const SearchWrapper = styled.div`
 const SearchBox = styled.input`
   display: flex;
   justify-content: flex-end;
-  width: 330px;
-  height: 50px;
-  padding: 13px 37px 13px 20px;
+  width: 330rem;
+  height: 50rem;
+  padding: 13rem 37rem 13rem 20rem;
   box-sizing: border-box;
   object-fit: contain;
-  border-radius: 5px;
-  border: solid 1px #e6e6e6;
+  border-radius: 5rem;
+  border: solid 1rem #e6e6e6;
   background-color: #fff;
 
   font-family: Pretendard;
-  font-size: 18px;
+  font-size: 18rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -163,24 +164,24 @@ const SearchBox = styled.input`
 `;
 
 const SearchBtn = styled.img`
-  width: 23px;
-  height: 23px;
+  width: 23rem;
+  height: 23rem;
   object-fit: contain;
   position: absolute;
-  right: 14px;
+  right: 14rem;
   &:hover {
     cursor: pointer;
   }
 `;
 
 const StartBtn = styled.a`
-  width: 140px;
-  height: 50px;
+  width: 140rem;
+  height: 50rem;
   object-fit: contain;
   background-color: #7b68ee;
-  padding: 16px 0;
+  padding: 16rem 0;
   font-family: Pretendard;
-  font-size: 18px;
+  font-size: 18rem;
   font-weight: 500;
   font-stretch: normal;
   font-style: normal;
@@ -189,7 +190,7 @@ const StartBtn = styled.a`
   text-align: center;
   color: #fff;
   box-sizing: border-box;
-  border-radius: 6px;
+  border-radius: 6rem;
   &:hover {
     cursor: pointer;
   }
@@ -201,19 +202,19 @@ const FlexDiv = styled.div`
 `;
 
 const UserDiv = styled(FlexDiv)`
-  padding: 4px 0;
+  padding: 4rem 0;
 `;
 
 const ProfileImg = styled.img`
-  width: 50px;
-  height: 50px;
-  margin: 0 12px;
+  width: 50rem;
+  height: 50rem;
+  margin: 0 12rem;
   object-fit: contain;
 `;
 
 const ProfileName = styled.div`
   font-family: Pretendard;
-  font-size: 18px;
+  font-size: 18rem;
   font-weight: 500;
   font-stretch: normal;
   font-style: normal;
@@ -224,13 +225,13 @@ const ProfileName = styled.div`
 `;
 
 const ProfileToggle = styled.img`
-  width: 10.2px;
-  margin-left: 10px;
+  width: 10.2rem;
+  margin-left: 10rem;
 `;
 
 const Relative = styled.div`
   position: relative;
-  height: 50px;
+  height: 50rem;
   display: flex;
   align-items: center;
 `;

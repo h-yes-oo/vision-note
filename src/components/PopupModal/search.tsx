@@ -98,9 +98,9 @@ const SearchModal: FC<Props> = ({ searchKeyword }) => {
 };
 
 const ToggleIcon = styled.img`
-  width: 12px;
-  height: 12px;
-  margin-left: 6px;
+  width: 12rem;
+  height: 12rem;
+  margin-left: 6rem;
 `;
 
 const Font = styled.div`
@@ -113,12 +113,12 @@ const Font = styled.div`
 `;
 
 const SearchBar = styled.input`
-  padding: 30px 30px 30px 82px;
+  padding: 30rem 30rem 30rem 82rem;
   border: none;
-  border-bottom: solid 1px #e6e6e6;
-  border-radius: 20px 20px 0 0;
+  border-bottom: solid 1rem #e6e6e6;
+  border-radius: 20rem 20rem 0 0;
   font-family: Pretendard;
-  font-size: 24px;
+  font-size: 24rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -129,10 +129,10 @@ const SearchBar = styled.input`
 
 const SearchIcon = styled.img`
   position: absolute;
-  top: 30px;
-  left: 30px;
-  width: 32px;
-  height: 32px;
+  top: 30rem;
+  left: 30rem;
+  width: 32rem;
+  height: 32rem;
 `;
 
 const ResultWrapper = styled.div`
@@ -141,16 +141,16 @@ const ResultWrapper = styled.div`
 `;
 
 const Sort = styled.div`
-  min-height: 52px;
+  min-height: 52rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 30px;
-  border-bottom: solid 1px #e6e6e6;
+  padding: 0 30rem;
+  border-bottom: solid 1rem #e6e6e6;
 `;
 
 const Num = styled(Font)`
-  font-size: 16px;
+  font-size: 16rem;
   color: #656565;
 `;
 
@@ -161,10 +161,10 @@ const Span = styled.span`
 `;
 
 const Result = styled.div`
-  min-height: 123px;
+  min-height: 123rem;
   background-color: #fff;
-  padding: 20px 30px 0;
-  border-bottom: solid 1px #e6e6e6;
+  padding: 20rem 30rem 0;
+  border-bottom: solid 1rem #e6e6e6;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -175,27 +175,27 @@ const Result = styled.div`
 `;
 
 const Title = styled(Font)`
-  font-size: 16px;
+  font-size: 16rem;
   color: #000;
   display: flex;
   align-items: center;
 `;
 
 const Folder = styled(Font)`
-  font-size: 14px;
+  font-size: 14rem;
   color: #656565;
-  margin: 8px 0 0 37px;
+  margin: 8rem 0 0 37rem;
 `;
 
 const Content = styled(Font)`
-  font-size: 16px;
+  font-size: 16rem;
   color: #656565;
-  margin: 16px 0 0 37px;
+  margin: 16rem 0 0 37rem;
 `;
 
 const NoteIcon = styled.img`
-  height: 24px;
-  margin-right: 13px;
+  height: 24rem;
+  margin-right: 13rem;
 `;
 
 export default SearchModal;

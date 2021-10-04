@@ -6,7 +6,7 @@ import LoginArrow from 'assets/icons/LoginArrow.svg';
 
 const Title = styled.div`
   font-family: Pretendard;
-  font-size: 34px;
+  font-size: 34rem;
   font-weight: 800;
   font-stretch: normal;
   font-style: normal;
@@ -14,29 +14,29 @@ const Title = styled.div`
   letter-spacing: normal;
   text-align: left;
   color: #000;
-  margin-top: 281px;
+  margin-top: 281rem;
 `;
 
 const Info = styled(Title)`
-  font-size: 18px;
+  font-size: 18rem;
   font-weight: normal;
   line-height: 1.22;
-  margin-top: 9px;
+  margin-top: 9rem;
 `;
 
 const Form = styled.input`
-  width: 420px;
-  height: 61px;
+  width: 420rem;
+  height: 61rem;
   box-sizing: border-box;
-  padding: 0 20px;
-  margin-top: 30px;
+  padding: 0 20rem;
+  margin-top: 30rem;
   object-fit: contain;
-  border-radius: 5px;
-  border: solid 1px #e6e6e6;
+  border-radius: 5rem;
+  border: solid 1rem #e6e6e6;
   background-color: #fff;
 
   font-family: Pretendard;
-  font-size: 18px;
+  font-size: 18rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -49,19 +49,19 @@ const Form = styled.input`
 `;
 
 const FindBtn = styled.button`
-  width: 420px;
-  height: 61px;
-  margin: 19px 0 31px;
+  width: 420rem;
+  height: 61rem;
+  margin: 19rem 0 31rem;
   display: flex;
   justify-content: center;
   align-items: center;
   object-fit: contain;
-  border-radius: 5px;
+  border-radius: 5rem;
   border: none;
   background-color: #7b68ee;
 
   font-family: Pretendard;
-  font-size: 18px;
+  font-size: 18rem;
   font-weight: 500;
   font-stretch: normal;
   font-style: normal;
@@ -78,21 +78,21 @@ const FindBtn = styled.button`
 
 const NotYet = styled.span`
   font-family: Pretendard;
-  font-size: 16px;
+  font-size: 16rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
   letter-spacing: normal;
   text-align: left;
   color: #000;
-  margin: 0 13px 0 0;
+  margin: 0 13rem 0 0;
 
   user-select: none !important;
 `;
 
 const PurpleAnchor = styled.a`
   font-family: Pretendard;
-  font-size: 16px;
+  font-size: 16rem;
   font-weight: 500;
   font-stretch: normal;
   font-style: normal;
@@ -114,7 +114,7 @@ const FlexBetween = styled(Flex)`
 `;
 
 const Arrow = styled.img`
-  height: 18px;
+  height: 18rem;
 `;
 
 interface Props {

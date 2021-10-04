@@ -33,12 +33,12 @@ const Visible = styled.div<{ visible: boolean }>`
 const Root = styled.div<{ visible: boolean }>`
   display: flex;
   flex-direction: column;
-  width: 1000px;
-  height: 745px;
+  width: 1000rem;
+  height: 745rem;
   box-sizing: border-box;
-  border-radius: 20px;
+  border-radius: 20rem;
   object-fit: contain;
-  box-shadow: 0 3px 16px 0 rgba(0, 0, 0, 0.16);
+  box-shadow: 0 3rem 16rem 0 rgba(0, 0, 0, 0.16);
   background-color: #fff;
   opacity: ${(props) => (props.visible ? '1' : '0')};
 

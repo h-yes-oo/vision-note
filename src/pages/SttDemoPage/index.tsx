@@ -77,9 +77,7 @@ const SttDemoPage: FC<Props> = () => {
   }, []);
 
   useEffect(() => {
-    dictate?.init();
     return () => {
-      console.log('close websokcet');
       dictate?.cancel();
     };
   }, [dictate]);
@@ -132,19 +130,22 @@ const Root = styled.div`
   }
 `;
 
-const Title = styled.div``;
+const Title = styled.div`
+  font-size: 20rem;
+`;
 
 const Logs = styled.div`
   white-space: break-spaces;
   overflow: scroll;
-  height: 500px;
-  width: 1000px;
+  height: 500rem;
+  width: 1000rem;
   user-select: text !important;
+  font-size: 20rem;
 `;
 
 const Button = styled.button`
   font-family: Pretendard;
-  font-size: 18px;
+  font-size: 18rem;
   font-weight: 500;
   font-stretch: normal;
   font-style: normal;
@@ -153,8 +154,8 @@ const Button = styled.button`
   text-align: left;
   color: #fff;
   border: none;
-  margin: 20px;
-  padding: 10px 20px;
+  margin: 20rem;
+  padding: 10rem 20rem;
 
   display: flex;
   align-items: center;
@@ -164,7 +165,7 @@ const Button = styled.button`
 const PurpleButton = styled(Button)`
   background-color: #7b68ee;
   color: #fff;
-  border-radius: 6px;
+  border-radius: 6rem;
 
   &:hover {
     cursor: pointer;

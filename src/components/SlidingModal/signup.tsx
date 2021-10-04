@@ -16,7 +16,7 @@ import LoadingDots from 'components/LoadingDots';
 
 const Title = styled.div`
   font-family: Pretendard;
-  font-size: 34px;
+  font-size: 34rem;
   font-weight: 800;
   font-stretch: normal;
   font-style: normal;
@@ -27,18 +27,18 @@ const Title = styled.div`
 `;
 
 const Form = styled.input`
-  width: 420px;
-  height: 61px;
+  width: 420rem;
+  height: 61rem;
   box-sizing: border-box;
-  padding: 0 20px;
-  margin-top: 30px;
+  padding: 0 20rem;
+  margin-top: 30rem;
   object-fit: contain;
-  border-radius: 5px;
-  border: solid 1px #e6e6e6;
+  border-radius: 5rem;
+  border: solid 1rem #e6e6e6;
   background-color: #fff;
 
   font-family: Pretendard;
-  font-size: 18px;
+  font-size: 18rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -52,22 +52,22 @@ const Form = styled.input`
 `;
 
 const HalfForm = styled(Form)`
-  width: 200px;
+  width: 200rem;
 `;
 
 const SelectForm = styled.select`
-  width: 200px;
-  height: 61px;
+  width: 200rem;
+  height: 61rem;
   box-sizing: border-box;
-  padding: 0 20px;
-  margin-top: 30px;
+  padding: 0 20rem;
+  margin-top: 30rem;
   object-fit: contain;
-  border-radius: 5px;
-  border: solid 1px #e6e6e6;
+  border-radius: 5rem;
+  border: solid 1rem #e6e6e6;
   background-color: #fff;
 
   font-family: Pretendard;
-  font-size: 18px;
+  font-size: 18rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -77,24 +77,24 @@ const SelectForm = styled.select`
 
   background-image: url(${SelectToggle});
   background-repeat: no-repeat;
-  background-position: right 10px center;
+  background-position: right 10rem center;
 
   appearance: none;
 `;
 
 const SignupButton = styled.button`
-  width: 420px;
-  height: 61px;
-  margin: 19px 0 21px;
+  width: 420rem;
+  height: 61rem;
+  margin: 19rem 0 21rem;
   display: flex;
   justify-content: center;
   align-items: center;
   object-fit: contain;
-  border-radius: 5px;
+  border-radius: 5rem;
   border: none;
   background-color: #7b68ee;
   font-family: Pretendard;
-  font-size: 18px;
+  font-size: 18rem;
   font-weight: 500;
   font-stretch: normal;
   font-style: normal;
@@ -122,19 +122,19 @@ const FlexAlign = styled(Flex)`
 
 const OrWrapper = styled(FlexBetween)`
   align-items: center;
-  width: 420px;
-  margin: 31px 0 29px;
+  width: 420rem;
+  margin: 31rem 0 29rem;
 `;
 
 const Line = styled.div`
-  width: 176px;
-  height: 1px;
+  width: 176rem;
+  height: 1rem;
   background-color: #e6e6e6;
 `;
 
 const OR = styled.div`
   font-family: Pretendard;
-  font-size: 18px;
+  font-size: 18rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -142,27 +142,27 @@ const OR = styled.div`
   letter-spacing: normal;
   text-align: center;
   color: #c5c5c5;
-  // margin: 0 18px;
+  // margin: 0 18rem;
 `;
 
 const SocialWrapper = styled(FlexBetween)`
   align-items: center;
-  width: 420px;
-  margin: 0 0 20px;
+  width: 420rem;
+  margin: 0 0 20rem;
 `;
 
 const SocialBox = styled(FlexAlign)`
-  width: 200px;
-  height: 61px;
+  width: 200rem;
+  height: 61rem;
   box-sizing: border-box;
-  padding: 0 0 0 20px;
+  padding: 0 0 0 20rem;
   object-fit: contain;
-  border-radius: 5px;
-  border: solid 1px #e6e6e6;
+  border-radius: 5rem;
+  border: solid 1rem #e6e6e6;
   background-color: #fff;
 
   font-family: Pretendard;
-  font-size: 18px;
+  font-size: 18rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -178,13 +178,13 @@ const SocialBox = styled(FlexAlign)`
 `;
 
 const SocialImage = styled.img`
-  width: 30px;
-  margin: 0 10px 0 0;
+  width: 30rem;
+  margin: 0 10rem 0 0;
 `;
 
 const NotYet = styled.span`
   font-family: Pretendard;
-  font-size: 16px;
+  font-size: 16rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -192,12 +192,12 @@ const NotYet = styled.span`
   letter-spacing: normal;
   text-align: left;
   color: #000;
-  margin: 0 13px 0 0;
+  margin: 0 13rem 0 0;
 `;
 
 const ToLogin = styled.a`
   font-family: Pretendard;
-  font-size: 16px;
+  font-size: 16rem;
   font-weight: 500;
   font-stretch: normal;
   font-style: normal;
@@ -211,8 +211,8 @@ const ToLogin = styled.a`
 `;
 
 const CheckBox = styled.input`
-  height: 20px;
-  width: 20px;
+  height: 20rem;
+  width: 20rem;
   border: none;
   appearance: none;
   background: url(${CheckBoxOff}) no-repeat;
@@ -226,27 +226,27 @@ const CheckBox = styled.input`
 
 const CheckText = styled.span`
   font-family: Pretendard;
-  font-size: 14px;
+  font-size: 14rem;
   font-weight: 600;
   font-stretch: normal;
   font-style: normal;
   line-height: 2.29;
-  letter-spacing: -0.35px;
+  letter-spacing: -0.35rem;
   text-align: left;
   color: #73768d;
 `;
 
 const CheckAnchor = styled.a`
   font-family: Pretendard;
-  font-size: 14px;
+  font-size: 14rem;
   font-weight: 600;
   font-stretch: normal;
   font-style: normal;
   line-height: 2.29;
-  letter-spacing: -0.35px;
+  letter-spacing: -0.35rem;
   text-align: left;
   color: #7b68ee;
-  margin-left: 8px;
+  margin-left: 8rem;
   &:hover {
     cursor: pointer;
   }

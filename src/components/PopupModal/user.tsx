@@ -171,7 +171,7 @@ const UserModal: FC<Props & RouteComponentProps> = ({
         <Wrapper>
           <FlexCenter>
             <Title>이메일</Title>
-            <Content disabled type="email" placeholder={user.email} />
+            <Content disabled type="email" placeholder={user.email ?? ''} />
           </FlexCenter>
           <FlexCenter>
             <Title>닉네임</Title>
@@ -276,17 +276,17 @@ const UserModal: FC<Props & RouteComponentProps> = ({
 };
 
 const Form = styled.input`
-  height: 61px;
+  height: 61rem;
   box-sizing: border-box;
-  padding: 0 20px;
-  margin-bottom: 20px;
+  padding: 0 20rem;
+  margin-bottom: 20rem;
   object-fit: contain;
-  border-radius: 5px;
-  border: solid 1px #e6e6e6;
+  border-radius: 5rem;
+  border: solid 1rem #e6e6e6;
   background-color: #fff;
 
   font-family: Pretendard;
-  font-size: 18px;
+  font-size: 18rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -300,9 +300,9 @@ const Form = styled.input`
 `;
 
 const UserIcon = styled.img`
-  width: 24px;
-  height: 24px;
-  margin: 0 10px;
+  width: 24rem;
+  height: 24rem;
+  margin: 0 10rem;
 `;
 
 const Flex = styled.div`
@@ -321,25 +321,25 @@ const FlexColumn = styled(Flex)`
 const Bottom = styled(Flex)`
   align-items: center;
   justify-content: space-between;
-  padding: 99px 80px 0;
+  padding: 99rem 80rem 0;
 `;
 
 const Top = styled(Flex)`
   align-items: flex-start;
   justify-content: space-between;
-  padding: 80px 80px 0;
+  padding: 80rem 80rem 0;
 `;
 
 const Wrapper = styled(FlexColumn)`
   justify-content: space-between;
-  height: 430px;
+  height: 430rem;
 `;
 
 const Title = styled.div`
-  width: 158px;
+  width: 158rem;
   object-fit: contain;
   font-family: Pretendard;
-  font-size: 18px;
+  font-size: 18rem;
   font-weight: 600;
   font-stretch: normal;
   font-style: normal;
@@ -352,18 +352,18 @@ const Title = styled.div`
 const EditButton = styled.img`
   position: absolute;
   right: 0;
-  width: 24px;
-  height: 24px;
+  width: 24rem;
+  height: 24rem;
   &:hover {
     cursor: pointer;
   }
 `;
 
 const Content = styled.input`
-  width: 440px;
-  height: 33px;
+  width: 440rem;
+  height: 33rem;
   font-family: Pretendard;
-  font-size: 24px;
+  font-size: 24rem;
   font-weight: 400;
   font-stretch: normal;
   font-style: normal;
@@ -372,16 +372,16 @@ const Content = styled.input`
   text-align: left;
   color: #656565;
   border: none;
-  border-bottom: solid 1px #e6e6e6;
+  border-bottom: solid 1rem #e6e6e6;
   outline: none;
   background: white;
 `;
 
 const TypeContent = styled.a`
-  width: 440px;
-  height: 33px;
+  width: 440rem;
+  height: 33rem;
   font-family: Pretendard;
-  font-size: 24px;
+  font-size: 24rem;
   font-weight: 400;
   font-stretch: normal;
   font-style: normal;
@@ -396,9 +396,9 @@ const TypeOption = styled(TypeContent)`
   display: flex;
   align-items: center;
   background: white;
-  padding-left: 10px;
+  padding-left: 10rem;
   box-sizing: border-box;
-  height: 40px;
+  height: 40rem;
   z-index: 1001;
   &:hover {
     background: #f5f5f5;
@@ -407,13 +407,13 @@ const TypeOption = styled(TypeContent)`
 
 const Relative = styled.div`
   position: relative;
-  border-bottom: solid 1px #e6e6e6;
-  min-width: 440px;
+  border-bottom: solid 1rem #e6e6e6;
+  min-width: 440rem;
 `;
 
 const Menu = styled.div<{ show: boolean }>`
-  border-radius: 5px;
-  box-shadow: 3px 5px 16px 0 rgba(0, 0, 0, 0.12);
+  border-radius: 5rem;
+  box-shadow: 3rem 5rem 16rem 0 rgba(0, 0, 0, 0.12);
 
   display: flex;
   flex-direction: column;
@@ -421,11 +421,11 @@ const Menu = styled.div<{ show: boolean }>`
 
   height: auto;
   margin: 0;
-  padding: 13px 0;
+  padding: 13rem 0;
 
   position: absolute;
   left: 0;
-  top: 30px;
+  top: 30rem;
   z-index: 1000;
 
   ${(props) => (props.show ? '' : 'display: none;')}
@@ -435,7 +435,7 @@ const Menu = styled.div<{ show: boolean }>`
 
 const SignOut = styled.a`
   font-family: Pretendard;
-  font-size: 18px;
+  font-size: 18rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -449,11 +449,11 @@ const SignOut = styled.a`
 `;
 
 const Button = styled.button`
-  width: 140px;
-  height: 50px;
-  border-radius: 5px;
+  width: 140rem;
+  height: 50rem;
+  border-radius: 5rem;
   font-family: Pretendard;
-  font-size: 18px;
+  font-size: 18rem;
   font-weight: 500;
   font-stretch: normal;
   font-style: normal;
@@ -466,7 +466,7 @@ const Button = styled.button`
 `;
 
 const WhiteButton = styled(Button)`
-  border: solid 1px #c5c5c5;
+  border: solid 1rem #c5c5c5;
   color: #c5c5c5;
   background-color: #fff;
   &:hover {
@@ -479,7 +479,7 @@ const PurpleButton = styled(Button)`
   border: none;
   color: #fff;
   background-color: #7b68ee;
-  margin-left: 20px;
+  margin-left: 20rem;
   &:hover {
     cursor: pointer;
     background-color: #6a58d3;
@@ -487,14 +487,14 @@ const PurpleButton = styled(Button)`
 `;
 
 const ProfileImage = styled.img`
-  width: 182px;
-  height: 182px;
+  width: 182rem;
+  height: 182rem;
 `;
 
 const ChangeProfile = styled.a`
   background-image: url(${ProfileChange});
-  width: 49px;
-  height: 49px;
+  width: 49rem;
+  height: 49rem;
   position: absolute;
   right: 0;
   bottom: 0;
@@ -504,15 +504,15 @@ const ChangeProfile = styled.a`
 `;
 
 const StatusBar = styled.div`
-  width: 440px;
-  height: 8px;
-  border-radius: 5px;
+  width: 440rem;
+  height: 8rem;
+  border-radius: 5rem;
   background-color: #e6e6e6;
   position: relative;
 `;
 
 const CurrentStatus = styled(StatusBar)<{ current: number }>`
-  width: ${(props) => props.current * 440}px;
+  width: ${(props) => props.current * 440}rem;
   position: absolute;
   left: 0;
   background-color: #7b68ee;
@@ -520,7 +520,7 @@ const CurrentStatus = styled(StatusBar)<{ current: number }>`
 
 const StorageInfo = styled.div`
   font-family: Pretendard;
-  font-size: 14px;
+  font-size: 14rem;
   font-weight: 400;
   font-stretch: normal;
   font-style: normal;
@@ -528,15 +528,15 @@ const StorageInfo = styled.div`
   letter-spacing: normal;
   text-align: left;
   color: #656565;
-  margin-top: 10px;
+  margin-top: 10rem;
 `;
 
 const UploadButton = styled.input`
   overflow: hidden;
   position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
+  width: 1rem;
+  height: 1rem;
+  margin: -1rem;
   padding: 0;
   border: 0;
   clip: rect(0, 0, 0, 0);

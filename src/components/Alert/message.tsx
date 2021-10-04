@@ -25,7 +25,7 @@ const AlertWithMessage: FC<ModalProps> = ({
 
 const Message = styled.div`
   font-family: Pretendard;
-  font-size: 16px;
+  font-size: 16rem;
   font-weight: 500;
   font-stretch: normal;
   font-style: normal;
@@ -33,7 +33,7 @@ const Message = styled.div`
   letter-spacing: normal;
   text-align: center;
   color: #000;
-  padding: 20px 19px 39px;
+  padding: 20rem 19rem 39rem;
 `;
 
 export default AlertWithMessage;

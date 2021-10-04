@@ -321,9 +321,9 @@ const NoteWrapper = styled.div<{ visible: boolean }>`
 `;
 
 const DataRow = styled.div<{ dragOver: boolean }>`
-  min-height: 65px;
-  border-bottom: #e6e6e6 1px solid;
-  padding: 0 30px;
+  min-height: 65rem;
+  border-bottom: #e6e6e6 1rem solid;
+  padding: 0 30rem;
 
   display: flex;
   align-items: center;
@@ -337,7 +337,7 @@ const DataRow = styled.div<{ dragOver: boolean }>`
 
 const TableData = styled.div`
   font-family: Pretendard;
-  font-size: 16px;
+  font-size: 16rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -355,8 +355,8 @@ const TableData = styled.div`
 `;
 
 const TitleData = styled(TableData)`
-  max-width: 570px;
-  width: 570px;
+  max-width: 570rem;
+  width: 570rem;
   justify-content: flex-start;
 `;
 
@@ -369,11 +369,11 @@ const TitleName = styled.p<{ visible: boolean }>`
 
 const EditTitleName = styled.input<{ visible: boolean }>`
   display: ${(props) => (props.visible ? '' : 'none')};
-  border: 2px solid #06cc80;
-  border-radius: 3px;
+  border: 2rem solid #06cc80;
+  border-radius: 3rem;
   box-sizing: border-box;
   font-family: Pretendard;
-  font-size: 16px;
+  font-size: 16rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -381,9 +381,9 @@ const EditTitleName = styled.input<{ visible: boolean }>`
 `;
 
 const TitleImage = styled.img<{ depth: number }>`
-  width: 24px;
-  margin-right: 11px;
-  margin-left: ${(props) => `${props.depth * 20}px`};
+  width: 24rem;
+  margin-right: 11rem;
+  margin-left: ${(props) => `${props.depth * 20}rem`};
   user-select: none !important;
 `;
 

@@ -27,13 +27,13 @@ const FAQToggle: FC<Props> = ({ title, content }) => {
 };
 
 const FAQWrapper = styled.div`
-  width: 1000px;
-  margin-bottom: 20px;
-  padding: 0 30px;
+  width: 1000rem;
+  margin-bottom: 20rem;
+  padding: 0 30rem;
   box-sizing: border-box;
   object-fit: contain;
-  border-radius: 14px;
-  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.1);
+  border-radius: 14rem;
+  box-shadow: 0 4rem 16rem 0 rgba(0, 0, 0, 0.1);
   background-color: #fff;
 
   display: flex;
@@ -41,7 +41,7 @@ const FAQWrapper = styled.div`
   justify-content: center;
 
   font-family: Pretendard;
-  font-size: 20px;
+  font-size: 20rem;
   font-weight: 600;
   font-stretch: normal;
   font-style: normal;
@@ -59,12 +59,12 @@ const FAQTitle = styled.div`
   justify-content: space-between;
 
   width: 100%;
-  height: 84px;
+  height: 84rem;
 `;
 
 const ToggleBtn = styled.img`
-  width: 45px;
-  height: 45px;
+  width: 45rem;
+  height: 45rem;
   &:hover {
     cursor: pointer;
   }
@@ -72,7 +72,7 @@ const ToggleBtn = styled.img`
 
 const FAQContent = styled.div<{ visible: boolean }>`
   font-family: Pretendard;
-  font-size: 18px;
+  font-size: 18rem;
   font-weight: 500;
   font-stretch: normal;
   font-style: normal;
@@ -82,8 +82,8 @@ const FAQContent = styled.div<{ visible: boolean }>`
   color: #676767;
 
   overflow: hidden;
-  max-height: ${(props) => (props.visible ? '100px' : '0')};
-  padding-bottom: ${(props) => (props.visible ? '30px' : '0')};
+  max-height: ${(props) => (props.visible ? '100rem' : '0')};
+  padding-bottom: ${(props) => (props.visible ? '30rem' : '0')};
   transition: 0.3s ease;
 `;
 

@@ -350,8 +350,8 @@ const Relative = styled.div`
 const Root = styled.div`
   display: flex;
   flex-direction: column;
-  margin-top: 32px;
-  width: 1000px;
+  margin-top: 32rem;
+  width: 1000rem;
 `;
 
 const ContentWrapper = styled.div`
@@ -362,8 +362,8 @@ const FolderName = styled.div`
   font-family: Pretendard;
   font-style: normal;
   font-weight: normal;
-  font-size: 16px;
-  max-height: 20px;
+  font-size: 16rem;
+  max-height: 20rem;
   display: flex;
   color: #656565;
 `;
@@ -378,7 +378,7 @@ const InfoTop = styled.div`
 const InfoMiddle = styled.div`
   display: flex;
   justify-content: flex-start;
-  margin: 8px 0 11px;
+  margin: 8rem 0 11rem;
 `;
 
 const InfoBottom = styled.div`
@@ -389,7 +389,7 @@ const InfoBottom = styled.div`
 const NoteTitle = styled.div<{ visible: boolean }>`
   display: ${(props) => (props.visible ? '' : 'none')};
   font-family: Pretendard;
-  font-size: 30px;
+  font-size: 30rem;
   font-weight: bold;
   font-stretch: normal;
   font-style: normal;
@@ -403,7 +403,7 @@ const NoteTitle = styled.div<{ visible: boolean }>`
 const EditNoteTitle = styled.input<{ visible: boolean }>`
   display: ${(props) => (props.visible ? '' : 'none')};
   font-family: Pretendard;
-  font-size: 30px;
+  font-size: 30rem;
   font-weight: bold;
   font-stretch: normal;
   font-style: normal;
@@ -411,12 +411,12 @@ const EditNoteTitle = styled.input<{ visible: boolean }>`
   letter-spacing: normal;
   text-align: left;
   color: #000;
-  border: 2px solid #06cc80;
+  border: 2rem solid #06cc80;
 `;
 
 const NoteDate = styled.div`
   font-family: Pretendard;
-  font-size: 16px;
+  font-size: 16rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -427,8 +427,8 @@ const NoteDate = styled.div`
 `;
 
 const NoteFolder = styled.img`
-  height: 20px;
-  margin-right: 8px;
+  height: 20rem;
+  margin-right: 8rem;
 `;
 
 const ButtonWrapper = styled.div`
@@ -436,13 +436,13 @@ const ButtonWrapper = styled.div`
 `;
 
 const SearchBtn = styled.img`
-  width: 24px;
-  height: 24px;
-  margin-right: 20px;
+  width: 24rem;
+  height: 24rem;
+  margin-right: 20rem;
 `;
 
 const MoreBtn = styled.img`
-  height: 24px;
+  height: 24rem;
   &:hover {
     cursor: pointer;
   }
@@ -462,13 +462,13 @@ const RecordingWrapper = styled.div`
 `;
 
 const RecordingBtn = styled.img`
-  width: 18px;
-  margin-right: 8px;
+  width: 18rem;
+  margin-right: 8rem;
 `;
 
 const RecordingStatus = styled.a`
   font-family: Pretendard;
-  font-size: 16px;
+  font-size: 16rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -485,7 +485,7 @@ const RecordingStatus = styled.a`
 
 const MemoBtn = styled.a`
   font-family: Pretendard;
-  font-size: 16px;
+  font-size: 16rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -493,23 +493,23 @@ const MemoBtn = styled.a`
   letter-spacing: normal;
   text-align: left;
   color: #000;
-  margin-left: 40px;
+  margin-left: 40rem;
   &:hover {
     cursor: pointer;
   }
 `;
 
 const ToggleBtn = styled.img`
-  width: 12px;
-  height: 12px;
-  margin-left: 8px;
+  width: 12rem;
+  height: 12rem;
+  margin-left: 8rem;
   &:hover {
     cursor: pointer;
   }
 `;
 
 const FolderNext = styled.img`
-  margin: 0 10px 0 3px;
+  margin: 0 10rem 0 3rem;
 `;
 
 export default withRouter(NotesPage);

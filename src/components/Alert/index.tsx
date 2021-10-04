@@ -35,11 +35,11 @@ const ButtonWrapper = styled.div`
 `;
 
 const Button = styled.button`
-  width: 191px;
-  height: 50px;
-  border-radius: 5px;
+  width: 191rem;
+  height: 50rem;
+  border-radius: 5rem;
   font-family: Pretendard;
-  font-size: 18px;
+  font-size: 18rem;
   font-weight: 500;
   font-stretch: normal;
   font-style: normal;
@@ -52,7 +52,7 @@ const Button = styled.button`
 `;
 
 const WhiteButton = styled(Button)`
-  border: solid 1px #c5c5c5;
+  border: solid 1rem #c5c5c5;
   color: #c5c5c5;
   background-color: #fff;
   &:hover {
@@ -65,7 +65,7 @@ const PurpleButton = styled(Button)`
   border: none;
   color: #fff;
   background-color: #7b68ee;
-  margin-left: 20px;
+  margin-left: 20rem;
   &:hover {
     cursor: pointer;
     background-color: #6a58d3;
@@ -77,12 +77,12 @@ const Root = styled.div<{ visible: boolean }>`
   flex-direction: column;
   justify-content: space-between;
 
-  width: 442px;
-  border-radius: 14px;
-  box-shadow: 0 3px 16px 0 rgba(0, 0, 0, 0.16);
+  width: 442rem;
+  border-radius: 14rem;
+  box-shadow: 0 3rem 16rem 0 rgba(0, 0, 0, 0.16);
   background-color: #fff;
 
-  padding: 20px;
+  padding: 20rem;
   box-sizing: border-box;
   object-fit: contain;
   opacity: ${(props) => (props.visible ? '1' : '0')};

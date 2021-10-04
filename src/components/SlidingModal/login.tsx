@@ -12,7 +12,7 @@ import LoadingDots from 'components/LoadingDots';
 
 const Title = styled.div`
   font-family: Pretendard;
-  font-size: 34px;
+  font-size: 34rem;
   font-weight: 800;
   font-stretch: normal;
   font-style: normal;
@@ -20,12 +20,12 @@ const Title = styled.div`
   letter-spacing: normal;
   text-align: left;
   color: #000;
-  margin-top: 121px;
+  margin-top: 121rem;
 `;
 
 const Info = styled.div`
   font-family: Pretendard;
-  font-size: 18px;
+  font-size: 18rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -33,22 +33,22 @@ const Info = styled.div`
   letter-spacing: normal;
   text-align: left;
   color: #000;
-  margin: 9px 0;
+  margin: 9rem 0;
 `;
 
 const Form = styled.input`
-  width: 420px;
-  height: 61px;
+  width: 420rem;
+  height: 61rem;
   box-sizing: border-box;
-  padding: 0 20px;
-  margin-top: 30px;
+  padding: 0 20rem;
+  margin-top: 30rem;
   object-fit: contain;
-  border-radius: 5px;
-  border: solid 1px #e6e6e6;
+  border-radius: 5rem;
+  border: solid 1rem #e6e6e6;
   background-color: #fff;
 
   font-family: Pretendard;
-  font-size: 18px;
+  font-size: 18rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -62,7 +62,7 @@ const Form = styled.input`
 
 const Find = styled.a`
   font-family: Pretendard;
-  font-size: 16px;
+  font-size: 16rem;
   font-weight: 500;
   font-stretch: normal;
   font-style: normal;
@@ -71,25 +71,25 @@ const Find = styled.a`
   text-align: left;
   color: #656565;
 
-  margin: 30px 0 0;
+  margin: 30rem 0 0;
   &:hover {
     cursor: pointer;
   }
 `;
 
 const LoginBtn = styled.button`
-  width: 420px;
-  height: 61px;
-  margin: 19px 0 31px;
+  width: 420rem;
+  height: 61rem;
+  margin: 19rem 0 31rem;
   display: flex;
   justify-content: center;
   align-items: center;
   object-fit: contain;
-  border-radius: 5px;
+  border-radius: 5rem;
   border: none;
   background-color: #7b68ee;
   font-family: Pretendard;
-  font-size: 18px;
+  font-size: 18rem;
   font-weight: 500;
   font-stretch: normal;
   font-style: normal;
@@ -107,19 +107,19 @@ const OrWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 420px;
-  margin: 0 0 29px;
+  width: 420rem;
+  margin: 0 0 29rem;
 `;
 
 const Line = styled.div`
-  width: 176px;
-  height: 1px;
+  width: 176rem;
+  height: 1rem;
   background-color: #e6e6e6;
 `;
 
 const OR = styled.div`
   font-family: Pretendard;
-  font-size: 18px;
+  font-size: 18rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -127,30 +127,30 @@ const OR = styled.div`
   letter-spacing: normal;
   text-align: center;
   color: #c5c5c5;
-  // margin: 0 18px;
+  // margin: 0 18rem;
 `;
 
 const SocialWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 420px;
-  margin: 0 0 20px;
+  width: 420rem;
+  margin: 0 0 20rem;
 `;
 
 const SocialBox = styled.div`
-  width: 200px;
-  height: 61px;
+  width: 200rem;
+  height: 61rem;
   box-sizing: border-box;
-  padding: 0 0 0 20px;
+  padding: 0 0 0 20rem;
   object-fit: contain;
-  border-radius: 5px;
-  border: solid 1px #e6e6e6;
+  border-radius: 5rem;
+  border: solid 1rem #e6e6e6;
   background-color: #fff;
   display: flex;
   align-items: center;
   font-family: Pretendard;
-  font-size: 18px;
+  font-size: 18rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -166,13 +166,13 @@ const SocialBox = styled.div`
 `;
 
 const SocialImage = styled.img`
-  width: 30px;
-  margin: 0 10px 0 0;
+  width: 30rem;
+  margin: 0 10rem 0 0;
 `;
 
 const NotYet = styled.span`
   font-family: Pretendard;
-  font-size: 16px;
+  font-size: 16rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -180,13 +180,13 @@ const NotYet = styled.span`
   letter-spacing: normal;
   text-align: left;
   color: #000;
-  margin: 0 13px 0 0;
+  margin: 0 13rem 0 0;
   user-select: none !important;
 `;
 
 const SignUp = styled.a`
   font-family: Pretendard;
-  font-size: 16px;
+  font-size: 16rem;
   font-weight: 500;
   font-stretch: normal;
   font-style: normal;

@@ -45,11 +45,11 @@ const SortMenu: FC<Props> = ({ show, closeMenu }) => {
 };
 
 const Menu = styled.div<{ show: boolean }>`
-  width: 150px;
-  border-radius: 5px;
-  box-shadow: 3px 5px 16px 0 rgba(0, 0, 0, 0.12);
+  width: 150rem;
+  border-radius: 5rem;
+  box-shadow: 3rem 5rem 16rem 0 rgba(0, 0, 0, 0.12);
   background-color: #fff;
-  padding: 13px 0;
+  padding: 13rem 0;
   z-index: 2;
 
   height: auto;
@@ -57,7 +57,7 @@ const Menu = styled.div<{ show: boolean }>`
 
   position: absolute;
   right: 0;
-  top: 24px;
+  top: 24rem;
 
   ${(props) => (props.show ? '' : 'display: none;')}
   opacity: ${(props) => (props.show ? '1' : '0')};
@@ -66,13 +66,13 @@ const Menu = styled.div<{ show: boolean }>`
 
 const MenuList = styled.button`
   border: none;
-  width: 150px;
-  height: 38px;
-  padding: 0px;
+  width: 150rem;
+  height: 38rem;
+  padding: 0rem;
   background-color: #fff;
 
   font-family: Pretendard;
-  font-size: 14px;
+  font-size: 14rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -90,9 +90,9 @@ const MenuList = styled.button`
 `;
 
 const ContextImage = styled.img<{ visible: boolean }>`
-  width: 16px;
-  height: 16px;
-  margin: 0 10px 0 20px;
+  width: 16rem;
+  height: 16rem;
+  margin: 0 10rem 0 20rem;
   opacity: ${(props) => (props.visible ? '1' : '0')};
 `;
 

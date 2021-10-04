@@ -277,8 +277,8 @@ const StartNotePage: FC<Props & RouteComponentProps> = ({ history }) => {
 const Root = styled.div`
   display: flex;
   flex-direction: column;
-  margin-top: 32px;
-  width: 1000px;
+  margin-top: 32rem;
+  width: 1000rem;
 `;
 
 const NoteInfo = styled.div``;
@@ -291,7 +291,7 @@ const InfoTop = styled.div`
 const InfoMiddle = styled.div`
   display: flex;
   justify-content: flex-start;
-  margin: 8px 0 11px;
+  margin: 8rem 0 11rem;
 `;
 
 const InfoBottom = styled.div`
@@ -301,7 +301,7 @@ const InfoBottom = styled.div`
 
 const NoteTitle = styled.input`
   font-family: Pretendard;
-  font-size: 30px;
+  font-size: 30rem;
   font-weight: bold;
   font-stretch: normal;
   font-style: normal;
@@ -314,7 +314,7 @@ const NoteTitle = styled.input`
 
 const NoteDate = styled.div`
   font-family: Pretendard;
-  font-size: 16px;
+  font-size: 16rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -325,7 +325,7 @@ const NoteDate = styled.div`
 `;
 
 const NoteFolder = styled.img`
-  height: 20px;
+  height: 20rem;
 `;
 
 const NoteContents = styled.div``;
@@ -338,7 +338,7 @@ const StartNote = styled.div`
 
 const Info = styled.div`
   font-family: Pretendard;
-  font-size: 24px;
+  font-size: 24rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -346,7 +346,7 @@ const Info = styled.div`
   letter-spacing: normal;
   text-align: center;
   color: #000;
-  margin: 97px 0 39px;
+  margin: 97rem 0 39rem;
   white-space: pre-wrap;
 `;
 
@@ -354,7 +354,7 @@ const CourseWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-itmes: center;
-  margin-bottom: 79px;
+  margin-bottom: 79rem;
 `;
 
 const Course = styled.div`
@@ -364,11 +364,11 @@ const Course = styled.div`
 `;
 
 const CourseBox = styled.a<{ full: string; empty: string; selected: boolean }>`
-  width: 168px;
-  height: 168px;
-  border-radius: 8px;
+  width: 168rem;
+  height: 168rem;
+  border-radius: 8rem;
   background-color: #fff;
-  margin: 20px;
+  margin: 20rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -376,17 +376,17 @@ const CourseBox = styled.a<{ full: string; empty: string; selected: boolean }>`
   background-position: center;
   background-image: url(${(props) =>
     props.selected ? props.full : props.empty});
-  box-shadow: 0 0 16px 0
+  box-shadow: 0 0 16rem 0
     rgba(0, 0, 0, ${(props) => (props.selected ? '0.2' : '0.12')});
   &:hover {
     background-image: url(${(props) => props.full});
-    box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 16rem 0 rgba(0, 0, 0, 0.2);
   }
 `;
 
 const CourseName = styled.div`
   font-family: Pretendard;
-  font-size: 20px;
+  font-size: 20rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -429,15 +429,15 @@ const StartBtn = styled.a`
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 310px;
-  height: 70px;
-  margin: 0 17px;
+  width: 310rem;
+  height: 70rem;
+  margin: 0 17rem;
   object-fit: contain;
-  border-radius: 8px;
-  box-shadow: 0 3px 16px 0 rgba(0, 0, 0, 0.08);
+  border-radius: 8rem;
+  box-shadow: 0 3rem 16rem 0 rgba(0, 0, 0, 0.08);
   background-color: #fff;
   font-family: Pretendard;
-  font-size: 20px;
+  font-size: 20rem;
   font-weight: 500;
   font-stretch: normal;
   font-style: normal;
@@ -447,7 +447,7 @@ const StartBtn = styled.a`
   color: #000;
   &:hover {
     color: #fff;
-    box-shadow: 0 0 20px 0 rgba(123, 104, 238, 0.6);
+    box-shadow: 0 0 20rem 0 rgba(123, 104, 238, 0.6);
     background-color: #7b68ee;
   }
 `;
@@ -455,18 +455,18 @@ const StartBtn = styled.a`
 const UploadButton = styled.input`
   overflow: hidden;
   position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
+  width: 1rem;
+  height: 1rem;
+  margin: -1rem;
   padding: 0;
   border: 0;
   clip: rect(0, 0, 0, 0);
 `;
 
 const BtnImage = styled.img`
-  width: 40px;
-  height: 40px;
-  margin-right: 10px;
+  width: 40rem;
+  height: 40rem;
+  margin-right: 10rem;
 `;
 
 export default withRouter(StartNotePage);

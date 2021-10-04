@@ -14,12 +14,12 @@ const Root = styled.div`
   display: flex;
   align-itmes: flex-start;
   justify-content: space-between;
-  margin-top: 80px;
+  margin-top: 80rem;
 `;
 
 const MoreBtn = styled.img`
-  height: 18px;
-  margin-left: 12px;
+  height: 18rem;
+  margin-left: 12rem;
   &:hover {
     cursor: pointer;
   }
@@ -27,7 +27,7 @@ const MoreBtn = styled.img`
 
 const Contents = styled.div<{ bookmarked: boolean }>`
   font-family: Pretendard;
-  font-size: 19px;
+  font-size: 19rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -37,11 +37,11 @@ const Contents = styled.div<{ bookmarked: boolean }>`
   color: #000;
   white-space: pre-wrap;
   user-select: text !important;
-  border-radius: 3px;
-  padding: 20px 0;
+  border-radius: 3rem;
+  padding: 20rem 0;
   ${(props) =>
     props.bookmarked
-      ? 'background-color: #f5f4fe; border-left: 5px solid #7b68ee; padding: 20px 15px 20px 20px;'
+      ? 'background-color: #f5f4fe; border-left: 5rem solid #7b68ee; padding: 20rem 15rem 20rem 20rem;'
       : ''}
 `;
 
@@ -51,7 +51,7 @@ const BtnWrapper = styled.div`
 
 const TimeStamp = styled.div`
   font-family: Pretendard;
-  font-size: 16px;
+  font-size: 16rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -62,17 +62,17 @@ const TimeStamp = styled.div`
 `;
 
 const BookMark = styled.img`
-  width: 18px;
-  height: 18px;
-  margin: 0 12px 0 10px;
+  width: 18rem;
+  height: 18rem;
+  margin: 0 12rem 0 10rem;
   &:hover {
     cursor: pointer;
   }
 `;
 
 const Note = styled.img`
-  width: 18px;
-  height: 18px;
+  width: 18rem;
+  height: 18rem;
   &:hover {
     cursor: pointer;
   }

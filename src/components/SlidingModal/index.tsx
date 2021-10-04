@@ -36,7 +36,7 @@ const ModalOverlay = styled.div<{ visible: boolean }>`
 const Root = styled.div<{ visible: boolean }>`
   height: 100vh;
   box-sizing: border-box;
-  padding: 40px;
+  padding: 40rem;
   background-color: #fff;
   position: fixed;
   transition: all 0.5s;
@@ -49,13 +49,13 @@ const Root = styled.div<{ visible: boolean }>`
 `;
 
 const ClostBtn = styled.a`
-  width: 32px;
-  height: 32px;
+  width: 32rem;
+  height: 32rem;
   border-radius: 50%;
   background-color: #fff;
   background-image: url(${Close});
   background-repeat: no-repeat;
-  background-size: 14px;
+  background-size: 14rem;
   background-position: 50%;
 
   &:hover {
