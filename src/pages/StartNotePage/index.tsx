@@ -91,14 +91,19 @@ const StartNotePage: FC<Props & RouteComponentProps> = ({ history }) => {
     console.log(response);
   };
 
-  const makeNote = async (fileToSend: File) => {
+  const makeNote = async (
+    isRecording: number,
+    fileToSend: File | null = null
+  ) => {
     const noteData = new FormData();
     if (title === '') noteData.append('fileName', placeholder);
     else noteData.append('fileName', title);
     noteData.append('categoryId', String(course));
-    // TODO : 녹음 파일 보내기
-    noteData.append('audioFile', fileToSend.name);
-    noteData.append('isRecording', '0');
+    noteData.append('isRecording', String(isRecording));
+    if (fileToSend !== null) {
+      // TODO : 녹음 파일 보내기
+      noteData.append('audioFile', fileToSend.name);
+    }
     try {
       const response = await axios.post(`/v1/script`, noteData, {
         headers: { Authorization: `Bearer ${authToken}` },
@@ -112,9 +117,16 @@ const StartNotePage: FC<Props & RouteComponentProps> = ({ history }) => {
 
   const goToNote = async (fileToSend: File) => {
     // setLoading(true);
-    const id = await makeNote(fileToSend);
+    const id = await makeNote(0, fileToSend);
     // setLoading(false);
     if (id !== null) history.push(`/note/${id}`);
+  };
+
+  const onClickStart = async () => {
+    if (isChrome()) {
+      const id = await makeNote(1);
+      if (id !== null) history.push(`/note/${id}`);
+    } else alert('녹음은 크롬 브라우저에서만 가능합니다');
   };
 
   // 음원 파일이 업로드 되면 노트 생성 후 페이지 이동
@@ -164,12 +176,6 @@ const StartNotePage: FC<Props & RouteComponentProps> = ({ history }) => {
     } catch (err) {
       console.error(`Error: ${err}`);
     }
-  };
-
-  const onClickStart = async () => {
-    if (isChrome()) await startRec();
-    else alert('녹음은 크롬 브라우저에서만 가능합니다');
-    console.log(`is windows : ${isWindows()}`);
   };
 
   return (

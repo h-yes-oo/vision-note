@@ -75,10 +75,16 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
       setStarred(data.script.isImportant);
       setTitle(data.script.fileName);
       setDate(data.script.createdAt.slice(0, 10).replace(/-/gi, '.'));
-      return data.parentFolder.folderId;
+      return {
+        folderId: data.parentFolder.folderId,
+        isRecording: data.script.isRecording,
+      };
     } catch {
       alert('노트 정보를 가져올 수 없습니다');
-      return null;
+      return {
+        folderId: null,
+        isRecording: 0,
+      };
     }
   };
 
@@ -123,13 +129,21 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
     setNoteId(noteId);
     setLoading(true);
     setContent(contents.join(''));
-    const folderId = await getNoteInfo(noteId);
+    const { folderId, isRecording } = await getNoteInfo(noteId);
     if (folderId !== null) await getParentFolders(folderId);
     setLoading(false);
+    if (isRecording) {
+      // TODO : start recording
+      console.log('recording...');
+    }
   };
 
   useEffect(() => {
     getStarted();
+    return () => {
+      // TODO : 녹음중이면, 지금까지 올라온 내용 스크립트로 저장 후 녹음 상태 전환
+      console.log('byebye');
+    };
   }, []);
   // temp end
 
@@ -298,8 +312,8 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
               <RecordingWrapper>
                 <RecordingStatus
                   onClick={() => {
-                    if (recording) onStop();
-                    else onStart();
+                    // if (recording) onStop();
+                    // else onStart();
                     setRecording(!recording);
                   }}
                 >
