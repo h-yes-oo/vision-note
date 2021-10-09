@@ -27,6 +27,7 @@ export enum NotesMode {
 
 export enum SortMode {
   Alphabetically,
+  ReverseAlphabetically,
   Oldest,
   Newest,
 }

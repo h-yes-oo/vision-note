@@ -29,7 +29,16 @@ const SortMenu: FC<Props> = ({ show, closeMenu }) => {
             visible={sortBy === SortMode.Alphabetically}
             src={Check}
           />
-          이름 순
+          이름 오름차순
+        </MenuList>
+        <MenuList
+          onClick={() => changeSortMode(SortMode.ReverseAlphabetically)}
+        >
+          <ContextImage
+            visible={sortBy === SortMode.ReverseAlphabetically}
+            src={Check}
+          />
+          이름 내림차순
         </MenuList>
         <MenuList onClick={() => changeSortMode(SortMode.Newest)}>
           <ContextImage visible={sortBy === SortMode.Newest} src={Check} />

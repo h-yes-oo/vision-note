@@ -56,6 +56,12 @@ const FolderPage: FC<Props> = () => {
       if (a.noteFolder!.folderName > b.noteFolder!.folderName) return 1;
       return 0;
     }
+    // 한글 내림차순
+    if (sortBy === SortMode.ReverseAlphabetically) {
+      if (a.noteFolder!.folderName > b.noteFolder!.folderName) return -1;
+      if (a.noteFolder!.folderName < b.noteFolder!.folderName) return 1;
+      return 0;
+    }
     // 오래된 순
     if (sortBy === SortMode.Oldest) {
       if (a.noteFolder!.createdAt < b.noteFolder!.createdAt) return -1;
@@ -73,6 +79,12 @@ const FolderPage: FC<Props> = () => {
     if (sortBy === SortMode.Alphabetically) {
       if (a.noteFile!.fileName < b.noteFile!.fileName) return -1;
       if (a.noteFile!.fileName > b.noteFile!.fileName) return 1;
+      return 0;
+    }
+    // 한글 내림차순
+    if (sortBy === SortMode.ReverseAlphabetically) {
+      if (a.noteFile!.fileName > b.noteFile!.fileName) return -1;
+      if (a.noteFile!.fileName < b.noteFile!.fileName) return 1;
       return 0;
     }
     // 오래된 순
