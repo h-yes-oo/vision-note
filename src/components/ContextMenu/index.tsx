@@ -1,7 +1,9 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { useRecoilValue } from 'recoil';
+
+import AlertWithMessage from 'components/Alert/message';
 
 import { authenticateToken } from 'state';
 import ContextDelete from 'assets/icons/ContextDelete.svg';
@@ -29,6 +31,7 @@ const ContextMenu: FC<Props> = ({
   afterStar,
 }) => {
   const authToken = useRecoilValue(authenticateToken);
+  const [showAlert, setShowAlert] = useState<boolean>(false);
 
   const downloadNote = () => {
     console.log(`${noteId} download`);
@@ -53,24 +56,49 @@ const ContextMenu: FC<Props> = ({
     afterDelete();
   };
 
+  const onClickDeleteNote = () => {
+    setShowAlert(true);
+  };
+
+  const onConfirmAlert = async () => {
+    await deleteNote();
+    setShowAlert(false);
+  };
+
+  const onCancelAlert = () => {
+    setShowAlert(false);
+  };
+
   return (
-    <Root visible={visible}>
-      <PreventClick onClick={closeContextMenu} />
-      <Menu top={anchorPoint.y} left={anchorPoint.x} onClick={closeContextMenu}>
-        <MenuList onClick={downloadNote}>
-          <ContextImage src={ContextDownload} />
-          노트 다운로드
-        </MenuList>
-        <MenuList onClick={starNote}>
-          <ContextImage src={starred ? FilledStar : ContextStar} />
-          {starred ? '중요 노트 해제' : '중요 노트함'}
-        </MenuList>
-        <MenuList onClick={deleteNote}>
-          <ContextImage src={ContextDelete} />
-          노트 삭제하기
-        </MenuList>
-      </Menu>
-    </Root>
+    <>
+      <AlertWithMessage
+        message="선택한 노트를 삭제합니다. 계속할까요 ?"
+        visible={showAlert}
+        confirm={onConfirmAlert}
+        cancel={onCancelAlert}
+      />
+      <Root visible={visible}>
+        <PreventClick onClick={closeContextMenu} />
+        <Menu
+          top={anchorPoint.y}
+          left={anchorPoint.x}
+          onClick={closeContextMenu}
+        >
+          <MenuList onClick={downloadNote}>
+            <ContextImage src={ContextDownload} />
+            노트 다운로드
+          </MenuList>
+          <MenuList onClick={starNote}>
+            <ContextImage src={starred ? FilledStar : ContextStar} />
+            {starred ? '중요 노트 해제' : '중요 노트함'}
+          </MenuList>
+          <MenuList onClick={onClickDeleteNote}>
+            <ContextImage src={ContextDelete} />
+            노트 삭제하기
+          </MenuList>
+        </Menu>
+      </Root>
+    </>
   );
 };
 

@@ -8,6 +8,7 @@ import BaseLayout from 'components/BaseLayout';
 import ListData, { NoteResponse } from 'components/ListData/list';
 import Loading from 'components/Loading';
 import SortMenu from 'components/SortMenu';
+import AlertWithMessage from 'components/Alert/message';
 import {
   authenticateToken,
   selectMode,
@@ -48,6 +49,8 @@ const FolderPage: FC<Props> = () => {
   const [selectedRefreshList, setSelectedRefresh] =
     useRecoilState(selectedRefresh);
   const refreshDrag = useRecoilValue<() => void>(dragRefresh);
+  // about delete alert
+  const [showAlert, setShowAlert] = useState<boolean>(false);
 
   const sortFolder = (a, b) => {
     // 한글 오름차순
@@ -259,6 +262,19 @@ const FolderPage: FC<Props> = () => {
     }
   };
 
+  const onClickDeleteAll = () => {
+    setShowAlert(true);
+  };
+
+  const onConfirmAlert = async () => {
+    await deleteAll();
+    setShowAlert(false);
+  };
+
+  const onCancelAlert = () => {
+    setShowAlert(false);
+  };
+
   const onClickMode = (mode: NotesMode) => {
     setMode(mode);
     setSelectedIds([]);
@@ -322,7 +338,7 @@ const FolderPage: FC<Props> = () => {
           </Button>
           <Button>
             <FolderImage src={GreyTrashCan} />
-            <ButtonName onClick={deleteAll}>노트 삭제</ButtonName>
+            <ButtonName onClick={onClickDeleteAll}>노트 삭제</ButtonName>
           </Button>
           <Button>
             <ButtonImage src={Check} />
@@ -377,7 +393,7 @@ const FolderPage: FC<Props> = () => {
           </Button>
           <Button>
             <FolderImage src={GreyTrashCan} />
-            <ButtonName onClick={deleteAll}>노트 삭제</ButtonName>
+            <ButtonName onClick={onClickDeleteAll}>노트 삭제</ButtonName>
           </Button>
           <Button>
             <ButtonImage src={Check} />
@@ -443,6 +459,12 @@ const FolderPage: FC<Props> = () => {
 
   return (
     <BaseLayout grey>
+      <AlertWithMessage
+        visible={showAlert}
+        message="선택하신 모든 폴더를 삭제합니다. 계속하시겠습니까 ?"
+        cancel={onCancelAlert}
+        confirm={onConfirmAlert}
+      />
       <Root>
         <Top>
           {getTitle()}

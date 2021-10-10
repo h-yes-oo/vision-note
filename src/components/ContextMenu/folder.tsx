@@ -1,7 +1,9 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { useRecoilValue } from 'recoil';
+
+import AlertWithMessage from 'components/Alert/message';
 
 import { authenticateToken } from 'state';
 import ContextDelete from 'assets/icons/ContextDelete.svg';
@@ -25,6 +27,7 @@ const ContextMenuFolder: FC<Props> = ({
   editFolderName,
 }) => {
   const authToken = useRecoilValue(authenticateToken);
+  const [showAlert, setShowAlert] = useState<boolean>(false);
 
   const deleteFolder = async () => {
     await axios.delete(`/v1/note/folder/${folderId}`, {
@@ -33,20 +36,45 @@ const ContextMenuFolder: FC<Props> = ({
     refreshNotes();
   };
 
+  const onClickDeleteFolder = () => {
+    setShowAlert(true);
+  };
+
+  const onConfirmAlert = async () => {
+    await deleteFolder();
+    setShowAlert(false);
+  };
+
+  const onCancelAlert = () => {
+    setShowAlert(false);
+  };
+
   return (
-    <Root visible={visible}>
-      <PreventClick onClick={closeContextMenu} />
-      <Menu top={anchorPoint.y} left={anchorPoint.x} onClick={closeContextMenu}>
-        <MenuList onClick={editFolderName}>
-          <ContextImage src={Edit} />
-          폴더 이름 변경
-        </MenuList>
-        <MenuList onClick={deleteFolder}>
-          <ContextImage src={ContextDelete} />
-          폴더 삭제하기
-        </MenuList>
-      </Menu>
-    </Root>
+    <>
+      <AlertWithMessage
+        visible={showAlert}
+        confirm={onConfirmAlert}
+        cancel={onCancelAlert}
+        message={`선택된 폴더에 속한 모든 폴더 및 노트가 삭제됩니다. \n삭제하시겠습니까?`}
+      />
+      <Root visible={visible}>
+        <PreventClick onClick={closeContextMenu} />
+        <Menu
+          top={anchorPoint.y}
+          left={anchorPoint.x}
+          onClick={closeContextMenu}
+        >
+          <MenuList onClick={editFolderName}>
+            <ContextImage src={Edit} />
+            폴더 이름 변경
+          </MenuList>
+          <MenuList onClick={onClickDeleteFolder}>
+            <ContextImage src={ContextDelete} />
+            폴더 삭제하기
+          </MenuList>
+        </Menu>
+      </Root>
+    </>
   );
 };
 

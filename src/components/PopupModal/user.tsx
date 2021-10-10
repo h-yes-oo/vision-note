@@ -70,7 +70,7 @@ const UserModal: FC<Props & RouteComponentProps> = ({
     }
   };
 
-  const cancleSignOut = () => {
+  const cancelSignOut = () => {
     setShowSignOutAlert(false);
   };
 
@@ -140,7 +140,7 @@ const UserModal: FC<Props & RouteComponentProps> = ({
     setLoading(false);
   };
 
-  const cancleNewPassword = () => {
+  const cancelNewPassword = () => {
     setNewPassword('');
     setConfirmPassword('');
     setShowPasswordAlert(false);
@@ -243,13 +243,13 @@ const UserModal: FC<Props & RouteComponentProps> = ({
   return (
     <>
       <AlertWithMessage
-        cancle={cancleSignOut}
+        cancel={cancelSignOut}
         confirm={confirmSignOut}
         visible={showSignOutAlert}
         message={`탈퇴하시면 그동안 작성하신 학습 노트가 모두 사라집니다.\n 탈퇴하시겠습니까?`}
       />
       <Alert
-        cancle={cancleNewPassword}
+        cancel={cancelNewPassword}
         confirm={confirmNewPassword}
         visible={showPasswordAlert}
       >

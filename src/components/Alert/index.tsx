@@ -2,13 +2,13 @@ import React, { FC, ReactElement } from 'react';
 import styled from 'styled-components';
 
 interface ModalProps {
-  cancle: () => void;
+  cancel: () => void;
   confirm: () => void | Promise<void>;
   visible: boolean;
   children: ReactElement;
 }
 
-const Alert: FC<ModalProps> = ({ cancle, confirm, visible, children }) => {
+const Alert: FC<ModalProps> = ({ cancel, confirm, visible, children }) => {
   return (
     <Visible visible={visible}>
       <ModalOverlay visible={visible} />
@@ -16,7 +16,7 @@ const Alert: FC<ModalProps> = ({ cancle, confirm, visible, children }) => {
         <Root visible={visible}>
           {children}
           <ButtonWrapper>
-            <WhiteButton onClick={cancle}>취소</WhiteButton>
+            <WhiteButton onClick={cancel}>취소</WhiteButton>
             <PurpleButton onClick={confirm}>확인</PurpleButton>
           </ButtonWrapper>
         </Root>

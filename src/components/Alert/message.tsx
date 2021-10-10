@@ -4,20 +4,20 @@ import styled from 'styled-components';
 import Alert from '.';
 
 interface ModalProps {
-  cancle: () => void;
+  cancel: () => void;
   confirm: () => void | Promise<void>;
   visible: boolean;
   message: string;
 }
 
 const AlertWithMessage: FC<ModalProps> = ({
-  cancle,
+  cancel,
   confirm,
   visible,
   message,
 }) => {
   return (
-    <Alert cancle={cancle} confirm={confirm} visible={visible}>
+    <Alert cancel={cancel} confirm={confirm} visible={visible}>
       <Message>{message}</Message>
     </Alert>
   );
@@ -34,6 +34,7 @@ const Message = styled.div`
   text-align: center;
   color: #000;
   padding: 20rem 19rem 39rem;
+  white-space: break-spaces;
 `;
 
 export default AlertWithMessage;

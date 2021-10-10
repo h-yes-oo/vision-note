@@ -1,9 +1,10 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import axios from 'axios';
 
+import AlertWithMessage from 'components/Alert/message';
 import ContextDownload from 'assets/icons/ContextDownload.svg';
 import Edit from 'assets/icons/Edit.svg';
 import ContextStar from 'assets/icons/ContextStar.svg';
@@ -31,6 +32,7 @@ const NoteMenu: FC<Props & RouteComponentProps> = ({
   starNote,
 }) => {
   const authToken = useRecoilValue(authenticateToken);
+  const [showAlert, setShowAlert] = useState<boolean>(false);
 
   const download = () => {
     console.log(`download ${noteId}`);
@@ -42,22 +44,36 @@ const NoteMenu: FC<Props & RouteComponentProps> = ({
     closeMenu();
   };
 
-  const deleteNote = async () => {
-    // event.stopPropagation();
-    await axios.delete(`/v1/note/file/${noteId}`, {
-      headers: { Authorization: `Bearer ${authToken}` },
-    });
-    history.push('/');
-    closeMenu();
-  };
-
   const onClickEditTitle = () => {
     editNoteTitle();
     closeMenu();
   };
 
+  const onClickDeleteNote = () => {
+    setShowAlert(true);
+    closeMenu();
+  };
+
+  const onConfirmAlert = async () => {
+    await axios.delete(`/v1/note/file/${noteId}`, {
+      headers: { Authorization: `Bearer ${authToken}` },
+    });
+    setShowAlert(false);
+    history.push('/');
+  };
+
+  const onCancelAlert = () => {
+    setShowAlert(false);
+  };
+
   return (
     <>
+      <AlertWithMessage
+        visible={showAlert}
+        confirm={onConfirmAlert}
+        cancel={onCancelAlert}
+        message="현재 노트를 삭제합니다. 계속하시곘습니까 ?"
+      />
       <Menu show={show}>
         <MenuList onClick={onClickEditTitle}>
           <ContextImage src={Edit} />
@@ -71,7 +87,7 @@ const NoteMenu: FC<Props & RouteComponentProps> = ({
           <ContextImage src={starred ? FilledStar : ContextStar} />
           {starred ? '중요 노트 해제' : '중요 노트함'}
         </MenuList>
-        <MenuList onClick={deleteNote}>
+        <MenuList onClick={onClickDeleteNote}>
           <ContextImage src={ContextDelete} />
           노트 삭제하기
         </MenuList>
