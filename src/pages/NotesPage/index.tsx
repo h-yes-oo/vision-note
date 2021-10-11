@@ -236,22 +236,26 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
       setTimeout(() => noteNameRef.current!.focus(), 10);
   };
 
-  const endEditing = async (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      setEditing(false);
-      if (newName !== '') {
-        try {
-          const noteData = new FormData();
-          noteData.append('fileId', String(noteId));
-          noteData.append('fileName', newName);
-          await axios.put(`/v1/note/file/${noteId}`, noteData, {
-            headers: { Authorization: `Bearer ${authToken}` },
-          });
-          setTitle(newName);
-        } catch {
-          alert('노트 제목을 변경하지 못했습니다');
-        }
+  const endEditing = async () => {
+    setEditing(false);
+    if (newName !== '') {
+      try {
+        const noteData = new FormData();
+        noteData.append('fileId', String(noteId));
+        noteData.append('fileName', newName);
+        await axios.put(`/v1/note/file/${noteId}`, noteData, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+        setTitle(newName);
+      } catch {
+        alert('노트 제목을 변경하지 못했습니다');
       }
+    }
+  };
+
+  const onPressEnter = async (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      await endEditing();
     }
   };
 
@@ -298,11 +302,13 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
             </InfoTop>
             <InfoMiddle>
               <NoteTitle visible={!editing}>{title}</NoteTitle>
+              <EditOverlay visible={editing} onClick={endEditing} />
               <EditNoteTitle
                 type="text"
+                placeholder={title}
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
-                onKeyPress={endEditing}
+                onKeyPress={onPressEnter}
                 ref={noteNameRef}
                 visible={editing}
               />
@@ -351,6 +357,17 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
     </BaseLayout>
   );
 };
+
+const EditOverlay = styled.div<{ visible: boolean }>`
+  box-sizing: border-box;
+  display: ${(props) => (props.visible ? 'block' : 'none')};
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 999;
+`;
 
 const FolderWrapper = styled.div`
   display: flex;
@@ -426,6 +443,7 @@ const EditNoteTitle = styled.input<{ visible: boolean }>`
   text-align: left;
   color: #000;
   border: 2rem solid #06cc80;
+  z-index: 1000;
 `;
 
 const NoteDate = styled.div`

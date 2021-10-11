@@ -297,7 +297,7 @@ const FolderData: FC<Props> = ({
         anchorPoint={anchorPoint}
         closeContextMenu={closeContextMenu}
         folderId={folderId}
-        refreshNotes={refreshRoot}
+        refreshNotes={refreshNotes}
         editFolderName={editFolderName}
       />
       <DataRow
