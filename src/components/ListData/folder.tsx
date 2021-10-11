@@ -213,7 +213,9 @@ const FolderData: FC<Props> = ({
   }, [refresh, mode, sortBy]);
 
   const handleClick = () => {
-    setOpen(!open);
+    if (!editing) {
+      setOpen(!open);
+    }
   };
 
   const editFolderName = () => {
@@ -222,24 +224,29 @@ const FolderData: FC<Props> = ({
       setTimeout(() => folderNameRef.current!.focus(), 10);
   };
 
-  const endEditing = async (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      setEditing(false);
-      if (newName !== '') {
-        try {
-          const folderData = new FormData();
-          folderData.append('folderId', String(folderId));
-          folderData.append('folderName', newName);
-          await axios.put(`/v1/note/folder/${folderId}`, folderData, {
-            headers: { Authorization: `Bearer ${authToken}` },
-          });
-          setFolderTitle(newName);
-        } catch {
-          alert('폴더 이름을 변경하지 못했습니다');
-        }
+  const endEditing = async () => {
+    setEditing(false);
+    if (newName !== '') {
+      try {
+        const folderData = new FormData();
+        folderData.append('folderId', String(folderId));
+        folderData.append('folderName', newName);
+        await axios.put(`/v1/note/folder/${folderId}`, folderData, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+        setFolderTitle(newName);
+      } catch {
+        alert('폴더 이름을 변경하지 못했습니다');
       }
     }
   };
+
+  const onPressEnter = async (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      await endEditing();
+    }
+  };
+
   const onDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     setDragOver(false);
@@ -312,11 +319,13 @@ const FolderData: FC<Props> = ({
       >
         <TitleData>
           <TitleImage depth={depth} src={folderImage()} />
+          <EditOverlay visible={editing} onClick={endEditing} />
           <EditTitleName
             type="text"
             value={newName}
+            placeholder={folderTitle}
             onChange={(e) => setNewName(e.target.value)}
-            onKeyPress={endEditing}
+            onKeyPress={onPressEnter}
             ref={folderNameRef}
             visible={editing}
           />
@@ -327,6 +336,17 @@ const FolderData: FC<Props> = ({
     </>
   );
 };
+
+const EditOverlay = styled.div<{ visible: boolean }>`
+  box-sizing: border-box;
+  display: ${(props) => (props.visible ? 'block' : 'none')};
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 999;
+`;
 
 const NoteWrapper = styled.div<{ visible: boolean }>`
   display: ${(props) => (props.visible ? '' : 'none')};
