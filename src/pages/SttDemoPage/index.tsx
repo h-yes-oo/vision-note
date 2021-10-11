@@ -10,10 +10,13 @@ interface Props {}
 
 const SttDemoPage: FC<Props> = () => {
   const [dictate, setDictate] = useState<Dictate>();
+  const [recording, setRecording] = useState<boolean>(false);
   const logRef: React.RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null);
   const transcriptRef: React.RefObject<HTMLDivElement> =
     useRef<HTMLDivElement>(null);
-  const startRef: React.RefObject<HTMLButtonElement> =
+  const startRef1: React.RefObject<HTMLButtonElement> =
+    useRef<HTMLButtonElement>(null);
+  const startRef2: React.RefObject<HTMLButtonElement> =
     useRef<HTMLButtonElement>(null);
   const user = useRecoilValue(userInfo);
 
@@ -48,12 +51,16 @@ const SttDemoPage: FC<Props> = () => {
           json.num_workers_available + ':' + json.num_requests_processed
         );
         if (json.num_workers_available === 0) {
-          const startBtn = startRef.current;
-          if (startBtn !== null) startBtn.disabled = true;
+          const startBtn1 = startRef1.current;
+          if (startBtn1 !== null) startBtn1.disabled = true;
+          const startBtn2 = startRef2.current;
+          if (startBtn2 !== null) startBtn2.disabled = true;
           addToLogs('unable to start\n');
         } else {
-          const startBtn = startRef.current;
-          if (startBtn !== null) startBtn.disabled = false;
+          const startBtn1 = startRef1.current;
+          if (startBtn1 !== null) startBtn1.disabled = false;
+          const startBtn2 = startRef2.current;
+          if (startBtn2 !== null) startBtn2.disabled = false;
           addToLogs('can start\n');
         }
       },
@@ -82,31 +89,45 @@ const SttDemoPage: FC<Props> = () => {
     };
   }, [dictate]);
 
-  const startListening = () => {
-    if (dictate !== undefined) dictate.startListening();
+  const recordWithMic = () => {
+    if (dictate !== undefined) {
+      dictate.init(0).then((result) => {
+        if (result) {
+          dictate.startListening();
+          setRecording(true);
+        }
+      });
+    }
   };
 
   const stopListening = () => {
     if (dictate !== undefined) dictate.stopListening();
+    setRecording(false);
   };
 
-  const cancel = () => {
-    if (dictate !== undefined) dictate.cancel();
-  };
-
-  const init = () => {
-    if (dictate !== undefined) dictate.init();
+  const recordWithoutMic = () => {
+    if (dictate !== undefined) {
+      dictate.init(1).then((result) => {
+        if (result) {
+          dictate.startListening();
+          setRecording(true);
+        }
+      });
+    }
   };
 
   return (
     <Root>
       <ButtonWrapper>
-        <PurpleButton onClick={init}>데모 시작하기</PurpleButton>
-        <PurpleButton ref={startRef} onClick={startListening}>
-          녹음 시작하기
+        <PurpleButton ref={startRef1} onClick={recordWithoutMic}>
+          마이크 없이 녹음하기
         </PurpleButton>
-        <PurpleButton onClick={stopListening}>녹음 끝내기</PurpleButton>
-        <PurpleButton onClick={cancel}>데모 끝내기</PurpleButton>
+        <PurpleButton ref={startRef2} onClick={recordWithMic}>
+          마이크 이용하여 녹음하기
+        </PurpleButton>
+        <PurpleButton onClick={stopListening} disabled={!recording}>
+          녹음 끝내기
+        </PurpleButton>
       </ButtonWrapper>
       <Title>음성 인식 결과 : </Title>
       <Logs ref={transcriptRef} />
@@ -160,6 +181,10 @@ const Button = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
+
+  &:disabled {
+    background-color: grey;
+  }
 `;
 
 const PurpleButton = styled(Button)`
@@ -167,9 +192,12 @@ const PurpleButton = styled(Button)`
   color: #fff;
   border-radius: 6rem;
 
-  &:hover {
-    cursor: pointer;
-    background-color: #6a58d3;
+  &:hover,
+  &:active {
+    &:not([disabled]) {
+      cursor: pointer;
+      background-color: #6a58d3;
+    }
   }
 `;
 

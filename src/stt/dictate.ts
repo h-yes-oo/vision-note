@@ -77,9 +77,11 @@ interface CustomWindow {
 }
 
 export class Dictate {
+  stream: MediaStream;
+
   getConfig: () => Config;
 
-  init: () => void;
+  init: (type: number) => Promise<boolean>;
 
   startListening: () => void;
 
@@ -165,66 +167,132 @@ export class Dictate {
       return config;
     };
 
+    const setStream = (stream) => {
+      this.stream = stream;
+    };
+
     // Set up the recorder (incl. asking permission)
     // Initializes audioContext
     // Can be called multiple times.
     // TODO: call something on success (MSG_INIT_RECORDER is currently called)
-    this.init = function () {
-      const audioSourceConstraints: AudioSourceConstraints = {};
-      config.onEvent(
-        MSG_WAITING_MICROPHONE,
-        'Waiting for approval to access your microphone ...'
-      );
-      try {
-        // window.AudioContext = window.AudioContext || window.webkitAudioContext;
-        // navigator.mediaDevices.getUserMedia = navigator.mediaDevices.getUserMedia || navigator.mediaDevices.webkitGetUserMedia || navigator.mediaDevices.mozGetUserMedia;
-        audioContext = new AudioContext();
-
-        if (navigator.mediaDevices.getUserMedia) {
-          if (config.audioSourceId) {
-            audioSourceConstraints.audio = {
-              optional: [{ sourceId: config.audioSourceId }],
-            };
-          } else {
-            audioSourceConstraints.audio = true;
-          }
-          navigator.mediaDevices
-            .getUserMedia(audioSourceConstraints)
-            .then(function (stream) {
-              /* use the stream */
-              const input: MediaStreamAudioSourceNode =
-                audioContext.createMediaStreamSource(stream);
-              config.onEvent(MSG_MEDIA_STREAM_CREATED, 'Media stream created');
-              // Firefox loses the audio input stream every five seconds
-              // To fix added the input to window.source
-              let window: Window & CustomWindow & typeof globalThis;
-              if (document.defaultView !== null) {
-                window = document.defaultView;
-                window.source = input;
-                window.userSpeechAnalyser = audioContext.createAnalyser();
-                input.connect(window.userSpeechAnalyser);
-              }
-              config.rafCallback();
-              recorder = new Recorder(input, {
-                workerPath: config.recorderWorkerPath,
-              });
-              config.onEvent(MSG_INIT_RECORDER, 'Recorder initialized');
-            });
-        } else {
-          config.onError(ERR_CLIENT, 'No user media support');
-        }
-      } catch (e) {
-        // Firefox 24: TypeError: AudioContext is not a constructor
-        // Set media.webaudio.enabled = true (in about:config) to fix this.
-        config.onError(
-          ERR_CLIENT,
-          `Error initializing Web Audio browser: ${e}`
+    this.init = (type: number) => {
+      return new Promise((resolve, reject) => {
+        config.onEvent(
+          MSG_WAITING_MICROPHONE,
+          'Waiting for approval to access your microphone ...'
         );
-      }
+        // 유저로부터 stream 받아오기
+        try {
+          // window.AudioContext = window.AudioContext || window.webkitAudioContext;
+          // navigator.mediaDevices.getUserMedia = navigator.mediaDevices.getUserMedia || navigator.mediaDevices.webkitGetUserMedia || navigator.mediaDevices.mozGetUserMedia;
+          audioContext = new AudioContext();
+
+          if (navigator.mediaDevices.getUserMedia !== undefined) {
+            // 마이크를 이용하여 녹음
+            if (type === 0) {
+              const audioSourceConstraints: AudioSourceConstraints = {};
+              if (config.audioSourceId) {
+                audioSourceConstraints.audio = {
+                  optional: [{ sourceId: config.audioSourceId }],
+                };
+              } else {
+                audioSourceConstraints.audio = true;
+              }
+              navigator.mediaDevices
+                .getUserMedia(audioSourceConstraints)
+                .then((stream) => {
+                  setStream(stream);
+                  /* use the stream */
+                  const input: MediaStreamAudioSourceNode =
+                    audioContext.createMediaStreamSource(stream);
+                  config.onEvent(
+                    MSG_MEDIA_STREAM_CREATED,
+                    'Media stream created'
+                  );
+                  // Firefox loses the audio input stream every five seconds
+                  // To fix added the input to window.source
+                  // let window: Window & CustomWindow & typeof globalThis;
+                  // if (document.defaultView !== null) {
+                  //   window = document.defaultView;
+                  //   window.source = input;
+                  //   window.userSpeechAnalyser = audioContext.createAnalyser();
+                  //   input.connect(window.userSpeechAnalyser);
+                  // }
+                  config.rafCallback();
+                  recorder = new Recorder(input, {
+                    workerPath: config.recorderWorkerPath,
+                  });
+                  config.onEvent(MSG_INIT_RECORDER, 'Recorder initialized');
+                  resolve(true);
+                });
+            } else {
+              // 마이크를 통하지 않고 오디오 캡쳐
+              const displayMediaConstraints = {
+                video: true,
+                audio: {
+                  sampleRate: 16000,
+                },
+              };
+              navigator.mediaDevices
+                .getDisplayMedia(displayMediaConstraints)
+                .then((stream) => {
+                  setStream(stream);
+                  /* use the stream */
+                  try {
+                    const input: MediaStreamAudioSourceNode =
+                      audioContext.createMediaStreamSource(stream);
+                    config.onEvent(
+                      MSG_MEDIA_STREAM_CREATED,
+                      'Media stream created'
+                    );
+                    // Firefox loses the audio input stream every five seconds
+                    // To fix added the input to window.source
+                    // let window: Window & CustomWindow & typeof globalThis;
+                    // if (document.defaultView !== null) {
+                    //   window = document.defaultView;
+                    //   window.source = input;
+                    //   window.userSpeechAnalyser = audioContext.createAnalyser();
+                    //   input.connect(window.userSpeechAnalyser);
+                    // }
+                    config.rafCallback();
+                    recorder = new Recorder(input, {
+                      workerPath: config.recorderWorkerPath,
+                    });
+                    config.onEvent(MSG_INIT_RECORDER, 'Recorder initialized');
+                    resolve(true);
+                  } catch {
+                    // 오디오가 공유되지 않은 경우
+                    alert('오디오 공유 표시에 체크해주세요');
+                    // 공유된 화면 취소
+                    if (stream !== undefined) {
+                      const tracks = stream.getTracks();
+                      if (tracks !== undefined)
+                        tracks.forEach((track) => {
+                          track.stop();
+                        });
+                    }
+                    resolve(false);
+                  }
+                });
+            }
+          } else {
+            config.onError(ERR_CLIENT, 'No user media support');
+            resolve(false);
+          }
+        } catch (e) {
+          // Firefox 24: TypeError: AudioContext is not a constructor
+          // Set media.webaudio.enabled = true (in about:config) to fix this.
+          config.onError(
+            ERR_CLIENT,
+            `Error initializing Web Audio browser: ${e}`
+          );
+          resolve(false);
+        }
+      });
     };
 
     // Start recording and transcribing
-    this.startListening = function () {
+    this.startListening = () => {
       if (!recorder) {
         config.onError(ERR_AUDIO, 'Recorder undefined');
         return;
@@ -245,7 +313,7 @@ export class Dictate {
     };
 
     // Stop listening, i.e. recording and sending of new input.
-    this.stopListening = function () {
+    this.stopListening = () => {
       // Stop the regular sending of audio
       clearInterval(intervalKey);
       // Stop recording
@@ -253,19 +321,28 @@ export class Dictate {
         recorder.stop();
         config.onEvent(MSG_STOP, 'Stopped recording');
         // Push the remaining audio to the server
-        recorder.export16kMono(function (blob) {
+        recorder.export16kMono((blob) => {
           socketSend(blob);
           socketSend(TAG_END_OF_SENTENCE);
           recorder.clear();
         }, 'audio/x-raw');
         config.onEndOfSpeech();
+        // custom : stopListening 시에 녹음 완전히 취소
+        if (this.stream !== undefined) {
+          const tracks = this.stream.getTracks();
+          if (tracks !== undefined) {
+            tracks.forEach((track) => {
+              track.stop();
+            });
+          }
+        }
       } else {
         config.onError(ERR_AUDIO, 'Recorder undefined');
       }
     };
 
     // Cancel everything without waiting on the server
-    this.cancel = function () {
+    this.cancel = () => {
       // Stop the regular sending of audio (if present)
       clearInterval(intervalKey);
       if (recorder) {
@@ -280,13 +357,13 @@ export class Dictate {
     };
 
     // Sets the URL of the speech server
-    this.setServer = function (server) {
+    this.setServer = (server) => {
       config.server = server;
       config.onEvent(MSG_SERVER_CHANGED, `Server changed: ${server}`);
     };
 
     // Sets the URL of the speech server status server
-    this.setServerStatus = function (serverStatus) {
+    this.setServerStatus = (serverStatus) => {
       config.serverStatus = serverStatus;
 
       if (config.onServerStatus) {
@@ -331,7 +408,7 @@ export class Dictate {
     };
 
     // Private methods
-    function socketSend(item) {
+    const socketSend = (item) => {
       if (ws) {
         const state = ws.readyState;
         if (state === 1) {
@@ -363,9 +440,9 @@ export class Dictate {
           `No web socket connection: failed to send: ${item}`
         );
       }
-    }
+    };
 
-    function createWebSocket() {
+    const createWebSocket = () => {
       // TODO: do we need to use a protocol?
       // let ws = new WebSocket("ws://127.0.0.1:8081", "echo-protocol");
       let url = `${config.server}?${config.contentType}`;
@@ -377,7 +454,7 @@ export class Dictate {
       }
       const ws = new WebSocket(url);
 
-      ws.onmessage = function (e) {
+      ws.onmessage = (e) => {
         const { data } = e;
         config.onEvent(MSG_WEB_SOCKET, data);
         if (data instanceof Object && !(data instanceof Blob)) {
@@ -398,7 +475,6 @@ export class Dictate {
               }
             }
           } else {
-            console.log(ws);
             config.onError(
               ERR_SERVER,
               `Server error: ${res.status}:${getDescription(res.status)}`
@@ -408,9 +484,9 @@ export class Dictate {
       };
 
       // Start recording only if the socket becomes open
-      ws.onopen = function (e) {
-        intervalKey = setInterval(function () {
-          recorder.export16kMono(function (blob) {
+      ws.onopen = (e) => {
+        intervalKey = setInterval(() => {
+          recorder.export16kMono((blob) => {
             socketSend(blob);
             recorder.clear();
           }, 'audio/x-raw');
@@ -427,7 +503,7 @@ export class Dictate {
       // http://tools.ietf.org/html/rfc6455#section-7.4.1
       // 1005:
       // 1006:
-      ws.onclose = function (e) {
+      ws.onclose = (e) => {
         const { code, reason, wasClean } = e;
         // The server closes the connection (only?)
         // when its endpointer triggers.
@@ -435,13 +511,13 @@ export class Dictate {
         config.onEvent(MSG_WEB_SOCKET_CLOSE, `${code}/${reason}/${wasClean}`);
       };
 
-      ws.onerror = function (e: any) {
+      ws.onerror = (e: any) => {
         const { data } = e;
         config.onError(ERR_NETWORK, data);
       };
 
       return ws;
-    }
+    };
 
     function monitorServerStatus() {
       if (wsServerStatus) {
@@ -453,11 +529,11 @@ export class Dictate {
       };
     }
 
-    function getDescription(code) {
+    const getDescription = (code) => {
       if (code in SERVER_STATUS_CODE) {
         return SERVER_STATUS_CODE[code];
       }
       return 'Unknown error';
-    }
+    };
   }
 }
