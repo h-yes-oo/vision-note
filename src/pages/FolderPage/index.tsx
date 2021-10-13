@@ -427,7 +427,7 @@ const FolderPage: FC<Props> = () => {
       const fileData = new FormData();
       fileData.append('folderId', String(id));
       fileData.append('parentFolderId', String(rootFolderId));
-      await axios.put(`/v1/note/folder/${id}`, fileData, {
+      await axios.put(`/v1/note/folder/move/${id}`, fileData, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       // 폴더(id)의 상위 폴더와 루트 폴더 리렌더
@@ -439,7 +439,7 @@ const FolderPage: FC<Props> = () => {
       const fileData = new FormData();
       fileData.append('fileId', String(id));
       fileData.append('folderId', String(rootFolderId));
-      await axios.put(`/v1/note/file/${id}`, fileData, {
+      await axios.put(`/v1/note/file/move/${id}`, fileData, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       // 파일(id)의 상위 폴더와 루트 폴더 리렌더
@@ -566,6 +566,7 @@ const HoverAnchor = styled.a`
   &:hover {
     cursor: pointer;
     background-color: #f1f3f4;
+    font-weight: bold;
   }
 `;
 

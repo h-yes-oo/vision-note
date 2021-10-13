@@ -105,8 +105,8 @@ const FolderData: FC<Props> = ({
       return 0;
     }
     // 새로 만든 순
-    if (a.noteFolder!.createdAt > b.noteFolder!.createdAt) return -1;
-    if (a.noteFolder!.createdAt < b.noteFolder!.createdAt) return 1;
+    if (a.noteFolder!.updatedAt > b.noteFolder!.updatedAt) return -1;
+    if (a.noteFolder!.updatedAt < b.noteFolder!.updatedAt) return 1;
     return 0;
   };
 
@@ -259,7 +259,7 @@ const FolderData: FC<Props> = ({
         const fileData = new FormData();
         fileData.append('folderId', id);
         fileData.append('parentFolderId', String(folderId));
-        await axios.put(`/v1/note/folder/${id}`, fileData, {
+        await axios.put(`/v1/note/folder/move/${id}`, fileData, {
           headers: { Authorization: `Bearer ${authToken}` },
         });
         // 폴더(id)의 상위 폴더와 옮겨 온 폴더(folderId) 리렌더
@@ -271,7 +271,7 @@ const FolderData: FC<Props> = ({
       const fileData = new FormData();
       fileData.append('fileId', id);
       fileData.append('folderId', String(folderId));
-      await axios.put(`/v1/note/file/${id}`, fileData, {
+      await axios.put(`/v1/note/file/move/${id}`, fileData, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       // 파일(id)의 상위 폴더와 옮겨 온 폴더(folderId) 리렌더
