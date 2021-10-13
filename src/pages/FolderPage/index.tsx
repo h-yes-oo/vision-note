@@ -18,6 +18,7 @@ import {
   selectedRefresh,
   sortMode,
 } from 'state';
+import { checkTime } from 'functions';
 
 import Check from 'assets/icons/Check.svg';
 import SortToggleDown from 'assets/icons/SortToggleDown.svg';
@@ -30,6 +31,7 @@ import Download from 'assets/icons/Download.svg';
 import GreyStar from 'assets/icons/GreyStar.svg';
 import GreyTrashCan from 'assets/icons/GreyTrashCan.svg';
 import Folder40 from 'assets/icons/Folder40.svg';
+import Clock from 'assets/icons/Clock.svg';
 
 interface Props {}
 
@@ -102,19 +104,87 @@ const FolderPage: FC<Props> = () => {
     return 0;
   };
 
+  const getAllNotes = async (folderId: number) => {
+    let noteQueue: NoteResponse[] = [];
+    const folderQueue: NoteResponse[] = [];
+    const response = await axios.get(`/v1/note/folder/childs/${folderId}`, {
+      headers: { Authorization: `Bearer ${authToken}` },
+    });
+    response.data.forEach((value) => {
+      if (value.itemType === 'FOLDER') {
+        folderQueue.push(value);
+      } else {
+        noteQueue.push(value);
+      }
+    });
+
+    if (folderQueue.length > 0) {
+      const promises: any[] = [];
+      folderQueue.forEach((value) =>
+        promises.push(getAllNotes(value.noteFolder!.folderId))
+      );
+      const response = await Promise.all(promises);
+      response.forEach((chlidNotes) => {
+        noteQueue = [...noteQueue, ...chlidNotes];
+      });
+    }
+    return noteQueue;
+  };
+
   const getRootItems = async () => {
     const response = await axios.get('/v1/note/folder/root', {
       headers: { Authorization: `Bearer ${authToken}` },
     });
     let data: NoteResponse[] = response.data.items;
-    console.log(data);
+
     setRootFolderId(response.data.rootFolderId);
-    if (mode === NotesMode.Star)
+
+    if (mode === NotesMode.Recent) {
+      // const currentdate = new Date();
+      // currentdate.setMonth(currentdate.getMonth() - 1);
+      // const beforeOneMonth = `${currentdate.getFullYear()}.${checkTime(
+      //   currentdate.getMonth() + 1
+      // )}.${checkTime(currentdate.getDate())}`;
+      // data = data.filter(
+      //   (value) =>
+      //     value.itemType === 'FOLDER' ||
+      //     (value.itemType === 'FILE' &&
+      //       value.noteFile!.createdAt.slice(0, 10).replace(/-/gi, '.') >
+      //         beforeOneMonth)
+      // );
+      const allNotes = await getAllNotes(rootFolderId);
+      allNotes.sort((a, b) => {
+        if (a.noteFile!.createdAt > b.noteFile!.createdAt) return -1;
+        if (a.noteFile!.createdAt < b.noteFile!.createdAt) return 1;
+        return 0;
+      });
+      setNotes(
+        allNotes.map((value) => {
+          const key = `FILE.${value.noteFile!.fileId}.${
+            value.noteFile!.isImportant
+          }`;
+          return (
+            <ListData
+              key={key}
+              data={value}
+              depth={0}
+              refreshNotes={getRootItems}
+              refreshRoot={getRootItems}
+            />
+          );
+        })
+      );
+      return;
+    }
+
+    if (mode === NotesMode.Star) {
       data = data.filter(
         (value) =>
           value.itemType === 'FOLDER' ||
           (value.itemType === 'FILE' && value.noteFile!.isImportant === 1)
       );
+    }
+
     const folders = data
       .filter((value) => value.itemType === 'FOLDER')
       .sort(sortFolder)
@@ -284,6 +354,7 @@ const FolderPage: FC<Props> = () => {
   const getTitle = () => {
     if (mode === NotesMode.All) return '내 학습노트';
     if (mode === NotesMode.Star) return '중요 노트함';
+    if (mode === NotesMode.Recent) return '최근 노트함';
     return '휴지통';
   };
 
@@ -376,6 +447,38 @@ const FolderPage: FC<Props> = () => {
           <Button>
             <ButtonImage src={Check} />
             <ButtonName onClick={stopSelectMode}>선택모드 해제</ButtonName>
+          </Button>
+        </ButtonWrapper>
+      );
+    // 최근 노트함 파일 선택 모드
+    if (mode === NotesMode.Recent && selecting)
+      return (
+        <ButtonWrapper>
+          <Button>
+            <FolderImage src={Download} />
+            <ButtonName onClick={downloadAll}>노트 다운로드</ButtonName>
+          </Button>
+          <Button>
+            <FolderImage src={GreyStar} />
+            <ButtonName onClick={starAll}>중요 표시</ButtonName>
+          </Button>
+          <Button>
+            <FolderImage src={GreyTrashCan} />
+            <ButtonName onClick={onClickDeleteAll}>노트 삭제</ButtonName>
+          </Button>
+          <Button>
+            <ButtonImage src={Check} />
+            <ButtonName onClick={stopSelectMode}>선택모드 해제</ButtonName>
+          </Button>
+        </ButtonWrapper>
+      );
+    // 최근 노트함 기본 모드
+    if (mode === NotesMode.Recent && !selecting)
+      return (
+        <ButtonWrapper>
+          <Button>
+            <ButtonImage src={Check} />
+            <ButtonName onClick={startSelectMode}>파일 선택하기</ButtonName>
           </Button>
         </ButtonWrapper>
       );
@@ -507,10 +610,10 @@ const FolderPage: FC<Props> = () => {
               중요 노트함
             </BoxTitle>
           </SmallBox>
-          <SmallBox onClick={() => onClickMode(NotesMode.Trash)}>
+          <SmallBox onClick={() => onClickMode(NotesMode.Recent)}>
             <BoxTitle>
-              <BoxImage src={TrashCan} />
-              휴지통
+              <BoxImage src={Clock} />
+              최근 노트함
             </BoxTitle>
           </SmallBox>
         </BoxWrapper>

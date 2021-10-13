@@ -22,6 +22,7 @@ export enum FileType {
 export enum NotesMode {
   All,
   Star,
+  Recent,
   Trash,
 }
 

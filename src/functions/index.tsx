@@ -42,3 +42,7 @@ export const isWindows = () => {
   if (navigator.appVersion.indexOf('Win') !== -1) return true;
   return false;
 };
+
+export const checkTime = (i: number) => {
+  return i < 10 ? `0${i}` : String(i);
+};

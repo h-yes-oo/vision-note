@@ -12,6 +12,7 @@ import { useRecoilValue, useRecoilState } from 'recoil';
 
 import { NotesMode, SortMode } from 'types';
 import ContextMenuFolder from 'components/ContextMenu/folder';
+import { checkTime } from 'functions';
 
 import FolderPurple from 'assets/icons/FolderPurple.svg';
 import FolderBlue from 'assets/icons/FolderBlue.svg';
@@ -105,8 +106,8 @@ const FolderData: FC<Props> = ({
       return 0;
     }
     // 새로 만든 순
-    if (a.noteFolder!.updatedAt > b.noteFolder!.updatedAt) return -1;
-    if (a.noteFolder!.updatedAt < b.noteFolder!.updatedAt) return 1;
+    if (a.noteFolder!.createdAt > b.noteFolder!.createdAt) return -1;
+    if (a.noteFolder!.createdAt < b.noteFolder!.createdAt) return 1;
     return 0;
   };
 
@@ -140,12 +141,28 @@ const FolderData: FC<Props> = ({
       headers: { Authorization: `Bearer ${authToken}` },
     });
     let folderData: NoteResponse[] = response.data;
-    if (mode === NotesMode.Star)
+    if (mode === NotesMode.Star) {
       folderData = folderData.filter(
         (value) =>
           value.itemType === 'FOLDER' ||
           (value.itemType === 'FILE' && value.noteFile!.isImportant === 1)
       );
+    }
+    // else if (mode === NotesMode.Recent) {
+    //   const currentdate = new Date();
+    //   currentdate.setMonth(currentdate.getMonth() - 1);
+    //   const beforeOneMonth = `${currentdate.getFullYear()}.${checkTime(
+    //     currentdate.getMonth() + 1
+    //   )}.${checkTime(currentdate.getDate())}`;
+    //   folderData = folderData.filter(
+    //     (value) =>
+    //       value.itemType === 'FOLDER' ||
+    //       (value.itemType === 'FILE' &&
+    //         value.noteFile!.createdAt.slice(0, 10).replace(/-/gi, '.') >
+    //           beforeOneMonth)
+    //   );
+    // }
+
     if (folderData !== undefined) {
       const folders = folderData
         .filter((value) => value.itemType === 'FOLDER')
