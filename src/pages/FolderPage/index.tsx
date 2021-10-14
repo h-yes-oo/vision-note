@@ -287,7 +287,6 @@ const FolderPage: FC<Props> = () => {
       });
       return true;
     } catch {
-      alert('문제가 발생했습니다');
       return false;
     }
   };
@@ -313,7 +312,6 @@ const FolderPage: FC<Props> = () => {
       });
       return true;
     } catch {
-      alert('문제가 발생했습니다');
       return false;
     }
   };
@@ -392,9 +390,9 @@ const FolderPage: FC<Props> = () => {
     if (mode === NotesMode.Star && !selecting)
       return (
         <ButtonWrapper>
-          <Button>
+          <Button onClick={startSelectMode}>
             <ButtonImage src={Check} />
-            <ButtonName onClick={startSelectMode}>파일 선택하기</ButtonName>
+            <ButtonName>파일 선택하기</ButtonName>
           </Button>
           {SortElement}
         </ButtonWrapper>
@@ -403,17 +401,17 @@ const FolderPage: FC<Props> = () => {
     if (mode === NotesMode.Star && selecting)
       return (
         <ButtonWrapper>
-          <Button>
+          <Button onClick={downloadAll}>
             <FolderImage src={Download} />
-            <ButtonName onClick={downloadAll}>노트 다운로드</ButtonName>
+            <ButtonName>노트 다운로드</ButtonName>
           </Button>
-          <Button>
+          <Button onClick={onClickDeleteAll}>
             <FolderImage src={GreyTrashCan} />
-            <ButtonName onClick={onClickDeleteAll}>노트 삭제</ButtonName>
+            <ButtonName>노트 삭제</ButtonName>
           </Button>
-          <Button>
+          <Button onClick={stopSelectMode}>
             <ButtonImage src={Check} />
-            <ButtonName onClick={stopSelectMode}>선택모드 해제</ButtonName>
+            <ButtonName>선택모드 해제</ButtonName>
           </Button>
         </ButtonWrapper>
       );
@@ -421,15 +419,13 @@ const FolderPage: FC<Props> = () => {
     if (mode === NotesMode.Trash && !selecting)
       return (
         <ButtonWrapper>
-          <Button>
+          <Button onClick={startSelectMode}>
             <ButtonImage src={Check} />
-            <ButtonName onClick={startSelectMode}>파일 선택하기</ButtonName>
+            <ButtonName>파일 선택하기</ButtonName>
           </Button>
-          <Button>
+          <Button onClick={() => console.log('휴지통 비우기')}>
             <ButtonImage src={EmptyTrashCan} />
-            <ButtonName onClick={() => console.log('휴지통 비우기')}>
-              휴지통 비우기
-            </ButtonName>
+            <ButtonName>휴지통 비우기</ButtonName>
           </Button>
           {SortElement}
         </ButtonWrapper>
@@ -438,15 +434,13 @@ const FolderPage: FC<Props> = () => {
     if (mode === NotesMode.Trash && selecting)
       return (
         <ButtonWrapper>
-          <Button>
+          <Button onClick={() => console.log('휴지통 비우기')}>
             <ButtonImage src={EmptyTrashCan} />
-            <ButtonName onClick={() => console.log('휴지통 비우기')}>
-              선택 파일 영구 삭제
-            </ButtonName>
+            <ButtonName>선택 파일 영구 삭제</ButtonName>
           </Button>
-          <Button>
+          <Button onClick={stopSelectMode}>
             <ButtonImage src={Check} />
-            <ButtonName onClick={stopSelectMode}>선택모드 해제</ButtonName>
+            <ButtonName>선택모드 해제</ButtonName>
           </Button>
         </ButtonWrapper>
       );
@@ -454,21 +448,21 @@ const FolderPage: FC<Props> = () => {
     if (mode === NotesMode.Recent && selecting)
       return (
         <ButtonWrapper>
-          <Button>
+          <Button onClick={downloadAll}>
             <FolderImage src={Download} />
-            <ButtonName onClick={downloadAll}>노트 다운로드</ButtonName>
+            <ButtonName>노트 다운로드</ButtonName>
           </Button>
-          <Button>
+          <Button onClick={starAll}>
             <FolderImage src={GreyStar} />
-            <ButtonName onClick={starAll}>중요 표시</ButtonName>
+            <ButtonName>중요 표시</ButtonName>
           </Button>
-          <Button>
+          <Button onClick={onClickDeleteAll}>
             <FolderImage src={GreyTrashCan} />
-            <ButtonName onClick={onClickDeleteAll}>노트 삭제</ButtonName>
+            <ButtonName>노트 삭제</ButtonName>
           </Button>
-          <Button>
+          <Button onClick={stopSelectMode}>
             <ButtonImage src={Check} />
-            <ButtonName onClick={stopSelectMode}>선택모드 해제</ButtonName>
+            <ButtonName>선택모드 해제</ButtonName>
           </Button>
         </ButtonWrapper>
       );
@@ -476,9 +470,9 @@ const FolderPage: FC<Props> = () => {
     if (mode === NotesMode.Recent && !selecting)
       return (
         <ButtonWrapper>
-          <Button>
+          <Button onClick={startSelectMode}>
             <ButtonImage src={Check} />
-            <ButtonName onClick={startSelectMode}>파일 선택하기</ButtonName>
+            <ButtonName>파일 선택하기</ButtonName>
           </Button>
         </ButtonWrapper>
       );
@@ -486,34 +480,34 @@ const FolderPage: FC<Props> = () => {
     if (mode === NotesMode.All && selecting)
       return (
         <ButtonWrapper>
-          <Button>
+          <Button onClick={downloadAll}>
             <FolderImage src={Download} />
-            <ButtonName onClick={downloadAll}>노트 다운로드</ButtonName>
+            <ButtonName>노트 다운로드</ButtonName>
           </Button>
-          <Button>
+          <Button onClick={starAll}>
             <FolderImage src={GreyStar} />
-            <ButtonName onClick={starAll}>중요 표시</ButtonName>
+            <ButtonName>중요 표시</ButtonName>
           </Button>
-          <Button>
+          <Button onClick={onClickDeleteAll}>
             <FolderImage src={GreyTrashCan} />
-            <ButtonName onClick={onClickDeleteAll}>노트 삭제</ButtonName>
+            <ButtonName>노트 삭제</ButtonName>
           </Button>
-          <Button>
+          <Button onClick={stopSelectMode}>
             <ButtonImage src={Check} />
-            <ButtonName onClick={stopSelectMode}>선택모드 해제</ButtonName>
+            <ButtonName>선택모드 해제</ButtonName>
           </Button>
         </ButtonWrapper>
       );
     // 전체 노트함 기본 모드
     return (
       <ButtonWrapper>
-        <Button>
+        <Button onClick={onClickNewFolder}>
           <FolderImage src={NewFolder} />
-          <ButtonName onClick={onClickNewFolder}>새폴더</ButtonName>
+          <ButtonName>새폴더</ButtonName>
         </Button>
-        <Button>
+        <Button onClick={startSelectMode}>
           <ButtonImage src={Check} />
-          <ButtonName onClick={startSelectMode}>파일 선택하기</ButtonName>
+          <ButtonName>파일 선택하기</ButtonName>
         </Button>
         {SortElement}
       </ButtonWrapper>

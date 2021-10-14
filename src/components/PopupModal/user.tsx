@@ -171,7 +171,11 @@ const UserModal: FC<Props & RouteComponentProps> = ({
         <Wrapper>
           <FlexCenter>
             <Title>이메일</Title>
-            <Content disabled type="email" placeholder={user.email ?? ''} />
+            <Content
+              disabled
+              type="email"
+              placeholder={user ? user.email : ''}
+            />
           </FlexCenter>
           <FlexCenter>
             <Title>닉네임</Title>
