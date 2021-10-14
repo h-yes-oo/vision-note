@@ -24,6 +24,11 @@ import MathEmptyDark from 'assets/icons/MathEmptyDark.svg';
 import SocialEmptyDark from 'assets/icons/SocialEmptyDark.svg';
 import ScienceEmptyDark from 'assets/icons/ScienceEmptyDark.svg';
 import GeneralEmptyDark from 'assets/icons/GeneralEmptyDark.svg';
+import KoreanFullDark from 'assets/icons/KoreanFullDark.svg';
+import MathFullDark from 'assets/icons/MathFullDark.svg';
+import SocialFullDark from 'assets/icons/SocialFullDark.svg';
+import ScienceFullDark from 'assets/icons/ScienceFullDark.svg';
+import GeneralFullDark from 'assets/icons/GeneralFullDark.svg';
 import MicGrey from 'assets/icons/MicGrey.svg';
 import MicWhite from 'assets/icons/MicWhite.svg';
 import UploadGrey from 'assets/icons/UploadGrey.svg';
@@ -205,9 +210,18 @@ const StartNotePage: FC<Props & RouteComponentProps> = ({ history }) => {
   dark[Subject.Social] = SocialEmptyDark;
   dark[Subject.Science] = ScienceEmptyDark;
   dark[Subject.General] = GeneralEmptyDark;
+  const fullDark = {};
+  fullDark[Subject.Korean] = KoreanFullDark;
+  fullDark[Subject.Math] = MathFullDark;
+  fullDark[Subject.Social] = SocialFullDark;
+  fullDark[Subject.Science] = ScienceFullDark;
+  fullDark[Subject.General] = GeneralFullDark;
 
   const getCourseSrc = (selected: Subject) => {
-    if (course === selected || hover === selected) return full[selected];
+    if (course === selected || hover === selected) {
+      if (currentTheme === lightTheme) return full[selected];
+      return fullDark[selected];
+    }
     if (currentTheme === lightTheme) return light[selected];
     return dark[selected];
   };

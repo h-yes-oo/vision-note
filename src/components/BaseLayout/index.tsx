@@ -119,6 +119,7 @@ const Header = styled.div`
   background-color: ${(props) => props.theme.color.background};
   display: flex;
   justify-content: center;
+  z-index: 1;
 `;
 
 const HeaderInside = styled.div`

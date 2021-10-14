@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import styled, { keyframes } from 'styled-components';
 
-const Root = styled.div<{ notes: boolean }>`
+const Root = styled.div<{ notes: boolean; darkmode: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -10,6 +10,8 @@ const Root = styled.div<{ notes: boolean }>`
   border: none;
   width: ${(props) => (props.notes ? '100%' : '100vw')};
   min-height: ${(props) => (props.notes ? '100%' : '100vh')};
+  background: ${(props) =>
+    props.darkmode && !props.notes ? '#32363a' : 'inherit'};
 `;
 
 const dotFalling = keyframes`
@@ -101,7 +103,7 @@ interface Props {
 
 const Loading: FC<Props> = ({ notes }) => {
   return (
-    <Root notes={notes}>
+    <Root notes={notes} darkmode={localStorage.getItem('theme') === '1'}>
       <DotFalling />
     </Root>
   );
