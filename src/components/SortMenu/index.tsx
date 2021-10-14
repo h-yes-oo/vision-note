@@ -1,12 +1,13 @@
 import { FC } from 'react';
 import styled from 'styled-components';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 
-import { sortMode } from 'state';
+import { sortMode, theme } from 'state';
 import { SortMode } from 'types';
 
-import Edit from 'assets/icons/Edit.svg';
+import CheckDark from 'assets/icons/CheckDark.svg';
 import Check from 'assets/icons/Check.svg';
+import { lightTheme } from 'styles/theme';
 
 interface Props {
   show: boolean;
@@ -15,6 +16,7 @@ interface Props {
 
 const SortMenu: FC<Props> = ({ show, closeMenu }) => {
   const [sortBy, setSortBy] = useRecoilState(sortMode);
+  const currentTheme = useRecoilValue(theme);
 
   const changeSortMode = (mode: SortMode) => {
     setSortBy(mode);
@@ -27,7 +29,7 @@ const SortMenu: FC<Props> = ({ show, closeMenu }) => {
         <MenuList onClick={() => changeSortMode(SortMode.Alphabetically)}>
           <ContextImage
             visible={sortBy === SortMode.Alphabetically}
-            src={Check}
+            src={currentTheme === lightTheme ? Check : CheckDark}
           />
           이름 오름차순
         </MenuList>
@@ -36,16 +38,22 @@ const SortMenu: FC<Props> = ({ show, closeMenu }) => {
         >
           <ContextImage
             visible={sortBy === SortMode.ReverseAlphabetically}
-            src={Check}
+            src={currentTheme === lightTheme ? Check : CheckDark}
           />
           이름 내림차순
         </MenuList>
         <MenuList onClick={() => changeSortMode(SortMode.Newest)}>
-          <ContextImage visible={sortBy === SortMode.Newest} src={Check} />
+          <ContextImage
+            visible={sortBy === SortMode.Newest}
+            src={currentTheme === lightTheme ? Check : CheckDark}
+          />
           최근 만든 순
         </MenuList>
         <MenuList onClick={() => changeSortMode(SortMode.Oldest)}>
-          <ContextImage visible={sortBy === SortMode.Oldest} src={Check} />
+          <ContextImage
+            visible={sortBy === SortMode.Oldest}
+            src={currentTheme === lightTheme ? Check : CheckDark}
+          />
           가장 오래된 순
         </MenuList>
       </Menu>
@@ -57,7 +65,7 @@ const Menu = styled.div<{ show: boolean }>`
   width: 150rem;
   border-radius: 5rem;
   box-shadow: 3rem 5rem 16rem 0 rgba(0, 0, 0, 0.12);
-  background-color: #fff;
+  background-color: ${(props) => props.theme.color.contextBackground};
   padding: 13rem 0;
   z-index: 2;
 
@@ -78,7 +86,7 @@ const MenuList = styled.button`
   width: 150rem;
   height: 38rem;
   padding: 0rem;
-  background-color: #fff;
+  background-color: ${(props) => props.theme.color.contextBackground};
 
   font-family: Pretendard;
   font-size: 14rem;
@@ -88,13 +96,13 @@ const MenuList = styled.button`
   line-height: 1.21;
   letter-spacing: normal;
   text-align: left;
-  color: #000;
+  color: ${(props) => props.theme.color.noteText};
 
   display: flex;
   justify-content: flex-start;
   align-items: center;
   &:hover {
-    background-color: #f5f5f5;
+    background-color: ${(props) => props.theme.color.hover};
   }
 `;
 

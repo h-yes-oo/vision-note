@@ -1,4 +1,4 @@
-import React, { FC, useState, ReactNode, useEffect } from 'react';
+import { FC, useState, ReactNode, useEffect } from 'react';
 import styled from 'styled-components';
 
 import Note from 'assets/icons/Note.svg';
@@ -115,7 +115,7 @@ const Font = styled.div`
 const SearchBar = styled.input`
   padding: 30rem 30rem 30rem 82rem;
   border: none;
-  border-bottom: solid 1rem #e6e6e6;
+  border-bottom: solid 1rem ${(props) => props.theme.color.border};
   border-radius: 20rem 20rem 0 0;
   font-family: Pretendard;
   font-size: 24rem;
@@ -124,7 +124,8 @@ const SearchBar = styled.input`
   font-style: normal;
   letter-spacing: normal;
   text-align: left;
-  color: #656565;
+  color: ${(props) => props.theme.color.secondaryText};
+  background-color: ${(props) => props.theme.color.lightBackground};
 `;
 
 const SearchIcon = styled.img`
@@ -146,50 +147,50 @@ const Sort = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 0 30rem;
-  border-bottom: solid 1rem #e6e6e6;
+  border-bottom: solid 1rem ${(props) => props.theme.color.border};
 `;
 
 const Num = styled(Font)`
   font-size: 16rem;
-  color: #656565;
+  color: ${(props) => props.theme.color.semiText};
 `;
 
 const Span = styled.span`
   font-weight: 600;
-  color: #000;
+  color: ${(props) => props.theme.color.primaryText};
   user-select: none !important;
 `;
 
 const Result = styled.div`
   min-height: 123rem;
-  background-color: #fff;
+  background-color: ${(props) => props.theme.color.lightBackground};
   padding: 20rem 30rem 0;
-  border-bottom: solid 1rem #e6e6e6;
+  border-bottom: solid 1rem ${(props) => props.theme.color.border};
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
 
   &:hover {
-    background-color: #f9f9f9;
+    background-color: ${(props) => props.theme.color.hover};
   }
 `;
 
 const Title = styled(Font)`
   font-size: 16rem;
-  color: #000;
+  color: ${(props) => props.theme.color.primaryText};
   display: flex;
   align-items: center;
 `;
 
 const Folder = styled(Font)`
   font-size: 14rem;
-  color: #656565;
+  color: ${(props) => props.theme.color.tertiaryText};
   margin: 8rem 0 0 37rem;
 `;
 
 const Content = styled(Font)`
   font-size: 16rem;
-  color: #656565;
+  color: ${(props) => props.theme.color.semiText};
   margin: 16rem 0 0 37rem;
 `;
 

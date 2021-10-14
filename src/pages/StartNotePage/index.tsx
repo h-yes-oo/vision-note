@@ -3,7 +3,7 @@ import { withRouter, RouteComponentProps } from 'react-router-dom';
 import styled, { keyframes } from 'styled-components';
 import axios from 'axios';
 import { useRecoilValue } from 'recoil';
-import { authenticateToken } from 'state';
+import { authenticateToken, theme } from 'state';
 import { isChrome, isWindows } from 'functions';
 import { Subject } from 'types';
 
@@ -19,11 +19,17 @@ import ScienceFull from 'assets/icons/ScienceFull.svg';
 import ScienceEmpty from 'assets/icons/ScienceEmpty.svg';
 import GeneralFull from 'assets/icons/GeneralFull.svg';
 import GeneralEmpty from 'assets/icons/GeneralEmpty.svg';
+import KoreanEmptyDark from 'assets/icons/KoreanEmptyDark.svg';
+import MathEmptyDark from 'assets/icons/MathEmptyDark.svg';
+import SocialEmptyDark from 'assets/icons/SocialEmptyDark.svg';
+import ScienceEmptyDark from 'assets/icons/ScienceEmptyDark.svg';
+import GeneralEmptyDark from 'assets/icons/GeneralEmptyDark.svg';
 import MicGrey from 'assets/icons/MicGrey.svg';
 import MicWhite from 'assets/icons/MicWhite.svg';
 import UploadGrey from 'assets/icons/UploadGrey.svg';
 import UploadWhite from 'assets/icons/UploadWhite.svg';
-import FolderSample from 'assets/images/FolderSample2.svg';
+import GreyFolder from 'assets/icons/GreyFolder.svg';
+import { lightTheme } from 'styles/theme';
 
 const checkTime = (i: number): string => {
   return i < 10 ? `0${i}` : String(i);
@@ -54,12 +60,15 @@ const StartNotePage: FC<Props & RouteComponentProps> = ({ history }) => {
   const [title, setTitle] = useState<string>('');
   const [date, setDate] = useState<string>(getCurrentDate());
   const [course, setCourse] = useState<Subject | undefined>(undefined);
+  const [hover, setHover] = useState<Subject | undefined>(undefined);
   const [onRec, setOnRec] = useState<boolean>(false);
   const [onUpload, setOnUpload] = useState<boolean>(false);
   const [file, setFile] = useState<File | null>(null);
   const fileRef: React.RefObject<HTMLInputElement> =
     useRef<HTMLInputElement>(null);
   const authToken = useRecoilValue(authenticateToken);
+  const currentTheme = useRecoilValue(theme);
+  const [clicked, setClicked] = useState<boolean>(false);
   // TODO : change recorder and stream as recoil state values
   const [recorder, setRecorder] = useState<MediaRecorder>();
   const [stream, setStream] = useState<MediaStream>();
@@ -178,12 +187,38 @@ const StartNotePage: FC<Props & RouteComponentProps> = ({ history }) => {
     }
   };
 
+  const full = {};
+  full[Subject.Korean] = KoreanFull;
+  full[Subject.Math] = MathFull;
+  full[Subject.Social] = SocialFull;
+  full[Subject.Science] = ScienceFull;
+  full[Subject.General] = GeneralFull;
+  const light = {};
+  light[Subject.Korean] = KoreanEmpty;
+  light[Subject.Math] = MathEmpty;
+  light[Subject.Social] = SocialEmpty;
+  light[Subject.Science] = ScienceEmpty;
+  light[Subject.General] = GeneralEmpty;
+  const dark = {};
+  dark[Subject.Korean] = KoreanEmptyDark;
+  dark[Subject.Math] = MathEmptyDark;
+  dark[Subject.Social] = SocialEmptyDark;
+  dark[Subject.Science] = ScienceEmptyDark;
+  dark[Subject.General] = GeneralEmptyDark;
+
+  const getCourseSrc = (selected: Subject) => {
+    if (course === selected || hover === selected) return full[selected];
+    if (currentTheme === lightTheme) return light[selected];
+    return dark[selected];
+  };
+
   return (
     <BaseLayout grey={false}>
       <Root>
         <NoteInfo>
           <InfoTop>
-            <NoteFolder src={FolderSample} />
+            <NoteFolder src={GreyFolder} />
+            전체 폴더
           </InfoTop>
           <InfoMiddle>
             <NoteTitle
@@ -206,46 +241,64 @@ const StartNotePage: FC<Props & RouteComponentProps> = ({ history }) => {
               <Course>
                 <CourseBox
                   onClick={() => setCourse(Subject.Korean)}
-                  full={KoreanFull}
-                  empty={KoreanEmpty}
-                  selected={course === Subject.Korean}
-                />
+                  selected={
+                    course === Subject.Korean || hover === Subject.Korean
+                  }
+                  onMouseEnter={() => setHover(Subject.Korean)}
+                  onMouseLeave={() => setHover(undefined)}
+                >
+                  <CourseImage src={getCourseSrc(Subject.Korean)} />
+                </CourseBox>
                 <CourseName>국어</CourseName>
               </Course>
               <Course>
                 <CourseBox
                   onClick={() => setCourse(Subject.Math)}
-                  full={MathFull}
-                  empty={MathEmpty}
-                  selected={course === Subject.Math}
-                />
+                  selected={course === Subject.Math || hover === Subject.Math}
+                  onMouseEnter={() => setHover(Subject.Math)}
+                  onMouseLeave={() => setHover(undefined)}
+                >
+                  <CourseImage src={getCourseSrc(Subject.Math)} />
+                </CourseBox>
                 <CourseName>수학</CourseName>
               </Course>
               <Course>
                 <CourseBox
                   onClick={() => setCourse(Subject.Social)}
-                  full={SocialFull}
-                  empty={SocialEmpty}
-                  selected={course === Subject.Social}
-                />
+                  selected={
+                    course === Subject.Social || hover === Subject.Social
+                  }
+                  onMouseEnter={() => setHover(Subject.Social)}
+                  onMouseLeave={() => setHover(undefined)}
+                >
+                  <CourseImage src={getCourseSrc(Subject.Social)} />
+                </CourseBox>
                 <CourseName>사회</CourseName>
               </Course>
               <Course>
                 <CourseBox
                   onClick={() => setCourse(Subject.Science)}
-                  full={ScienceFull}
-                  empty={ScienceEmpty}
-                  selected={course === Subject.Science}
-                />
+                  selected={
+                    course === Subject.Science || hover === Subject.Science
+                  }
+                  onMouseEnter={() => setHover(Subject.Science)}
+                  onMouseLeave={() => setHover(undefined)}
+                >
+                  <CourseImage src={getCourseSrc(Subject.Science)} />
+                </CourseBox>
                 <CourseName>과학</CourseName>
               </Course>
               <Course>
                 <CourseBox
                   onClick={() => setCourse(Subject.General)}
-                  full={GeneralFull}
-                  empty={GeneralEmpty}
-                  selected={course === Subject.General}
-                />
+                  selected={
+                    course === Subject.General || hover === Subject.General
+                  }
+                  onMouseEnter={() => setHover(Subject.General)}
+                  onMouseLeave={() => setHover(undefined)}
+                >
+                  <CourseImage src={getCourseSrc(Subject.General)} />
+                </CourseBox>
                 <CourseName>일반</CourseName>
               </Course>
             </CourseWrapper>
@@ -255,7 +308,11 @@ const StartNotePage: FC<Props & RouteComponentProps> = ({ history }) => {
                 onMouseOut={() => setOnRec(false)}
                 onClick={onClickStart}
               >
-                <BtnImage src={onRec ? MicWhite : MicGrey} />
+                <BtnImage
+                  src={
+                    !onRec && currentTheme === lightTheme ? MicGrey : MicWhite
+                  }
+                />
                 녹음 시작하기
               </StartBtn>
               <StartBtn
@@ -269,7 +326,13 @@ const StartNotePage: FC<Props & RouteComponentProps> = ({ history }) => {
                   accept=".wav"
                   onChange={onFileChange}
                 />
-                <BtnImage src={onUpload ? UploadWhite : UploadGrey} />
+                <BtnImage
+                  src={
+                    !onUpload && currentTheme === lightTheme
+                      ? UploadGrey
+                      : UploadWhite
+                  }
+                />
                 녹음 파일 업로드 하기
               </StartBtn>
             </Fade>
@@ -290,8 +353,13 @@ const Root = styled.div`
 const NoteInfo = styled.div``;
 
 const InfoTop = styled.div`
+  font-family: Pretendard;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 16rem;
+  max-height: 20rem;
   display: flex;
-  justify-content: space-between;
+  color: ${(props) => props.theme.color.semiText};
 `;
 
 const InfoMiddle = styled.div`
@@ -314,8 +382,13 @@ const NoteTitle = styled.input`
   line-height: 1.2;
   letter-spacing: normal;
   text-align: left;
-  color: #000;
+  color: ${(props) => props.theme.color.secondaryText};
+  background: ${(props) => props.theme.color.background};
   border: none;
+
+  &::placeholder {
+    color: ${(props) => props.theme.color.secondaryText};
+  }
 `;
 
 const NoteDate = styled.div`
@@ -327,11 +400,12 @@ const NoteDate = styled.div`
   line-height: 1.19;
   letter-spacing: normal;
   text-align: left;
-  color: #656565;
+  color: ${(props) => props.theme.color.tertiaryText};
 `;
 
 const NoteFolder = styled.img`
   height: 20rem;
+  margin-right: 8rem;
 `;
 
 const NoteContents = styled.div``;
@@ -351,7 +425,7 @@ const Info = styled.div`
   line-height: 1.5;
   letter-spacing: normal;
   text-align: center;
-  color: #000;
+  color: ${(props) => props.theme.color.primaryText};
   margin: 97rem 0 39rem;
   white-space: pre-wrap;
 `;
@@ -369,25 +443,26 @@ const Course = styled.div`
   align-items: center;
 `;
 
-const CourseBox = styled.a<{ full: string; empty: string; selected: boolean }>`
+const CourseBox = styled.div<{ selected: boolean }>`
   width: 168rem;
   height: 168rem;
   border-radius: 8rem;
-  background-color: #fff;
+  background-color: ${(props) => props.theme.color.lightBackground};
   margin: 20rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-image: url(${(props) =>
-    props.selected ? props.full : props.empty});
+
   box-shadow: 0 0 16rem 0
     rgba(0, 0, 0, ${(props) => (props.selected ? '0.2' : '0.12')});
   &:hover {
-    background-image: url(${(props) => props.full});
     box-shadow: 0 0 16rem 0 rgba(0, 0, 0, 0.2);
   }
+`;
+
+const CourseImage = styled.img`
+  width: 76rem;
+  height: 76rem;
 `;
 
 const CourseName = styled.div`
@@ -399,7 +474,7 @@ const CourseName = styled.div`
   line-height: 1.2;
   letter-spacing: normal;
   text-align: center;
-  color: #000;
+  color: ${(props) => props.theme.color.secondaryText};
 `;
 
 const fadeIn = keyframes`
@@ -441,7 +516,7 @@ const StartBtn = styled.a`
   object-fit: contain;
   border-radius: 8rem;
   box-shadow: 0 3rem 16rem 0 rgba(0, 0, 0, 0.08);
-  background-color: #fff;
+  background-color: ${(props) => props.theme.color.lightBackground};
   font-family: Pretendard;
   font-size: 20rem;
   font-weight: 500;
@@ -450,7 +525,7 @@ const StartBtn = styled.a`
   line-height: 1.2;
   letter-spacing: normal;
   text-align: left;
-  color: #000;
+  color: ${(props) => props.theme.color.contrast};
   &:hover {
     color: #fff;
     box-shadow: 0 0 20rem 0 rgba(123, 104, 238, 0.6);

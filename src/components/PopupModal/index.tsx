@@ -1,5 +1,6 @@
 import React, { FC, ReactElement } from 'react';
 import styled from 'styled-components';
+import { lightTheme } from 'styles/theme';
 
 interface ModalProps {
   onClose: any;
@@ -39,7 +40,7 @@ const Root = styled.div<{ visible: boolean }>`
   border-radius: 20rem;
   object-fit: contain;
   box-shadow: 0 3rem 16rem 0 rgba(0, 0, 0, 0.16);
-  background-color: #fff;
+  background-color: ${(props) => props.theme.color.lightBackground};
   opacity: ${(props) => (props.visible ? '1' : '0')};
 
   position: fixed;
@@ -71,7 +72,7 @@ const ModalOverlay = styled.div<{ visible: boolean }>`
   bottom: 0;
   right: 0;
   background: #000000;
-  opacity: 0.16;
+  opacity: ${(props) => (props.theme === lightTheme ? '0.16' : '0.5')};
   z-index: 999;
 `;
 

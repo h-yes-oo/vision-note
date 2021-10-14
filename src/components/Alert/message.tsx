@@ -32,7 +32,7 @@ const Message = styled.div`
   line-height: 1.5;
   letter-spacing: normal;
   text-align: center;
-  color: #000;
+  color: ${(props) => props.theme.color.primaryText};
   padding: 20rem 19rem 39rem;
   white-space: break-spaces;
 `;

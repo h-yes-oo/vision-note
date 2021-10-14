@@ -1,5 +1,6 @@
 import React, { FC, ReactElement } from 'react';
 import styled from 'styled-components';
+import { lightTheme } from 'styles/theme';
 
 interface ModalProps {
   cancel: () => void;
@@ -52,12 +53,12 @@ const Button = styled.button`
 `;
 
 const WhiteButton = styled(Button)`
-  border: solid 1rem #c5c5c5;
-  color: #c5c5c5;
-  background-color: #fff;
+  border: solid 1rem ${(props) => props.theme.color.placeHolder};
+  color: ${(props) => props.theme.color.placeHolder};
+  background-color: ${(props) => props.theme.color.alertBackground};
   &:hover {
     cursor: pointer;
-    background-color: #f6f8fa;
+    background-color: ${(props) => props.theme.color.hover};
   }
 `;
 
@@ -80,7 +81,7 @@ const Root = styled.div<{ visible: boolean }>`
   width: 442rem;
   border-radius: 14rem;
   box-shadow: 0 3rem 16rem 0 rgba(0, 0, 0, 0.16);
-  background-color: #fff;
+  background-color: ${(props) => props.theme.color.alertBackground};
 
   padding: 20rem;
   box-sizing: border-box;
@@ -116,7 +117,7 @@ const ModalOverlay = styled.div<{ visible: boolean }>`
   bottom: 0;
   right: 0;
   background: #000000;
-  opacity: 0.16;
+  opacity: ${(props) => (props.theme === lightTheme ? '0.16' : '0.5')};
   z-index: 1999;
 `;
 

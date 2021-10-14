@@ -1,14 +1,15 @@
 import { FC, useState } from 'react';
 import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
-import { useSetRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 
 import DarkMode from 'assets/icons/DarkMode.svg';
 import Logout from 'assets/icons/Logout.svg';
 import UserEdit from 'assets/icons/UserEdit.svg';
 
-import { authenticateToken } from 'state';
+import { authenticateToken, theme } from 'state';
 import UserModal from 'components/PopupModal/user';
+import { darkTheme, lightTheme } from 'styles/theme';
 
 interface Props {
   show: boolean;
@@ -22,15 +23,21 @@ const UserMenu: FC<Props & RouteComponentProps> = ({
 }) => {
   const [userModal, setUserModal] = useState<boolean>(false);
   const setAuthToken = useSetRecoilState(authenticateToken);
+  const [currentTheme, setTheme] = useRecoilState(theme);
 
   const closeModal = () => {
     setUserModal(false);
   };
 
   const darkmode = () => {
-    alert(
-      '아직 지원하지 않는 기능입니다. 빠른 시일 내에 제공하고자 노력하겠습니다.'
-    );
+    if (currentTheme === lightTheme) {
+      localStorage.setItem('theme', '1');
+      setTheme(darkTheme);
+    } else {
+      localStorage.setItem('theme', '0');
+      setTheme(lightTheme);
+    }
+    setShow(false);
   };
 
   const logout = () => {
@@ -50,7 +57,7 @@ const UserMenu: FC<Props & RouteComponentProps> = ({
       <Menu show={show}>
         <MenuList onClick={darkmode}>
           <ContextImage src={DarkMode} />
-          다크모드
+          {currentTheme === lightTheme ? '다크모드' : '다크모드 해제'}
         </MenuList>
         <MenuList onClick={logout}>
           <ContextImage src={Logout} />
@@ -68,7 +75,7 @@ const Menu = styled.div<{ show: boolean }>`
   width: 150rem;
   border-radius: 5rem;
   box-shadow: 3rem 5rem 16rem 0 rgba(0, 0, 0, 0.12);
-  background-color: #fff;
+  background-color: ${(props) => props.theme.color.contextBackground};
   padding: 13rem 0;
 
   height: auto;
@@ -89,7 +96,7 @@ const MenuList = styled.button`
   width: 150rem;
   height: 38rem;
   padding: 0rem;
-  background-color: #fff;
+  background-color: ${(props) => props.theme.color.contextBackground};
 
   font-family: Pretendard;
   font-size: 14rem;
@@ -99,13 +106,13 @@ const MenuList = styled.button`
   line-height: 1.21;
   letter-spacing: normal;
   text-align: left;
-  color: #000;
+  color: ${(props) => props.theme.color.noteText};
 
   display: flex;
   justify-content: flex-start;
   align-items: center;
   &:hover {
-    background-color: #f5f5f5;
+    background-color: ${(props) => props.theme.color.hover};
   }
 `;
 

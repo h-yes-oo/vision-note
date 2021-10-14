@@ -3,14 +3,17 @@ import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import { isMobile } from 'functions';
+import { darkTheme, lightTheme } from 'styles/theme';
 
 import SampleLogo from 'assets/icons/SampleLogo15.png';
+import LogoLight from 'assets/icons/LogoLight.png';
+import LogoDark from 'assets/icons/LogoDark.png';
 import SearchIcon from 'assets/icons/SearchIcon.svg';
 import ProfileImage from 'assets/images/SampleProfile.svg';
 import ProfileToggleDown from 'assets/icons/ProfileToggleDown.svg';
 import ProfileToggleUp from 'assets/icons/ProfileToggleUp.svg';
 
-import { userName } from 'state';
+import { userName, theme } from 'state';
 import UserMenu from 'components/UserMenu';
 import PopupModal from 'components/PopupModal';
 import SearchModal from 'components/PopupModal/search';
@@ -29,6 +32,7 @@ const BaseLayout: FC<Props & RouteComponentProps> = ({
   const [showSearch, setShowSearch] = useState<boolean>(false);
   const [searchKeyword, setSearchKeyword] = useState<string>('');
   const userNickname = useRecoilValue(userName);
+  const currentTheme = useRecoilValue(theme);
 
   const search = () => {
     setShowSearch(true);
@@ -57,7 +61,7 @@ const BaseLayout: FC<Props & RouteComponentProps> = ({
       </PopupModal>
       <Header>
         <HeaderInside>
-          <Logo src={SampleLogo} onClick={() => history.push('/')} />
+          <Logo onClick={() => history.push('/')} />
           <FlexDiv>
             <SearchWrapper>
               <SearchBox
@@ -93,7 +97,10 @@ const BaseLayout: FC<Props & RouteComponentProps> = ({
 };
 
 const Root = styled.div<{ grey: boolean }>`
-  background-color: ${(props) => (props.grey ? '#f9f9f9' : '')};
+  background-color: ${(props) => {
+    if (props.theme === darkTheme) return '#2f3437';
+    return props.grey ? '#f9f9f9' : '';
+  }};
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -109,7 +116,7 @@ const Header = styled.div`
   padding-top: 15rem;
   object-fit: contain;
   box-shadow: 0 3rem 6rem 0 rgba(0, 0, 0, 0.08);
-  background-color: #fff;
+  background-color: ${(props) => props.theme.color.background};
   display: flex;
   justify-content: center;
 `;
@@ -121,10 +128,13 @@ const HeaderInside = styled.div`
   align-items: center;
 `;
 
-const Logo = styled.img`
-  width: 240rem;
-  height: 90rem;
-  object-fit: contain;
+const Logo = styled.a`
+  width: 210rem;
+  height: 100rem;
+  background-size: 300rem;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-image: url(${(props) => props.theme.logo});
   &:hover {
     cursor: pointer;
   }
@@ -146,8 +156,9 @@ const SearchBox = styled.input`
   box-sizing: border-box;
   object-fit: contain;
   border-radius: 5rem;
-  border: solid 1rem #e6e6e6;
-  background-color: #fff;
+  border: solid 1rem ${(props) => props.theme.color.lightBorder};
+  background-color: ${(props) => props.theme.color.background};
+  color: ${(props) => props.theme.color.primaryText};
 
   font-family: Pretendard;
   font-size: 18rem;
@@ -158,8 +169,8 @@ const SearchBox = styled.input`
   letter-spacing: normal;
   text-align: left;
 
-  &:placeholder {
-    color: #c5c5c5;
+  &::placeholder {
+    color: ${(props) => props.theme.color.placeHolder};
   }
 `;
 
@@ -221,7 +232,7 @@ const ProfileName = styled.div`
   line-height: 1.22;
   letter-spacing: normal;
   text-align: left;
-  color: #676767;
+  color: ${(props) => props.theme.color.secondaryText}; ;
 `;
 
 const ProfileToggle = styled.img`

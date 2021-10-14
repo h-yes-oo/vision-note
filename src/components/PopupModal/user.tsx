@@ -4,15 +4,18 @@ import { withRouter, RouteComponentProps } from 'react-router-dom';
 import { useRecoilValue, useRecoilState } from 'recoil';
 import axios from 'axios';
 
-import { userInfo, authenticateToken } from 'state';
+import { userInfo, authenticateToken, theme } from 'state';
 import LoadingDots from 'components/LoadingDots';
 import Alert from 'components/Alert';
 import AlertWithMessage from 'components/Alert/message';
+import { lightTheme } from 'styles/theme';
 
 import Edit from 'assets/icons/Edit.svg';
 import EditPurple from 'assets/icons/EditPurple.svg';
 import EditType from 'assets/icons/EditType.svg';
 import EditTypeUp from 'assets/icons/EditTypeUp.svg';
+import ToggleUpDark from 'assets/icons/ToggleUpDark.svg';
+import ToggleDownDark from 'assets/icons/ToggleDownDark.svg';
 import UserEdit from 'assets/icons/UserEdit.svg';
 import SampleProfile from 'assets/images/SampleProfile.svg';
 import ProfileChange from 'assets/icons/ProfileChange.svg';
@@ -50,6 +53,7 @@ const UserModal: FC<Props & RouteComponentProps> = ({
   // Alert states
   const [showSignOutAlert, setShowSignOutAlert] = useState<boolean>(false);
   const [showPasswordAlert, setShowPasswordAlert] = useState<boolean>(false);
+  const currentTheme = useRecoilValue(theme);
 
   const logout = () => {
     localStorage.removeItem('user');
@@ -154,6 +158,11 @@ const UserModal: FC<Props & RouteComponentProps> = ({
     } else setShowPasswordAlert(false);
   };
 
+  const getToggleSrc = () => {
+    if (currentTheme === lightTheme) return editType ? EditTypeUp : EditType;
+    return editType ? ToggleUpDark : ToggleDownDark;
+  };
+
   const ModalInner = (
     <>
       <Top>
@@ -207,7 +216,7 @@ const UserModal: FC<Props & RouteComponentProps> = ({
               </Menu>
             </Relative>
             <EditButton
-              src={editType ? EditTypeUp : EditType}
+              src={getToggleSrc()}
               onClick={() => setEditType(!editType)}
             />
           </FlexCenter>
@@ -223,9 +232,9 @@ const UserModal: FC<Props & RouteComponentProps> = ({
             <Title>저장용량</Title>
             <FlexColumn>
               <StatusBar>
-                <CurrentStatus current={user.storage ?? 0 / 15} />
+                <CurrentStatus current={user ? 6 / 15 : 0 / 15} />
               </StatusBar>
-              <StorageInfo>{`15GB 중 ${user.storage ?? 0}GB 사용`}</StorageInfo>
+              <StorageInfo>{`15GB 중 ${user ? 6 : 0}GB 사용`}</StorageInfo>
             </FlexColumn>
           </FlexCenter>
         </Wrapper>
@@ -286,8 +295,9 @@ const Form = styled.input`
   margin-bottom: 20rem;
   object-fit: contain;
   border-radius: 5rem;
-  border: solid 1rem #e6e6e6;
-  background-color: #fff;
+  border: solid 1rem ${(props) => props.theme.color.lightBorder};
+  background-color: ${(props) => props.theme.color.lightBackground};
+  color: ${(props) => props.theme.color.primaryText};
 
   font-family: Pretendard;
   font-size: 18rem;
@@ -299,7 +309,7 @@ const Form = styled.input`
   text-align: left;
 
   &::placeholder {
-    color: #c5c5c5;
+    color: ${(props) => props.theme.color.placeHolder};
   }
 `;
 
@@ -350,7 +360,7 @@ const Title = styled.div`
   line-height: 1.22;
   letter-spacing: normal;
   text-align: left;
-  color: #000;
+  color: ${(props) => props.theme.color.secondaryText};
 `;
 
 const EditButton = styled.img`
@@ -374,11 +384,18 @@ const Content = styled.input`
   line-height: 1.21;
   letter-spacing: normal;
   text-align: left;
-  color: #656565;
+  color: ${(props) => props.theme.color.tertiaryText};
   border: none;
   border-bottom: solid 1rem #e6e6e6;
   outline: none;
-  background: white;
+  background-color: ${(props) => props.theme.color.lightBackground};
+
+  &:disabled {
+    color: ${(props) => props.theme.color.tertiaryText};
+  }
+  &::placeholder {
+    color: ${(props) => props.theme.color.tertiaryText};
+  }
 `;
 
 const TypeContent = styled.a`
@@ -392,20 +409,20 @@ const TypeContent = styled.a`
   line-height: 1.21;
   letter-spacing: normal;
   text-align: left;
-  color: #656565;
+  color: ${(props) => props.theme.color.tertiaryText};
   border: none;
 `;
 
 const TypeOption = styled(TypeContent)`
   display: flex;
   align-items: center;
-  background: white;
+  background-color: ${(props) => props.theme.color.background};
   padding-left: 10rem;
   box-sizing: border-box;
   height: 40rem;
   z-index: 1001;
   &:hover {
-    background: #f5f5f5;
+    background: ${(props) => props.theme.color.hover};
   }
 `;
 
@@ -421,7 +438,7 @@ const Menu = styled.div<{ show: boolean }>`
 
   display: flex;
   flex-direction: column;
-  background-color: #fff;
+  background-color: ${(props) => props.theme.color.background};
 
   height: auto;
   margin: 0;
@@ -470,12 +487,12 @@ const Button = styled.button`
 `;
 
 const WhiteButton = styled(Button)`
-  border: solid 1rem #c5c5c5;
-  color: #c5c5c5;
-  background-color: #fff;
+  border: solid 1rem ${(props) => props.theme.color.placeHolder};
+  color: ${(props) => props.theme.color.placeHolder};
+  background-color: ${(props) => props.theme.color.lightBackground};
   &:hover {
     cursor: pointer;
-    background-color: #f6f8fa;
+    background-color: ${(props) => props.theme.color.hover};
   }
 `;
 
@@ -499,6 +516,7 @@ const ChangeProfile = styled.a`
   background-image: url(${ProfileChange});
   width: 49rem;
   height: 49rem;
+  background-size: contain;
   position: absolute;
   right: 0;
   bottom: 0;
@@ -511,7 +529,7 @@ const StatusBar = styled.div`
   width: 440rem;
   height: 8rem;
   border-radius: 5rem;
-  background-color: #e6e6e6;
+  background-color: ${(props) => props.theme.color.border};
   position: relative;
 `;
 
@@ -531,7 +549,7 @@ const StorageInfo = styled.div`
   line-height: 1.21;
   letter-spacing: normal;
   text-align: left;
-  color: #656565;
+  color: ${(props) => props.theme.color.tertiaryText};
   margin-top: 10rem;
 `;
 

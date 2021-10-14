@@ -96,7 +96,7 @@ const NoteData: FC<Props & RouteComponentProps> = ({
         afterStar={refreshNotes}
       />
       <DataRow
-        selected={selectedIds.includes(noteId)}
+        selected={showContextMenu || selectedIds.includes(noteId)}
         onClick={selecting ? toggleSelected : moveToNote}
         onContextMenu={handleContextMenu}
         draggable
@@ -106,7 +106,7 @@ const NoteData: FC<Props & RouteComponentProps> = ({
           <TitleImage depth={depth} src={Note} />
           <TitleName> {title} </TitleName>
         </TitleData>
-        <StarData>{starred && <Image24 src={Star} />}</StarData>
+        <StarData>{starred && <StarImage src={Star} />}</StarData>
         <DateData>{date}</DateData>
         <SubjectData>{subject}</SubjectData>
       </DataRow>
@@ -116,17 +116,18 @@ const NoteData: FC<Props & RouteComponentProps> = ({
 
 const DataRow = styled.div<{ selected: boolean }>`
   min-height: 65rem;
-  border-bottom: #e6e6e6 1rem solid;
+  border-bottom: ${(props) => props.theme.color.border} 1rem solid;
   padding: 0 30rem;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  ${(props) => (props.selected ? 'background-color : #f6f6f6;' : '')}
+  background-color: ${(props) =>
+    props.selected ? props.theme.color.hover : ''};
 
   &:hover {
-    background-color: #f6f6f6;
+    background-color: ${(props) => props.theme.color.hover};
   }
 `;
 
@@ -139,7 +140,7 @@ const TableData = styled.div`
   line-height: 1.19;
   letter-spacing: normal;
   text-align: left;
-  color: #000;
+  color: ${(props) => props.theme.color.primaryText};
 
   user-select: none !important;
 
@@ -175,13 +176,14 @@ const SubjectData = styled(TableData)`
   width: 28rem;
 `;
 
-const Image24 = styled.img`
-  width: 24rem;
-
+const StarImage = styled.img`
+  width: 28rem;
   user-select: none !important;
 `;
 
-const TitleImage = styled(Image24)<{ depth: number }>`
+const TitleImage = styled.img<{ depth: number }>`
+  width: 24rem;
+  user-select: none !important;
   margin-right: 11rem;
   margin-left: ${(props) => `${props.depth * 20}rem`};
 `;

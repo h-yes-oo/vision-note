@@ -1,6 +1,8 @@
 import { atom, selector } from 'recoil';
 import axios from 'axios';
 import { NotesMode, SortMode } from 'types';
+import { lightTheme, darkTheme } from 'styles/theme';
+import { DefaultTheme } from 'styled-components';
 
 const getToken = () => {
   try {
@@ -74,4 +76,19 @@ export const selectedRefresh = atom<(() => void)[]>({
 export const sortMode = atom<SortMode>({
   key: 'sortMode',
   default: SortMode.Alphabetically,
+});
+
+export const getTheme = (): DefaultTheme => {
+  const storedTheme = localStorage.getItem('theme');
+
+  if (storedTheme === '1') {
+    return darkTheme;
+  }
+  // localStorage에 있는 값이 DARK가 아니라면, 모든 경우에도 LIGHT를 return 합니다.
+  return lightTheme;
+};
+
+export const theme = atom<DefaultTheme>({
+  key: 'theme',
+  default: getTheme(),
 });

@@ -4,7 +4,8 @@ import { withRouter, RouteComponentProps } from 'react-router-dom';
 import axios from 'axios';
 import { useRecoilValue } from 'recoil';
 
-import { authenticateToken } from 'state';
+import { authenticateToken, theme } from 'state';
+import { lightTheme } from 'styles/theme';
 import BaseLayout from 'components/BaseLayout';
 import Paragraph from 'components/Paragraph';
 import NoteMenu from 'components/NoteMenu';
@@ -15,10 +16,16 @@ import BlueFolder from 'assets/icons/BlueFolder.svg';
 import FolderArrow from 'assets/icons/FolderArrow.svg';
 import LookCloser from 'assets/icons/LookCloser.svg';
 import More from 'assets/icons/More.svg';
+import LookCloserDark from 'assets/icons/LookCloserDark.svg';
+import MoreDark from 'assets/icons/MoreDark.svg';
 import Recording from 'assets/icons/Recording.svg';
 import Mic from 'assets/icons/Mic.svg';
+import RecordingDark from 'assets/icons/RecordingDark.svg';
+import MicDark from 'assets/icons/MicDark.svg';
 import ToggleUp from 'assets/icons/RecordingToggleUp.svg';
 import ToggleDown from 'assets/icons/RecordingToggleDown.svg';
+import ToggleUpDark from 'assets/icons/ToggleUpDark.svg';
+import ToggleDownDark from 'assets/icons/ToggleDownDark.svg';
 import Loading from 'components/Loading';
 
 interface Props {}
@@ -60,6 +67,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
   const [content, setContent] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
   const [starred, setStarred] = useState<boolean>(false);
+  const currentTheme = useRecoilValue(theme);
 
   const contents = [
     '노트 생성은 아직 준비중입니다\n',
@@ -273,6 +281,16 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
     }
   };
 
+  const getRecordingSrc = () => {
+    if (currentTheme === lightTheme) return recording ? Recording : Mic;
+    return recording ? RecordingDark : MicDark;
+  };
+
+  const getToggleSrc = () => {
+    if (currentTheme === lightTheme) return showRecord ? ToggleUp : ToggleDown;
+    return showRecord ? ToggleUpDark : ToggleDownDark;
+  };
+
   return (
     <BaseLayout grey={false}>
       {loading ? (
@@ -283,12 +301,18 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
             <InfoTop>
               {folderElement}
               <ButtonWrapper>
-                <SearchBtn src={LookCloser} />
+                <SearchBtn
+                  src={
+                    currentTheme === lightTheme ? LookCloser : LookCloserDark
+                  }
+                />
                 <Relative
                   onMouseEnter={handleMouseEnter}
                   onMouseLeave={() => setShowContextMenu(false)}
                 >
-                  <MoreBtn src={More} />
+                  <MoreBtn
+                    src={currentTheme === lightTheme ? More : MoreDark}
+                  />
                   <NoteMenu
                     noteId={Number(noteId)}
                     starred={starred}
@@ -323,14 +347,14 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
                     setRecording(!recording);
                   }}
                 >
-                  <RecordingBtn src={recording ? Recording : Mic} />
+                  <RecordingBtn src={getRecordingSrc()} />
                   {recording ? '녹음중' : '녹음하기'}
                 </RecordingStatus>
                 {recording ? (
                   <></>
                 ) : (
                   <ToggleBtn
-                    src={showRecord ? ToggleUp : ToggleDown}
+                    src={getToggleSrc()}
                     onClick={() => setShowRecord(!showRecord)}
                   />
                 )}
@@ -396,7 +420,7 @@ const FolderName = styled.div`
   font-size: 16rem;
   max-height: 20rem;
   display: flex;
-  color: #656565;
+  color: ${(props) => props.theme.color.semiText};
 `;
 
 const NoteInfo = styled.div``;
@@ -427,7 +451,7 @@ const NoteTitle = styled.div<{ visible: boolean }>`
   line-height: 1.2;
   letter-spacing: normal;
   text-align: left;
-  color: #000;
+  color: ${(props) => props.theme.color.primaryText};
   border: none;
 `;
 
@@ -441,7 +465,8 @@ const EditNoteTitle = styled.input<{ visible: boolean }>`
   line-height: 1.2;
   letter-spacing: normal;
   text-align: left;
-  color: #000;
+  color: ${(props) => props.theme.color.primaryText};
+  background: ${(props) => props.theme.color.background};
   border: 2rem solid #06cc80;
   z-index: 1000;
 `;
@@ -455,7 +480,7 @@ const NoteDate = styled.div`
   line-height: 1.19;
   letter-spacing: normal;
   text-align: left;
-  color: #656565;
+  color: ${(props) => props.theme.color.tertiaryText};
 `;
 
 const NoteFolder = styled.img`
@@ -507,7 +532,7 @@ const RecordingStatus = styled.a`
   line-height: 1.19;
   letter-spacing: normal;
   text-align: left;
-  color: #000;
+  color: ${(props) => props.theme.color.primaryText};
   display: flex;
   align-items: center;
   &:hover {
@@ -524,7 +549,7 @@ const MemoBtn = styled.a`
   line-height: 1.19;
   letter-spacing: normal;
   text-align: left;
-  color: #000;
+  color: ${(props) => props.theme.color.primaryText};
   margin-left: 40rem;
   &:hover {
     cursor: pointer;

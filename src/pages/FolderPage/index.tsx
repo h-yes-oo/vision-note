@@ -17,21 +17,29 @@ import {
   dragRefresh,
   selectedRefresh,
   sortMode,
+  theme,
 } from 'state';
-import { checkTime } from 'functions';
 
 import Check from 'assets/icons/Check.svg';
 import SortToggleDown from 'assets/icons/SortToggleDown.svg';
 import SortToggleUp from 'assets/icons/SortToggleUp.svg';
+import ToggleUpDark from 'assets/icons/ToggleUpDark.svg';
+import ToggleDownDark from 'assets/icons/ToggleDownDark.svg';
 import NewFolder from 'assets/icons/NewFolder.svg';
 import Star from 'assets/icons/Star.svg';
 import EmptyTrashCan from 'assets/icons/EmptyTrashCan.svg';
 import TrashCan from 'assets/icons/TrashCan.svg';
 import Download from 'assets/icons/Download.svg';
 import GreyStar from 'assets/icons/GreyStar.svg';
+import GreyStarDark from 'assets/icons/GreyStarDark.svg';
+import NewFolderDark from 'assets/icons/NewFolderDark.svg';
+import TrashCanDark from 'assets/icons/TrashCanDark.svg';
+import DownloadDark from 'assets/icons/DownloadDark.svg';
+import CheckDark from 'assets/icons/CheckDark.svg';
 import GreyTrashCan from 'assets/icons/GreyTrashCan.svg';
 import Folder40 from 'assets/icons/Folder40.svg';
 import Clock from 'assets/icons/Clock.svg';
+import { lightTheme } from 'styles/theme';
 
 interface Props {}
 
@@ -53,6 +61,7 @@ const FolderPage: FC<Props> = () => {
   const refreshDrag = useRecoilValue<() => void>(dragRefresh);
   // about delete alert
   const [showAlert, setShowAlert] = useState<boolean>(false);
+  const currentTheme = useRecoilValue(theme);
 
   const sortFolder = (a, b) => {
     // 한글 오름차순
@@ -374,13 +383,19 @@ const FolderPage: FC<Props> = () => {
     [setShowSortMenu]
   );
 
+  const getSortSrc = () => {
+    if (currentTheme === lightTheme)
+      return showSortMenu ? SortToggleUp : SortToggleDown;
+    return showSortMenu ? ToggleUpDark : ToggleDownDark;
+  };
+
   const SortElement = (
     <Button
       onMouseEnter={handleMouseEnter}
       onMouseLeave={() => setShowSortMenu(false)}
     >
       <Sort>정렬 기준</Sort>
-      <ButtonImage src={showSortMenu ? SortToggleUp : SortToggleDown} />
+      <ButtonImage src={getSortSrc()} />
       <SortMenu show={showSortMenu} closeMenu={() => setShowSortMenu(false)} />
     </Button>
   );
@@ -391,7 +406,9 @@ const FolderPage: FC<Props> = () => {
       return (
         <ButtonWrapper>
           <Button onClick={startSelectMode}>
-            <ButtonImage src={Check} />
+            <ButtonImage
+              src={currentTheme === lightTheme ? Check : CheckDark}
+            />
             <ButtonName>파일 선택하기</ButtonName>
           </Button>
           {SortElement}
@@ -402,15 +419,21 @@ const FolderPage: FC<Props> = () => {
       return (
         <ButtonWrapper>
           <Button onClick={downloadAll}>
-            <FolderImage src={Download} />
+            <FolderImage
+              src={currentTheme === lightTheme ? Download : DownloadDark}
+            />
             <ButtonName>노트 다운로드</ButtonName>
           </Button>
           <Button onClick={onClickDeleteAll}>
-            <FolderImage src={GreyTrashCan} />
+            <FolderImage
+              src={currentTheme === lightTheme ? GreyTrashCan : TrashCanDark}
+            />
             <ButtonName>노트 삭제</ButtonName>
           </Button>
           <Button onClick={stopSelectMode}>
-            <ButtonImage src={Check} />
+            <ButtonImage
+              src={currentTheme === lightTheme ? Check : CheckDark}
+            />
             <ButtonName>선택모드 해제</ButtonName>
           </Button>
         </ButtonWrapper>
@@ -420,7 +443,9 @@ const FolderPage: FC<Props> = () => {
       return (
         <ButtonWrapper>
           <Button onClick={startSelectMode}>
-            <ButtonImage src={Check} />
+            <ButtonImage
+              src={currentTheme === lightTheme ? Check : CheckDark}
+            />
             <ButtonName>파일 선택하기</ButtonName>
           </Button>
           <Button onClick={() => console.log('휴지통 비우기')}>
@@ -439,7 +464,9 @@ const FolderPage: FC<Props> = () => {
             <ButtonName>선택 파일 영구 삭제</ButtonName>
           </Button>
           <Button onClick={stopSelectMode}>
-            <ButtonImage src={Check} />
+            <ButtonImage
+              src={currentTheme === lightTheme ? Check : CheckDark}
+            />
             <ButtonName>선택모드 해제</ButtonName>
           </Button>
         </ButtonWrapper>
@@ -449,19 +476,27 @@ const FolderPage: FC<Props> = () => {
       return (
         <ButtonWrapper>
           <Button onClick={downloadAll}>
-            <FolderImage src={Download} />
+            <FolderImage
+              src={currentTheme === lightTheme ? Download : DownloadDark}
+            />
             <ButtonName>노트 다운로드</ButtonName>
           </Button>
           <Button onClick={starAll}>
-            <FolderImage src={GreyStar} />
+            <FolderImage
+              src={currentTheme === lightTheme ? GreyStar : GreyStarDark}
+            />
             <ButtonName>중요 표시</ButtonName>
           </Button>
           <Button onClick={onClickDeleteAll}>
-            <FolderImage src={GreyTrashCan} />
+            <FolderImage
+              src={currentTheme === lightTheme ? GreyTrashCan : TrashCanDark}
+            />
             <ButtonName>노트 삭제</ButtonName>
           </Button>
           <Button onClick={stopSelectMode}>
-            <ButtonImage src={Check} />
+            <ButtonImage
+              src={currentTheme === lightTheme ? Check : CheckDark}
+            />
             <ButtonName>선택모드 해제</ButtonName>
           </Button>
         </ButtonWrapper>
@@ -471,7 +506,9 @@ const FolderPage: FC<Props> = () => {
       return (
         <ButtonWrapper>
           <Button onClick={startSelectMode}>
-            <ButtonImage src={Check} />
+            <ButtonImage
+              src={currentTheme === lightTheme ? Check : CheckDark}
+            />
             <ButtonName>파일 선택하기</ButtonName>
           </Button>
         </ButtonWrapper>
@@ -481,19 +518,27 @@ const FolderPage: FC<Props> = () => {
       return (
         <ButtonWrapper>
           <Button onClick={downloadAll}>
-            <FolderImage src={Download} />
+            <FolderImage
+              src={currentTheme === lightTheme ? Download : DownloadDark}
+            />
             <ButtonName>노트 다운로드</ButtonName>
           </Button>
           <Button onClick={starAll}>
-            <FolderImage src={GreyStar} />
+            <FolderImage
+              src={currentTheme === lightTheme ? GreyStar : GreyStarDark}
+            />
             <ButtonName>중요 표시</ButtonName>
           </Button>
           <Button onClick={onClickDeleteAll}>
-            <FolderImage src={GreyTrashCan} />
+            <FolderImage
+              src={currentTheme === lightTheme ? GreyTrashCan : TrashCanDark}
+            />
             <ButtonName>노트 삭제</ButtonName>
           </Button>
           <Button onClick={stopSelectMode}>
-            <ButtonImage src={Check} />
+            <ButtonImage
+              src={currentTheme === lightTheme ? Check : CheckDark}
+            />
             <ButtonName>선택모드 해제</ButtonName>
           </Button>
         </ButtonWrapper>
@@ -502,11 +547,13 @@ const FolderPage: FC<Props> = () => {
     return (
       <ButtonWrapper>
         <Button onClick={onClickNewFolder}>
-          <FolderImage src={NewFolder} />
+          <FolderImage
+            src={currentTheme === lightTheme ? NewFolder : NewFolderDark}
+          />
           <ButtonName>새폴더</ButtonName>
         </Button>
         <Button onClick={startSelectMode}>
-          <ButtonImage src={Check} />
+          <ButtonImage src={currentTheme === lightTheme ? Check : CheckDark} />
           <ButtonName>파일 선택하기</ButtonName>
         </Button>
         {SortElement}
@@ -650,7 +697,7 @@ const Top = styled.div`
   line-height: 1.21;
   letter-spacing: normal;
   text-align: left;
-  color: #000;
+  color: ${(props) => props.theme.color.primaryText};
 `;
 
 const ButtonWrapper = styled.div`
@@ -662,8 +709,7 @@ const HoverAnchor = styled.a`
   border-radius: 5rem;
   &:hover {
     cursor: pointer;
-    background-color: #f1f3f4;
-    font-weight: bold;
+    background-color: ${(props) => props.theme.color.hover};
   }
 `;
 
@@ -684,7 +730,7 @@ const ButtonName = styled.div`
   line-height: 1.19;
   letter-spacing: normal;
   text-align: left;
-  color: #000;
+  color: ${(props) => props.theme.color.primaryText};
   margin-left: 8rem;
 `;
 
@@ -697,7 +743,7 @@ const Sort = styled.div`
   line-height: 1.19;
   letter-spacing: normal;
   text-align: left;
-  color: #000;
+  color: ${(props) => props.theme.color.primaryText};
   margin-right: 8rem;
 `;
 
@@ -716,7 +762,7 @@ const Box = styled.div`
   height: 719rem;
   object-fit: contain;
   box-shadow: 0 3rem 16rem 0 rgba(0, 0, 0, 0.08);
-  background-color: #fff;
+  background-color: ${(props) => props.theme.color.lightBackground};
   display: flex;
   flex-direction: column;
   border-radius: 15rem;
@@ -727,7 +773,7 @@ const Box = styled.div`
 
 const TableRow = styled.div`
   height: 48rem;
-  border-bottom: #e6e6e6 1rem solid;
+  border-bottom: ${(props) => props.theme.color.border} 1rem solid;
   padding: 0 30rem;
 
   display: flex;
@@ -748,7 +794,7 @@ const TableHeader = styled.div`
   line-height: 1.21;
   letter-spacing: normal;
   text-align: left;
-  color: #000;
+  color: ${(props) => props.theme.color.primaryText};
   user-select: none !important;
 
   display: flex;
@@ -785,7 +831,7 @@ const SmallBox = styled(HoverAnchor)`
   object-fit: contain;
   border-radius: 8rem;
   box-shadow: 0 3rem 16rem 0 rgba(0, 0, 0, 0.08);
-  background-color: #fff;
+  background-color: ${(props) => props.theme.color.lightBackground};
   display: flex;
   justify-content: center;
   align-items: center;
@@ -800,7 +846,7 @@ const BoxTitle = styled.div`
   line-height: 1.2;
   letter-spacing: normal;
   text-align: left;
-  color: #000;
+  color: ${(props) => props.theme.color.primaryText};
   margin-left: -20rem;
   display: flex;
   align-items: center;

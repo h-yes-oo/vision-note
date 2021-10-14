@@ -330,7 +330,7 @@ const FolderData: FC<Props> = ({
         onDrop={onDrop}
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
-        dragOver={dragOver}
+        dragOver={dragOver || contextMode}
         draggable
         onDragStart={onDragStart}
       >
@@ -371,16 +371,17 @@ const NoteWrapper = styled.div<{ visible: boolean }>`
 
 const DataRow = styled.div<{ dragOver: boolean }>`
   min-height: 65rem;
-  border-bottom: #e6e6e6 1rem solid;
+  border-bottom: ${(props) => props.theme.color.border} 1rem solid;
   padding: 0 30rem;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
-  ${(props) => (props.dragOver ? 'background-color: #f6f6f6;' : '')}
+  background-color: ${(props) =>
+    props.dragOver ? props.theme.color.hover : ''};
 
   &:hover {
-    background-color: #f6f6f6;
+    background-color: ${(props) => props.theme.color.hover};
   }
 `;
 
@@ -393,7 +394,7 @@ const TableData = styled.div`
   line-height: 1.19;
   letter-spacing: normal;
   text-align: left;
-  color: #000;
+  color: ${(props) => props.theme.color.primaryText};
 
   display: flex;
   align-items: center;
@@ -414,6 +415,7 @@ const TitleName = styled.p<{ visible: boolean }>`
   text-overflow: ellipsis;
   overflow: hidden;
   user-select: none !important;
+  color: ${(props) => props.theme.color.primaryText};
 `;
 
 const EditTitleName = styled.input<{ visible: boolean }>`
@@ -427,6 +429,8 @@ const EditTitleName = styled.input<{ visible: boolean }>`
   font-stretch: normal;
   font-style: normal;
   line-height: 1.19;
+  background: ${(props) => props.theme.color.background};
+  color: ${(props) => props.theme.color.primaryText};
 `;
 
 const TitleImage = styled.img<{ depth: number }>`
