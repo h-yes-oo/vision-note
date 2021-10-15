@@ -267,7 +267,7 @@ const SignUp: FC<Props> = ({ toLogin }) => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [confirm, setConfirm] = useState<string>('');
-  const [type, setType] = useState<string>('');
+  const [type, setType] = useState<string>('2');
   const [nickname, setNickname] = useState<string>('');
   const [privacy, setPrivacy] = useState<boolean>(false);
   const [agreement, setAgreement] = useState<boolean>(false);
@@ -289,7 +289,7 @@ const SignUp: FC<Props> = ({ toLogin }) => {
 
   const signUp = async () => {
     const userData = new FormData();
-    userData.append('avatar', '');
+    userData.append('avatar', '0');
     userData.append('email', email);
     userData.append('nickname', nickname);
     userData.append('password', password);
@@ -310,6 +310,15 @@ const SignUp: FC<Props> = ({ toLogin }) => {
 
   const goTo = async () => {
     if (password !== confirm) alert('비밀번호가 같지 않습니다');
+    else if (type === '') alert('학생 구분을 선택해주세요');
+    else if (
+      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%*?&]{8,20}/.test(
+        password
+      )
+    )
+      alert(
+        '영문 대소문자와 특수문자가 결합된 8자 이상 20자 이하의 비밀번호여야 합니다'
+      );
     else if (!privacy) alert('개인정보 처리방침에 동의해주세요');
     else if (!agreement) alert('이용약관에 동의해주세요');
     else if (!/^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/.test(email))
