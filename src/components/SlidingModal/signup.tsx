@@ -1,5 +1,5 @@
 import { FC, useState } from 'react';
-import styled from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 import axios from 'axios';
 import { useSetRecoilState } from 'recoil';
 
@@ -13,6 +13,9 @@ import SelectToggle from 'assets/icons/SelectToggle.svg';
 import CheckBoxOff from 'assets/icons/CheckBoxOff.svg';
 import CheckBoxOn from 'assets/icons/CheckBoxOn.svg';
 import LoadingDots from 'components/LoadingDots';
+import UserEdit from 'assets/icons/UserEdit.svg';
+import EditType from 'assets/icons/EditType.svg';
+import EditTypeUp from 'assets/icons/EditTypeUp.svg';
 
 const Title = styled.div`
   font-family: Pretendard;
@@ -24,14 +27,22 @@ const Title = styled.div`
   letter-spacing: normal;
   text-align: left;
   color: #000;
+  margin-bottom: 13px;
 `;
 
-const Form = styled.input`
+const shake = keyframes`
+  0% { margin-left: 0rem; }
+  25% { margin-left: 5rem; }
+  75% { margin-left: -5rem; }
+  100% { margin-left: 0rem; }
+`;
+
+const Form = styled.input<{ error: boolean }>`
   width: 420rem;
   height: 61rem;
   box-sizing: border-box;
   padding: 0 20rem;
-  margin-top: 30rem;
+  margin-top: 9rem;
   object-fit: contain;
   border-radius: 5rem;
   border: solid 1rem #e6e6e6;
@@ -49,18 +60,28 @@ const Form = styled.input`
   &::placeholder {
     color: #c5c5c5;
   }
+
+  transition: box-shadow 0.5s;
+
+  ${(props) =>
+    props.error &&
+    css`
+      animation: ${shake} 0.2s ease-in-out 0s 2;
+      box-shadow: 0 0 0.5em red;
+    `}
 `;
 
 const HalfForm = styled(Form)`
   width: 200rem;
+  margin-top: 9rem;
 `;
 
-const SelectForm = styled.select`
+const SelectForm = styled.select<{ error: boolean }>`
   width: 200rem;
   height: 61rem;
   box-sizing: border-box;
   padding: 0 20rem;
-  margin-top: 30rem;
+  margin-top: 9rem;
   object-fit: contain;
   border-radius: 5rem;
   border: solid 1rem #e6e6e6;
@@ -80,6 +101,15 @@ const SelectForm = styled.select`
   background-position: right 10rem center;
 
   appearance: none;
+
+  transition: box-shadow 0.5s;
+
+  ${(props) =>
+    props.error &&
+    css`
+      animation: ${shake} 0.2s ease-in-out 0s 2;
+      box-shadow: 0 0 0.5em red;
+    `}
 `;
 
 const SignupButton = styled.button`
@@ -210,7 +240,7 @@ const ToLogin = styled.a`
   }
 `;
 
-const CheckBox = styled.input`
+const CheckBox = styled.input<{ error: boolean }>`
   height: 20rem;
   width: 20rem;
   border: none;
@@ -222,6 +252,21 @@ const CheckBox = styled.input`
     background: url(${CheckBoxOn}) no-repeat;
     background-size: contain;
   }
+
+  transition: box-shadow 0.5s;
+
+  ${(props) =>
+    props.error &&
+    css`
+      animation: ${shake} 0.2s ease-in-out 0s 2;
+      box-shadow: 0 0 0.5em red;
+    `}
+`;
+
+const UserIcon = styled.img`
+  width: 24rem;
+  height: 24rem;
+  margin: 0 10rem;
 `;
 
 const CheckText = styled.span`
@@ -259,6 +304,106 @@ const Wrapper = styled.div`
   height: 100%;
 `;
 
+const Alert = styled.div`
+  margin-top: 4rem;
+  height: 17rem;
+  font-family: Pretendard;
+  font-size: 14rem;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.21;
+  letter-spacing: normal;
+  text-align: left;
+  color: #ff2a2a;
+`;
+
+const TypeContent = styled.div<{ error: boolean }>`
+  width: 200rem;
+  height: 61rem;
+  box-sizing: border-box;
+  padding: 0 20rem;
+  margin-top: 9rem;
+  object-fit: contain;
+  border-radius: 5rem;
+  border: solid 1rem #e6e6e6;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  font-family: Pretendard;
+  font-size: 18rem;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.22;
+  letter-spacing: normal;
+  text-align: left;
+
+  transition: box-shadow 0.5s;
+
+  ${(props) =>
+    props.error &&
+    css`
+      animation: ${shake} 0.2s ease-in-out 0s 2;
+      box-shadow: 0 0 0.5em red;
+    `}
+`;
+
+const TypeOption = styled.div`
+  display: flex;
+  align-items: center;
+  padding-left: 10rem;
+  box-sizing: border-box;
+  width: 200rem;
+  height: 40rem;
+  z-index: 1001;
+  border: none;
+
+  font-family: Pretendard;
+  font-size: 18rem;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.22;
+  letter-spacing: normal;
+  text-align: left;
+  &:hover {
+    background: #f6f6f6;
+  }
+`;
+
+const Relative = styled.div`
+  position: relative;
+`;
+
+const Menu = styled.div<{ show: boolean }>`
+  border-radius: 5rem;
+  box-shadow: 3rem 5rem 16rem 0 rgba(0, 0, 0, 0.12);
+
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+
+  height: auto;
+  margin: 0;
+  padding: 13rem 0;
+
+  position: absolute;
+  left: 0;
+  top: 67rem;
+  z-index: 1000;
+
+  ${(props) => (props.show ? '' : 'display: none;')}
+  opacity: ${(props) => (props.show ? '1' : '0')};
+  transition: opacity 0.5s linear;
+`;
+
+const ToggleImage = styled.img`
+  width: 24px;
+`;
+
 interface Props {
   toLogin: any;
 }
@@ -267,12 +412,21 @@ const SignUp: FC<Props> = ({ toLogin }) => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [confirm, setConfirm] = useState<string>('');
-  const [type, setType] = useState<string>('2');
+  const [type, setType] = useState<string>('');
   const [nickname, setNickname] = useState<string>('');
   const [privacy, setPrivacy] = useState<boolean>(false);
   const [agreement, setAgreement] = useState<boolean>(false);
   const setAuthToken = useSetRecoilState(authenticateToken);
   const [loading, setLoading] = useState<boolean>(false);
+  const [emailError, setEmailError] = useState<boolean>(false);
+  const [passwordError, setPasswordError] = useState<boolean>(false);
+  const [nicknameError, setNicknameError] = useState<boolean>(false);
+  const [confirmError, setConfirmError] = useState<boolean>(false);
+  const [privacyError, setPrivacyError] = useState<boolean>(false);
+  const [agreementError, setAgreementError] = useState<boolean>(false);
+  const [typeError, setTypeError] = useState<boolean>(false);
+  const [editType, setEditType] = useState<boolean>(false);
+  const [emailAlert, setEmailAlert] = useState<string>('');
 
   const authenticate = async () => {
     const frm = new FormData();
@@ -298,8 +452,13 @@ const SignUp: FC<Props> = ({ toLogin }) => {
     try {
       await axios.post('/v1/user', userData);
       return true;
-    } catch {
-      alert('이미 가입된 메일입니다');
+    } catch (error: any) {
+      if (error.response.status === 409) {
+        setEmailError(true);
+        setEmailAlert('이미 가입된 메일입니다');
+      } else {
+        alert('회원가입에 실패했습니다. 다시 시도해주세요');
+      }
       setEmail('');
       setNickname('');
       setPassword('');
@@ -308,80 +467,150 @@ const SignUp: FC<Props> = ({ toLogin }) => {
     }
   };
 
+  const testEmail = (email: string) => {
+    return /^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/.test(email);
+  };
+
+  const testPassword = (password: string) => {
+    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%*?&]{8,20}/.test(
+      password
+    );
+  };
+
   const goTo = async () => {
-    if (password !== confirm) alert('비밀번호가 같지 않습니다');
-    else if (type === '') alert('학생 구분을 선택해주세요');
-    else if (
-      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%*?&]{8,20}/.test(
-        password
-      )
-    )
-      alert(
-        '영문 대소문자와 특수문자가 결합된 8자 이상 20자 이하의 비밀번호여야 합니다'
-      );
-    else if (!privacy) alert('개인정보 처리방침에 동의해주세요');
-    else if (!agreement) alert('이용약관에 동의해주세요');
-    else if (!/^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/.test(email))
-      alert('이메일 형식을 확인해주세요');
-    else if (email === '' || nickname === '' || password === '')
-      alert('필수 정보를 입력해주세요');
-    else {
-      setLoading(true);
-      const signUpSuccess = await signUp();
-      // 로그인 성공시 자동 로그인
-      if (signUpSuccess) authenticate();
-      else setLoading(false);
+    const emailCheck = email === '' || !testEmail(email);
+    setEmailError(emailCheck);
+    const passwordCheck = password === '' || !testPassword(password);
+    setPasswordError(passwordCheck);
+    const nicknameCheck = nickname === '';
+    setNicknameError(nicknameCheck);
+    const confirmCheck = password !== confirm;
+    setConfirmError(confirmCheck);
+    const typeCheck = type === '';
+    setTypeError(typeCheck);
+    setPrivacyError(!privacy);
+    setAgreementError(!agreement);
+    if (
+      emailCheck ||
+      passwordCheck ||
+      nicknameCheck ||
+      confirmCheck ||
+      typeCheck ||
+      !privacy ||
+      !agreement
+    ) {
+      return false;
     }
+    setLoading(true);
+    const signUpSuccess = await signUp();
+    // 로그인 성공시 자동 로그인
+    if (signUpSuccess) authenticate();
+    else setLoading(false);
+    return true;
   };
 
   const onChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
+    if (testEmail(e.target.value)) {
+      setEmailError(false);
+      setEmailAlert('');
+    } else {
+      setEmailAlert('이메일 형식을 확인해주세요');
+    }
+    if (e.target.value === '') setEmailAlert('이메일 형식을 확인해주세요');
   };
   const onChangePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
+    if (testPassword(e.target.value)) setPasswordError(false);
   };
   const onChangeConfirm = (e: React.ChangeEvent<HTMLInputElement>) => {
     setConfirm(e.target.value);
+    if (e.target.value === password) setPasswordError(false);
   };
   const onChangeNickname = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNickname(e.target.value);
+    if (e.target.value !== '') setNicknameError(false);
+  };
+  const onClickOption = (option: string) => {
+    setType(option);
+    setEditType(false);
+    setTypeError(false);
+  };
+
+  const getTypeText = () => {
+    if (type === '1') return '초/중/고';
+    if (type === '2') return '대학생';
+    return '학생 구분';
+  };
+
+  const onChangePrivacy = () => {
+    if (!privacy) setPrivacyError(false);
+    setPrivacy((prev) => !prev);
+  };
+
+  const onChangeAgreement = () => {
+    if (!agreement) setAgreementError(false);
+    setAgreement((prev) => !prev);
   };
 
   return (
     <Wrapper>
       <Title>회원가입</Title>
       <Form
+        error={emailError}
         placeholder="이메일 주소"
         type="email"
         value={email}
         onChange={onChangeEmail}
       />
+      <Alert>{emailAlert}</Alert>
       <Form
+        error={passwordError}
         placeholder="비밀번호"
         type="password"
         value={password}
         onChange={onChangePassword}
       />
+      <Alert>
+        {password !== '' &&
+          !testPassword(password) &&
+          '영문 대소문자, 숫자, 특수기호를 포함하여 8~20자로 설정해주세요'}
+      </Alert>
       <Form
+        error={confirmError}
         placeholder="비밀번호 확인"
         type="password"
         value={confirm}
         onChange={onChangeConfirm}
       />
+      <Alert>{password !== confirm && '비밀번호가 같지 않습니다'}</Alert>
       <FlexBetween>
         <HalfForm
+          error={nicknameError}
           placeholder="닉네임"
           type="text"
           value={nickname}
           onChange={onChangeNickname}
         />
-        <SelectForm onChange={(e) => setType(e.target.value)}>
-          <option value="default" disabled style={{ color: '#c5c5c5' }}>
-            학생 구분
-          </option>
-          <option value="2">대학생</option>
-          <option value="1">초/중/고</option>
-        </SelectForm>
+        <Relative>
+          <TypeContent error={typeError}>
+            {getTypeText()}
+            <ToggleImage
+              onClick={() => setEditType((prev) => !prev)}
+              src={editType ? EditTypeUp : EditType}
+            />
+          </TypeContent>
+          <Menu show={editType}>
+            <TypeOption onClick={() => onClickOption('1')}>
+              <UserIcon src={UserEdit} />
+              초/중/고
+            </TypeOption>
+            <TypeOption onClick={() => onClickOption('2')}>
+              <UserIcon src={UserEdit} />
+              대학생
+            </TypeOption>
+          </Menu>
+        </Relative>
       </FlexBetween>
 
       {loading ? (
@@ -391,18 +620,20 @@ const SignUp: FC<Props> = ({ toLogin }) => {
       )}
       <FlexAlign>
         <CheckBox
+          error={privacyError}
           type="checkbox"
           checked={privacy}
-          onChange={() => setPrivacy(!privacy)}
+          onChange={onChangePrivacy}
         />
         <CheckAnchor>개인정보 처리방침</CheckAnchor>
         <CheckText>에 동의합니다.</CheckText>
       </FlexAlign>
       <FlexAlign>
         <CheckBox
+          error={agreementError}
           type="checkbox"
           checked={agreement}
-          onChange={() => setAgreement(!agreement)}
+          onChange={onChangeAgreement}
         />
         <CheckAnchor>서비스 이용약관</CheckAnchor>
         <CheckText>에 동의합니다.</CheckText>

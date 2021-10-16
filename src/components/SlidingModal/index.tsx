@@ -35,6 +35,7 @@ const ModalOverlay = styled.div<{ visible: boolean }>`
 
 const Root = styled.div<{ visible: boolean }>`
   height: 100vh;
+  width: 500rem;
   box-sizing: border-box;
   padding: 40rem;
   background-color: #fff;
