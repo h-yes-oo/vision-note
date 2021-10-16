@@ -73,17 +73,6 @@ const StartNotePage: FC<Props & RouteComponentProps> = ({ history }) => {
     useRef<HTMLInputElement>(null);
   const authToken = useRecoilValue(authenticateToken);
   const currentTheme = useRecoilValue(theme);
-  const [clicked, setClicked] = useState<boolean>(false);
-  // TODO : change recorder and stream as recoil state values
-  const [recorder, setRecorder] = useState<MediaRecorder>();
-  const [stream, setStream] = useState<MediaStream>();
-
-  const displayMediaOptions = {
-    video: true,
-    audio: {
-      sampleRate: 16000,
-    },
-  };
 
   const sendFile = async (fileToSend: File) => {
     const data = new FormData();
@@ -154,42 +143,6 @@ const StartNotePage: FC<Props & RouteComponentProps> = ({ history }) => {
 
   const onClickUpload = () => {
     if (fileRef.current !== null) fileRef.current.click();
-  };
-
-  const startRec = async () => {
-    try {
-      // 공유 시작
-      const mediaDevices = navigator.mediaDevices as any;
-      if (mediaDevices !== undefined) {
-        mediaDevices
-          .getDisplayMedia(displayMediaOptions)
-          .then((mediaStream: any) => {
-            // 두번째 파라미터인 options 없어도 무방; mimeType에 audio/x-wav 불가
-            const options = {
-              audioBitsPerSecond: 16000,
-              mimeType: 'audio/webm;codecs=opus',
-            };
-            const mediaRecorder = new MediaRecorder(mediaStream, options);
-            mediaRecorder.start();
-
-            mediaRecorder.ondataavailable = (e) => {
-              const blob = new Blob([e.data], { type: e.data.type });
-              // const filename = getFileName();
-              // const downloadElem = window.document.createElement('a');
-              // downloadElem.href = window.URL.createObjectURL(blob);
-              // downloadElem.download = filename;
-              // document.body.appendChild(downloadElem);
-              // downloadElem.click();
-              // document.body.removeChild(downloadElem);
-            };
-
-            setStream(mediaStream);
-            setRecorder(mediaRecorder);
-          });
-      }
-    } catch (err) {
-      console.error(`Error: ${err}`);
-    }
   };
 
   const full = {};

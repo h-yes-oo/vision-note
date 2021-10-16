@@ -1,22 +1,24 @@
-import React, { FC, useState, useCallback } from 'react';
+import React, { FC, useState, useCallback, useRef } from 'react';
 import styled from 'styled-components';
-
+import axios from 'axios';
 import ParagraphMenu from 'components/ParagraphMenu';
+import { useRecoilValue } from 'recoil';
 
+import { authenticateToken } from 'state';
 import BookMarkEmpty from 'assets/icons/BookMarkEmpty.svg';
 import BookMarkFull from 'assets/icons/BookMarkFull.svg';
 import NoteEmpty from 'assets/icons/NoteEmpty.svg';
 import NoteFull from 'assets/icons/NoteFull.svg';
 import HighlightButton from 'assets/icons/HighlightButton.svg';
 import MoreHorizontal from 'assets/icons/MoreHorizontal.svg';
-import { parentPort } from 'worker_threads';
 
 interface Props {
   paragraphId: number;
   bookmarked: boolean;
   content: string;
   time: string;
-  note: string;
+  note: string | null;
+  recording: boolean;
 }
 
 const Paragraph: FC<Props> = ({
@@ -25,16 +27,34 @@ const Paragraph: FC<Props> = ({
   content,
   time,
   note,
+  recording,
 }) => {
   const [bookmark, setBookmark] = useState<boolean>(bookmarked);
-  const [noted, setNoted] = useState<boolean>(note !== '');
+  const [noted, setNoted] = useState<boolean>(note !== null);
   const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
   const [selectedRange, setSelectedRange] = useState<Range | null>(null);
   const [showHighlightBtn, setShowHighlightBtn] = useState<boolean>(false);
   const [showMenu, setShowMenu] = useState<boolean>(false);
+  const [memo, setMemo] = useState<string | null>(note);
+  const [memoEditMode, setMemoEditMode] = useState<boolean>(false);
+  const [newMemo, setNewMemo] = useState<string>(note ?? '');
+  const memoRef: React.RefObject<HTMLTextAreaElement> =
+    useRef<HTMLTextAreaElement>(null);
+  const authToken = useRecoilValue(authenticateToken);
 
-  const bookmarkParagraph = () => {
-    // TODO : 해당 문단 북마크 요청 보내기 & props type () => void로 바꾸기
+  const bookmarkParagraph = async () => {
+    if (!recording) {
+      try {
+        const bookmarkData = new FormData();
+        bookmarkData.append('paragraphId', String(paragraphId));
+        bookmarkData.append('isBookmarked', bookmark ? '0' : '1');
+        await axios.put(`/v1/script/paragraph/${paragraphId}`, bookmarkData, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+      } catch {
+        alert('북마크에 실패했습니다. 다시 시도해주세요');
+      }
+    }
     setBookmark(!bookmark);
   };
 
@@ -75,7 +95,33 @@ const Paragraph: FC<Props> = ({
   };
 
   const editMemo = () => {
-    console.log('edit Memo');
+    if (memoRef.current !== null) {
+      setTimeout(() => memoRef.current!.focus(), 10);
+    }
+    setMemoEditMode(true);
+  };
+
+  const endEditing = async () => {
+    setMemoEditMode(false);
+    if (!recording && newMemo !== '') {
+      try {
+        const memoData = new FormData();
+        memoData.append('paragraphId', String(paragraphId));
+        memoData.append('memoContent', newMemo);
+        await axios.put(`/v1/script/paragraph/${paragraphId}`, memoData, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+        setMemo(newMemo);
+      } catch {
+        alert('폴더 이름을 변경하지 못했습니다');
+      }
+    }
+  };
+
+  const onPressEnter = async (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      await endEditing();
+    }
   };
 
   const editParagraph = () => {
@@ -103,33 +149,101 @@ const Paragraph: FC<Props> = ({
       <Contents onMouseUp={highlightSelection} bookmarked={bookmark}>
         {content}
       </Contents>
-      <BtnWrapper>
-        <TimeStamp>{time}</TimeStamp>
-        {/* <BookMark
-          src={bookmark ? BookMarkFull : BookMarkEmpty}
-          onClick={bookmarkParagraph}
+      <FlexColumn>
+        <BtnWrapper>
+          <TimeStamp>{time}</TimeStamp>
+          {recording ? (
+            <>
+              <BookMark
+                src={bookmark ? BookMarkFull : BookMarkEmpty}
+                onClick={bookmarkParagraph}
+              />
+              <Note src={noted ? NoteFull : NoteEmpty} />
+            </>
+          ) : (
+            <Relative
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={() => setShowMenu(false)}
+            >
+              <MoreBtn src={MoreHorizontal} />
+              <ParagraphMenu
+                show={showMenu}
+                closeMenu={() => setShowMenu(false)}
+                bookmarked={bookmark}
+                noted={noted}
+                paragraphId={paragraphId}
+                editMemo={editMemo}
+                editParagraph={editParagraph}
+                bookmarkParagraph={bookmarkParagraph}
+              />
+            </Relative>
+          )}
+        </BtnWrapper>
+        {!memoEditMode && memo !== null && <Memo>{memo}</Memo>}
+        <EditMemo
+          visible={memoEditMode}
+          ref={memoRef}
+          value={newMemo}
+          onChange={(e) => setNewMemo(e.target.value)}
+          onKeyPress={onPressEnter}
         />
-        <Note src={noted ? NoteFull : NoteEmpty} /> */}
-        <Relative
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={() => setShowMenu(false)}
-        >
-          <MoreBtn src={MoreHorizontal} />
-          <ParagraphMenu
-            show={showMenu}
-            closeMenu={() => setShowMenu(false)}
-            bookmarked={bookmark}
-            noted={noted}
-            paragraphId={paragraphId}
-            editMemo={editMemo}
-            editParagraph={editParagraph}
-            bookmarkParagraph={bookmarkParagraph}
-          />
-        </Relative>
-      </BtnWrapper>
+      </FlexColumn>
     </Root>
   );
 };
+
+const FlexColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const Memo = styled.div`
+  width: 201rem;
+  height: 145rem;
+  border-radius: 5rem;
+  box-shadow: 0 5rem 12rem 0 rgba(0, 0, 0, 0.12);
+  background-color: ${(props) => props.theme.color.contextBackground};
+  border-top: solid 8rem ${(props) => props.theme.color.hover};
+  padding: 20px;
+  box-sizing: border-box;
+  overflow: scroll;
+  margin-top: 4px;
+
+  font-family: Pretendard;
+  font-size: 14px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.71;
+  letter-spacing: normal;
+  text-align: left;
+  color: ${(props) => props.theme.color.semiText};
+`;
+
+const EditMemo = styled.textarea<{ visible: boolean }>`
+  display: ${(props) => (props.visible ? '' : 'none')};
+  width: 201rem;
+  height: 145rem;
+  border-radius: 5rem;
+  box-shadow: 0 5rem 12rem 0 rgba(0, 0, 0, 0.12);
+  background-color: ${(props) => props.theme.color.contextBackground};
+  border: none;
+  border-top: solid 8rem ${(props) => props.theme.color.hover};
+  padding: 20px;
+  box-sizing: border-box;
+  overflow: scroll;
+  margin-top: 4px;
+
+  font-family: Pretendard;
+  font-size: 14px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.71;
+  letter-spacing: normal;
+  text-align: left;
+  color: ${(props) => props.theme.color.semiText};
+`;
 
 const Root = styled.div`
   display: flex;
@@ -170,6 +284,7 @@ const Contents = styled.div<{ bookmarked: boolean }>`
 
 const BtnWrapper = styled.div`
   display: flex;
+  justify-content: flex-end;
 `;
 
 const TimeStamp = styled.div`

@@ -17,7 +17,7 @@ interface Props {
   paragraphId: number;
   editMemo: () => void;
   editParagraph: () => void;
-  bookmarkParagraph: () => void;
+  bookmarkParagraph: () => Promise<void>;
 }
 
 const ParagraphMenu: FC<Props> = ({
@@ -59,7 +59,7 @@ const ParagraphMenu: FC<Props> = ({
         </MenuList>
         <MenuList onClick={onClickEditMemo}>
           <ContextImage src={noted ? NoteFull : NoteEmpty} />
-          {bookmarked ? '메모 수정' : '메모 작성'}
+          {noted ? '메모 수정' : '메모 작성'}
         </MenuList>
         <MenuList onClick={onClickEditParagraph}>
           <ContextImage src={Edit} />
@@ -87,7 +87,7 @@ const Menu = styled.div<{ show: boolean }>`
 
   position: absolute;
   right: 0;
-  top: 24rem;
+  top: 20rem;
 
   ${(props) => (props.show ? '' : 'display: none;')}
   opacity: ${(props) => (props.show ? '1' : '0')};
