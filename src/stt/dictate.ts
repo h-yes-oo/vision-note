@@ -20,6 +20,7 @@ interface Config {
   audioSourceId: any;
   user_id?: any;
   content_id?: any;
+  onWsClose?: any;
 }
 
 interface AudioSourceConstraints {
@@ -509,6 +510,7 @@ export class Dictate {
         // when its endpointer triggers.
         config.onEndOfSession();
         config.onEvent(MSG_WEB_SOCKET_CLOSE, `${code}/${reason}/${wasClean}`);
+        if (config.onWsClose !== undefined) config.onWsClose();
       };
 
       ws.onerror = (e: any) => {
