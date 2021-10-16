@@ -1,5 +1,5 @@
 import React, { FC, useState } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
 import { useSetRecoilState } from 'recoil';
 import axios from 'axios';
 
@@ -36,7 +36,14 @@ const Info = styled.div`
   margin: 9rem 0;
 `;
 
-const Form = styled.input`
+const shake = keyframes`
+  0% { margin-left: 0rem; }
+  25% { margin-left: 5rem; }
+  75% { margin-left: -5rem; }
+  100% { margin-left: 0rem; }
+`;
+
+const Form = styled.input<{ error: boolean }>`
   width: 420rem;
   height: 61rem;
   box-sizing: border-box;
@@ -55,9 +62,19 @@ const Form = styled.input`
   line-height: 1.22;
   letter-spacing: normal;
   text-align: left;
+
   &::placeholder {
     color: #c5c5c5;
   }
+
+  transition: box-shadow 0.5s;
+
+  ${(props) =>
+    props.error &&
+    css`
+      animation: ${shake} 0.2s ease-in-out 0s 2;
+      box-shadow: 0 0 0.5em red;
+    `}
 `;
 
 const Find = styled.a`
@@ -71,7 +88,7 @@ const Find = styled.a`
   text-align: left;
   color: #656565;
 
-  margin: 30rem 0 0;
+  margin: 9rem 0 0;
   &:hover {
     cursor: pointer;
   }
@@ -202,6 +219,19 @@ const SignUp = styled.a`
 const Flex = styled.div`
   display: flex;
 `;
+const Alert = styled.div`
+  margin-top: 4rem;
+  height: 17rem;
+  font-family: Pretendard;
+  font-size: 14rem;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.21;
+  letter-spacing: normal;
+  text-align: left;
+  color: #ff2a2a;
+`;
 interface Props {
   toFind: any;
   toSignUp: any;
@@ -212,6 +242,7 @@ const Login: FC<Props> = ({ toFind, toSignUp }) => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<boolean>(false);
 
   const authenticate = async () => {
     const frm = new FormData();
@@ -223,7 +254,7 @@ const Login: FC<Props> = ({ toFind, toSignUp }) => {
       localStorage.setItem('user', JSON.stringify(response.data.token));
       setAuthToken(response.data.token);
     } catch (e) {
-      alert('아이디와 비밀번호를 다시 확인해주세요');
+      setError(true);
     }
     setLoading(false);
   };
@@ -232,21 +263,34 @@ const Login: FC<Props> = ({ toFind, toSignUp }) => {
     if (e.key === 'Enter') authenticate();
   };
 
+  const onChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+    if (error) setError(false);
+  };
+
+  const onChangePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+    if (error) setError(false);
+  };
+
   return (
     <>
       <Title>로그인</Title>
       <Info>학습 노트를 바로 만들고 관리해보세요</Info>
       <Form
+        error={error}
         placeholder="이메일 주소"
         type="email"
-        onChange={(e) => setEmail(e.target.value)}
+        onChange={onChangeEmail}
       />
       <Form
+        error={error}
         placeholder="비밀번호"
         type="password"
-        onChange={(e) => setPassword(e.target.value)}
+        onChange={onChangePassword}
         onKeyPress={onKeyPress}
       />
+      <Alert>{error && '아이디와 비밀번호를 다시 확인해주세요'}</Alert>
       <Find onClick={toFind}>아이디 / 비밀번호 찾기</Find>
       {loading ? (
         <LoadingDots small={false} />

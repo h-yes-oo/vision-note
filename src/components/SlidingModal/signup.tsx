@@ -9,7 +9,6 @@ import Kakao from 'assets/icons/Kakao.svg';
 import Facebook from 'assets/icons/Facebook.svg';
 import Google from 'assets/icons/Google.svg';
 import Naver from 'assets/icons/Naver@3x.png';
-import SelectToggle from 'assets/icons/SelectToggle.svg';
 import CheckBoxOff from 'assets/icons/CheckBoxOff.svg';
 import CheckBoxOn from 'assets/icons/CheckBoxOn.svg';
 import LoadingDots from 'components/LoadingDots';
@@ -74,42 +73,6 @@ const Form = styled.input<{ error: boolean }>`
 const HalfForm = styled(Form)`
   width: 200rem;
   margin-top: 9rem;
-`;
-
-const SelectForm = styled.select<{ error: boolean }>`
-  width: 200rem;
-  height: 61rem;
-  box-sizing: border-box;
-  padding: 0 20rem;
-  margin-top: 9rem;
-  object-fit: contain;
-  border-radius: 5rem;
-  border: solid 1rem #e6e6e6;
-  background-color: #fff;
-
-  font-family: Pretendard;
-  font-size: 18rem;
-  font-weight: normal;
-  font-stretch: normal;
-  font-style: normal;
-  line-height: 1.22;
-  letter-spacing: normal;
-  text-align: left;
-
-  background-image: url(${SelectToggle});
-  background-repeat: no-repeat;
-  background-position: right 10rem center;
-
-  appearance: none;
-
-  transition: box-shadow 0.5s;
-
-  ${(props) =>
-    props.error &&
-    css`
-      animation: ${shake} 0.2s ease-in-out 0s 2;
-      box-shadow: 0 0 0.5em red;
-    `}
 `;
 
 const SignupButton = styled.button`
