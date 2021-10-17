@@ -1,87 +1,87 @@
 import { FC, useState, ReactNode, useEffect } from 'react';
 import styled from 'styled-components';
+import { withRouter, RouteComponentProps } from 'react-router-dom';
+import axios from 'axios';
+import { useRecoilValue } from 'recoil';
+import { authenticateToken } from 'state';
 
+import Loading from 'components/Loading';
 import Note from 'assets/icons/Note.svg';
 import Search from 'assets/icons/SearchIcon.svg';
 import ToggleDown from 'assets/icons/ToggleDown.svg';
+
+interface SearchResult {
+  scriptId: number;
+  file_name: string;
+  paragraphContent: string;
+  folderName: string;
+}
 
 interface Props {
   searchKeyword: string;
 }
 
-const SearchModal: FC<Props> = ({ searchKeyword }) => {
+const SearchModal: FC<Props & RouteComponentProps> = ({
+  searchKeyword,
+  history,
+}) => {
   const [keyword, setKeyword] = useState<string>(searchKeyword);
+  const authToken = useRecoilValue(authenticateToken);
+  const [result, setResult] = useState<SearchResult[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const getSearchResult = async (keyword: string) => {
+    if (keyword !== '') {
+      setLoading(true);
+      try {
+        const response = await axios.get(`/v1/note/search/${keyword}`, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+        setResult(response.data);
+      } catch {
+        alert('검색에 실패했습니다. 다시 시도해주세요');
+      }
+      setLoading(false);
+    }
+  };
+
+  const onPressEnter = async (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      await getSearchResult(keyword);
+    }
+  };
 
   useEffect(() => {
     setKeyword(searchKeyword);
+    // getSearchResult(searchKeyword)
   }, [searchKeyword]);
 
-  const result = [
-    {
-      id: 0,
-      title: '지구과학 첫걸음',
-      folder: '전체 노트',
-      content: '단군 할아버지가 터잡으시고 홍익인간 뜻으로 ...',
-    },
-    {
-      id: 1,
-      title: '역사: 단군신화 - 2021.06.22',
-      folder: '2021년 1학기/한국사',
-      content: '단군 할아버지가 터잡으시고 홍익인간 뜻으로 ...',
-    },
-    {
-      id: 2,
-      title: '수학 다시 보는 개념',
-      folder: '2021년 1학기',
-      content: '단군 할아버지가 터잡으시고 홍익인간 뜻으로 ...',
-    },
-    {
-      id: 3,
-      title: '역사 보충 수업',
-      folder: '2021년 1학기/한국사',
-      content: '단군 할아버지가 터잡으시고 홍익인간 뜻으로 ...',
-    },
-    {
-      id: 4,
-      title: '지구과학 첫걸음',
-      folder: '전체 노트',
-      content: '단군 할아버지가 터잡으시고 홍익인간 뜻으로 ...',
-    },
-    {
-      id: 5,
-      title: '역사: 단군신화 - 2021.06.22',
-      folder: '2021년 1학기/한국사',
-      content: '단군 할아버지가 터잡으시고 홍익인간 뜻으로 ...',
-    },
-    {
-      id: 6,
-      title: '수학 다시 보는 개념',
-      folder: '2021년 1학기',
-      content: '단군 할아버지가 터잡으시고 홍익인간 뜻으로 ...',
-    },
-    {
-      id: 7,
-      title: '역사 보충 수업',
-      folder: '2021년 1학기/한국사',
-      content: '단군 할아버지가 터잡으시고 홍익인간 뜻으로 ...',
-    },
-  ];
+  useEffect(() => {
+    if (searchKeyword !== '') getSearchResult(searchKeyword);
+  }, []);
 
-  const searchResult: ReactNode = result.map((value, index) => (
-    <Result key={value.id}>
+  const searchResult: ReactNode = result.map((value) => (
+    <Result
+      key={value.scriptId}
+      onClick={() => history.push(`/note/${value.scriptId}`)}
+    >
       <Title>
         <NoteIcon src={Note} />
-        {value.title}
+        {value.file_name}
       </Title>
-      <Folder>{value.folder}</Folder>
-      <Content>{value.content}</Content>
+      <Folder>{value.folderName}</Folder>
+      <Content>{value.paragraphContent}</Content>
     </Result>
   ));
 
   return (
     <>
-      <SearchBar value={keyword} onChange={(e) => setKeyword(e.target.value)} />
-      <SearchIcon src={Search} />
+      <SearchBar
+        value={keyword}
+        onChange={(e) => setKeyword(e.target.value)}
+        onKeyPress={onPressEnter}
+      />
+      <SearchIcon onClick={() => getSearchResult(keyword)} src={Search} />
       <Sort>
         <Num>
           정렬 :<Span>{` 가장 잘 맞는 결과부터`}</Span>
@@ -92,7 +92,9 @@ const SearchModal: FC<Props> = ({ searchKeyword }) => {
           개의 결과
         </Num>
       </Sort>
-      <ResultWrapper>{searchResult}</ResultWrapper>
+      <ResultWrapper>
+        {loading ? <Loading notes /> : searchResult}
+      </ResultWrapper>
     </>
   );
 };
@@ -139,6 +141,7 @@ const SearchIcon = styled.img`
 const ResultWrapper = styled.div`
   overflow: scroll;
   border-radius: inherit;
+  height: 100%;
 `;
 
 const Sort = styled.div`
@@ -199,4 +202,4 @@ const NoteIcon = styled.img`
   margin-right: 13rem;
 `;
 
-export default SearchModal;
+export default withRouter(SearchModal);

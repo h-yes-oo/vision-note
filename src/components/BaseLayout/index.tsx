@@ -3,9 +3,8 @@ import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import { isMobile } from 'functions';
-import { darkTheme, lightTheme } from 'styles/theme';
+import { darkTheme } from 'styles/theme';
 
-import SampleLogo from 'assets/icons/SampleLogo15.png';
 import LogoLight from 'assets/icons/LogoLight.png';
 import LogoDark from 'assets/icons/LogoDark.png';
 import SearchIcon from 'assets/icons/SearchIcon.svg';
@@ -36,14 +35,14 @@ const BaseLayout: FC<Props & RouteComponentProps> = ({
 
   const search = () => {
     setShowSearch(true);
-    console.log(searchKeyword);
   };
 
   const closeModal = () => {
     setShowSearch(false);
+    setSearchKeyword('');
   };
 
-  const handleMouseEnter = (e: React.MouseEvent) => {
+  const handleMouseEnter = () => {
     setShowUserMenu(true);
   };
 
@@ -56,12 +55,18 @@ const BaseLayout: FC<Props & RouteComponentProps> = ({
 
   return (
     <Root grey={grey}>
-      <PopupModal onClose={closeModal} visible={showSearch}>
-        <SearchModal searchKeyword={searchKeyword} />
-      </PopupModal>
+      {showSearch && (
+        <PopupModal onClose={closeModal} visible={showSearch}>
+          <SearchModal searchKeyword={searchKeyword} />
+        </PopupModal>
+      )}
       <Header>
         <HeaderInside>
-          <Logo onClick={() => history.push('/')} />
+          <Logo onClick={() => history.push('/')}>
+            <LogoImage
+              src={currentTheme === darkTheme ? LogoDark : LogoLight}
+            />
+          </Logo>
           <FlexDiv>
             <SearchWrapper>
               <SearchBox
@@ -129,16 +134,20 @@ const HeaderInside = styled.div`
   align-items: center;
 `;
 
-const Logo = styled.a`
-  width: 210rem;
-  height: 100rem;
-  background-size: 300rem;
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-image: url(${(props) => props.theme.logo});
+const Logo = styled.div`
+  width: 300rem;
+  height: 80rem;
+  margin: 0 -40rem;
   &:hover {
     cursor: pointer;
   }
+  overflow: hidden;
+`;
+
+const LogoImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 `;
 
 const SearchWrapper = styled.div`

@@ -269,7 +269,7 @@ const Contents = styled.div<{ bookmarked: boolean }>`
   line-height: 1.63;
   letter-spacing: normal;
   text-align: left;
-  color: ${(props) => props.theme.color.noteText};
+  color: ${(props) => props.theme.color.primaryText};
   white-space: pre-wrap;
   user-select: text !important;
   border-radius: 3rem;
