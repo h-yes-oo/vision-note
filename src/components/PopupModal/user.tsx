@@ -203,7 +203,9 @@ const UserModal: FC<Props & RouteComponentProps> = ({
           <FlexCenter>
             <Title>학생 구분</Title>
             <Relative>
-              <TypeContent>{type === 1 ? '초/중/고' : '대학생'}</TypeContent>
+              <TypeContent>
+                {type === 1 ? '초/중/고' : '대학생/일반인'}
+              </TypeContent>
               <Menu show={editType}>
                 <TypeOption onClick={() => onClickOption(1)}>
                   <UserIcon src={UserEdit} />
@@ -211,7 +213,7 @@ const UserModal: FC<Props & RouteComponentProps> = ({
                 </TypeOption>
                 <TypeOption onClick={() => onClickOption(2)}>
                   <UserIcon src={UserEdit} />
-                  대학생
+                  대학생/일반인
                 </TypeOption>
               </Menu>
             </Relative>

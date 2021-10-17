@@ -36,7 +36,6 @@ const fonts = {
 };
 
 const colors = {
-  purple: '#7b68ee',
   darkPurple: '#6a58d3',
   white: '#fff',
   darkGrey: '#676767',
@@ -56,6 +55,7 @@ const colors = {
 // 테마에 따라 다른 값을 갖는 색상 값입니다
 const lightThemeColors = {
   ...colors,
+  purple: '#7b68ee',
   primaryText: '#000',
   secondaryText: '#676767',
   tertiaryText: '#656565',
@@ -75,6 +75,7 @@ const lightThemeColors = {
 
 const darkThemeColors = {
   ...colors,
+  purple: '#816cff',
   primaryText: '#e6e6e6',
   secondaryText: '#f9f9f9',
   tertiaryText: '#a2a2a2',

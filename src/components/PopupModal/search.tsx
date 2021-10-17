@@ -112,7 +112,7 @@ const SearchModal: FC<Props & RouteComponentProps> = ({
 };
 
 const Highlighted = styled.span`
-  color: #7b68ee;
+  color: ${(props) => props.theme.color.purple};
 `;
 
 const ToggleIcon = styled.img`

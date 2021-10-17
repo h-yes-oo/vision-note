@@ -80,9 +80,10 @@ const FAQContent = styled.div<{ visible: boolean }>`
   letter-spacing: normal;
   text-align: left;
   color: #676767;
+  white-space: break-spaces;
 
   overflow: hidden;
-  max-height: ${(props) => (props.visible ? '100rem' : '0')};
+  max-height: ${(props) => (props.visible ? '' : '0')};
   padding-bottom: ${(props) => (props.visible ? '30rem' : '0')};
   transition: 0.3s ease;
 `;

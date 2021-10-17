@@ -169,7 +169,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
     // TODO : recording status 변경 해결하기
     const fileData = new FormData();
     fileData.append('scriptId', match.params.noteId);
-    fileData.append('isRecording', 'false');
+    fileData.append('isRecording', '0');
     await axios.put(`/v1/script/recording/${match.params.noteId}`, fileData, {
       headers: { Authorization: `Bearer ${authToken}` },
     });

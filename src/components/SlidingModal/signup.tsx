@@ -502,7 +502,7 @@ const SignUp: FC<Props> = ({ toLogin }) => {
 
   const getTypeText = () => {
     if (type === '1') return '초/중/고';
-    if (type === '2') return '대학생';
+    if (type === '2') return '대학생/일반인';
     return '학생 구분';
   };
 
@@ -570,7 +570,7 @@ const SignUp: FC<Props> = ({ toLogin }) => {
             </TypeOption>
             <TypeOption onClick={() => onClickOption('2')}>
               <UserIcon src={UserEdit} />
-              대학생
+              대학생/일반인
             </TypeOption>
           </Menu>
         </Relative>
