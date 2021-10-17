@@ -145,7 +145,6 @@ const FolderPage: FC<Props> = () => {
       headers: { Authorization: `Bearer ${authToken}` },
     });
     let data: NoteResponse[] = response.data.items;
-
     setRootFolderId(response.data.rootFolderId);
 
     if (mode === NotesMode.Recent) {
@@ -163,8 +162,8 @@ const FolderPage: FC<Props> = () => {
       // );
       const allNotes = await getAllNotes(rootFolderId);
       allNotes.sort((a, b) => {
-        if (a.noteFile!.createdAt > b.noteFile!.createdAt) return -1;
-        if (a.noteFile!.createdAt < b.noteFile!.createdAt) return 1;
+        if (a.noteFile!.updatedAt > b.noteFile!.updatedAt) return -1;
+        if (a.noteFile!.updatedAt < b.noteFile!.updatedAt) return 1;
         return 0;
       });
       setNotes(
@@ -183,6 +182,7 @@ const FolderPage: FC<Props> = () => {
           );
         })
       );
+      setLoading(false);
       return;
     }
 
@@ -252,13 +252,13 @@ const FolderPage: FC<Props> = () => {
         {notes}
       </>
     );
+    setLoading(false);
   };
 
   // refresh 되거나 mode 바뀌면 로딩닷과 함께 리렌더
   useEffect(() => {
     setLoading(true);
     if (authToken !== null) getRootItems();
-    setLoading(false);
   }, [refresh, mode]);
 
   // 정렬 기준 바뀌면 로딩닷 없이 리렌더
@@ -619,7 +619,9 @@ const FolderPage: FC<Props> = () => {
             <TableRow>
               <TitleHeader>노트 제목</TitleHeader>
               <StarHeader>중요 표시</StarHeader>
-              <DateHeader>생성일</DateHeader>
+              <DateHeader>
+                {mode === NotesMode.Recent ? '최근 수정일' : '생성일'}
+              </DateHeader>
               <SubjectHeader>분류</SubjectHeader>
             </TableRow>
           </div>

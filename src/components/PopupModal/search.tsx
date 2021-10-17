@@ -29,6 +29,7 @@ const SearchModal: FC<Props & RouteComponentProps> = ({
   const authToken = useRecoilValue(authenticateToken);
   const [result, setResult] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [resultNode, setResultNode] = useState<ReactNode>(<></>);
 
   const getSearchResult = async (keyword: string) => {
     if (keyword !== '') {
@@ -37,6 +38,33 @@ const SearchModal: FC<Props & RouteComponentProps> = ({
         const response = await axios.get(`/v1/note/search/${keyword}`, {
           headers: { Authorization: `Bearer ${authToken}` },
         });
+        const searchResult: ReactNode = response.data.map(
+          (value: SearchResult) => (
+            <Result
+              key={value.scriptId}
+              onClick={() => history.push(`/note/${value.scriptId}`)}
+            >
+              <Title>
+                <NoteIcon src={Note} />
+                {value.file_name}
+              </Title>
+              <Folder>{value.folderName}</Folder>
+              <Content>
+                {value.paragraphContent.split(keyword).map((value, index) => {
+                  if (index !== 0)
+                    return (
+                      <>
+                        <Highlighted>{keyword}</Highlighted>
+                        {value}
+                      </>
+                    );
+                  return <>{value}</>;
+                })}
+              </Content>
+            </Result>
+          )
+        );
+        setResultNode(searchResult);
         setResult(response.data);
       } catch {
         alert('검색에 실패했습니다. 다시 시도해주세요');
@@ -60,20 +88,6 @@ const SearchModal: FC<Props & RouteComponentProps> = ({
     if (searchKeyword !== '') getSearchResult(searchKeyword);
   }, []);
 
-  const searchResult: ReactNode = result.map((value) => (
-    <Result
-      key={value.scriptId}
-      onClick={() => history.push(`/note/${value.scriptId}`)}
-    >
-      <Title>
-        <NoteIcon src={Note} />
-        {value.file_name}
-      </Title>
-      <Folder>{value.folderName}</Folder>
-      <Content>{value.paragraphContent}</Content>
-    </Result>
-  ));
-
   return (
     <>
       <SearchBar
@@ -92,12 +106,14 @@ const SearchModal: FC<Props & RouteComponentProps> = ({
           개의 결과
         </Num>
       </Sort>
-      <ResultWrapper>
-        {loading ? <Loading notes /> : searchResult}
-      </ResultWrapper>
+      <ResultWrapper>{loading ? <Loading notes /> : resultNode}</ResultWrapper>
     </>
   );
 };
+
+const Highlighted = styled.span`
+  color: #7b68ee;
+`;
 
 const ToggleIcon = styled.img`
   width: 12rem;

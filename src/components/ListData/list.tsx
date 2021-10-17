@@ -12,7 +12,7 @@ export interface NoteFile {
   folderId: number;
   fileName: string;
   createdAt: string;
-  updatedAt: string | null;
+  updatedAt: string;
   categoryName: string;
   isImportant: number;
 }
@@ -45,7 +45,8 @@ const ListData: FC<Props> = ({ data, depth, refreshNotes, refreshRoot }) => {
 
   if (data.itemType === 'FILE') {
     const note = data.noteFile!;
-    const oldDate = note?.createdAt;
+    const oldDate =
+      mode === NotesMode.Recent ? note?.updatedAt : note?.createdAt;
     const newDate = `${oldDate?.substring(0, 4)}.${oldDate?.substring(
       5,
       7
