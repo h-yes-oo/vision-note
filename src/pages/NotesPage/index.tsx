@@ -720,6 +720,7 @@ const Root = styled.div`
   flex-direction: column;
   margin-top: 32rem;
   width: 1000rem;
+  padding-bottom: 200rem;
 `;
 
 const ContentWrapper = styled.div`
