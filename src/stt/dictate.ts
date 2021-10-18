@@ -508,6 +508,7 @@ export class Dictate {
         const { code, reason, wasClean } = e;
         // The server closes the connection (only?)
         // when its endpointer triggers.
+        console.log('web socket closed');
         config.onEndOfSession();
         config.onEvent(MSG_WEB_SOCKET_CLOSE, `${code}/${reason}/${wasClean}`);
         if (config.onWsClose !== undefined) config.onWsClose();

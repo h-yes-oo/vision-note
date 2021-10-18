@@ -39,7 +39,9 @@ import CheckDark from 'assets/icons/CheckDark.svg';
 import GreyTrashCan from 'assets/icons/GreyTrashCan.svg';
 import Folder40 from 'assets/icons/Folder40.svg';
 import Clock from 'assets/icons/Clock.svg';
-import { lightTheme } from 'styles/theme';
+import { darkTheme, lightTheme } from 'styles/theme';
+import NoNotesLight from 'assets/icons/NoNotesLight.svg';
+import NoNotesDark from 'assets/icons/NoNotesDark.svg';
 
 interface Props {}
 
@@ -61,6 +63,7 @@ const FolderPage: FC<Props> = () => {
   const refreshDrag = useRecoilValue<() => void>(dragRefresh);
   // about delete alert
   const [showAlert, setShowAlert] = useState<boolean>(false);
+  const [noNotes, setNoNotes] = useState<boolean>(false);
   const currentTheme = useRecoilValue(theme);
 
   const sortFolder = (a, b) => {
@@ -146,7 +149,12 @@ const FolderPage: FC<Props> = () => {
     });
     let data: NoteResponse[] = response.data.items;
     setRootFolderId(response.data.rootFolderId);
-
+    if (data.length === 0) {
+      setNoNotes(true);
+      setLoading(false);
+      return;
+    }
+    setNoNotes(false);
     if (mode === NotesMode.Recent) {
       // const currentdate = new Date();
       // currentdate.setMonth(currentdate.getMonth() - 1);
@@ -161,6 +169,10 @@ const FolderPage: FC<Props> = () => {
       //         beforeOneMonth)
       // );
       const allNotes = await getAllNotes(rootFolderId);
+      if (allNotes.length === 0) {
+        setNoNotes(true);
+        return;
+      }
       allNotes.sort((a, b) => {
         if (a.noteFile!.updatedAt > b.noteFile!.updatedAt) return -1;
         if (a.noteFile!.updatedAt < b.noteFile!.updatedAt) return 1;
@@ -601,6 +613,30 @@ const FolderPage: FC<Props> = () => {
     e.preventDefault();
   };
 
+  const whatToShow = () => {
+    if (noNotes)
+      return (
+        <ImageWrapper>
+          <Image
+            src={currentTheme === darkTheme ? NoNotesDark : NoNotesLight}
+          />
+          아직 작성하신 노트가 없습니다. {'\n'}
+          학습 시작하기를 눌러 새 노트를 만들어보세요 !
+        </ImageWrapper>
+      );
+    if (loading) return <Loading notes />;
+    return (
+      <>
+        {notes}
+        <DropZone
+          onDrop={onDrop}
+          onDragOver={onDragOver}
+          onDragLeave={onDragLeave}
+        />
+      </>
+    );
+  };
+
   return (
     <BaseLayout grey>
       <AlertWithMessage
@@ -625,20 +661,7 @@ const FolderPage: FC<Props> = () => {
               <SubjectHeader>분류</SubjectHeader>
             </TableRow>
           </div>
-          <NoteWrapper>
-            {loading ? (
-              <Loading notes />
-            ) : (
-              <>
-                {notes}
-                <DropZone
-                  onDrop={onDrop}
-                  onDragOver={onDragOver}
-                  onDragLeave={onDragLeave}
-                />
-              </>
-            )}
-          </NoteWrapper>
+          <NoteWrapper>{whatToShow()}</NoteWrapper>
         </Box>
         <BoxWrapper>
           <SmallBox onClick={() => onClickMode(NotesMode.All)}>
@@ -857,6 +880,29 @@ const BoxTitle = styled.div`
 const BoxImage = styled.img`
   width: 40rem;
   margin-right: 10rem;
+`;
+
+const Image = styled.img`
+  width: 200rem;
+  margin-bottom: 20rem;
+`;
+
+const ImageWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  flex-direction: column;
+  font-family: Pretendard;
+  font-size: 20rem;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.5;
+  letter-spacing: normal;
+  text-align: center;
+  white-space: break-spaces;
+  color: ${(props) => props.theme.color.tertiaryText};
 `;
 
 export default FolderPage;

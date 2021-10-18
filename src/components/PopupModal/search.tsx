@@ -3,12 +3,17 @@ import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import axios from 'axios';
 import { useRecoilValue } from 'recoil';
-import { authenticateToken } from 'state';
+import { authenticateToken, theme } from 'state';
 
 import Loading from 'components/Loading';
 import Note from 'assets/icons/Note.svg';
 import Search from 'assets/icons/SearchIcon.svg';
 import ToggleDown from 'assets/icons/ToggleDown.svg';
+import NoSearchKeywordLight from 'assets/icons/NoSearchKeywordLight.svg';
+import NoSearchKeywordDark from 'assets/icons/NoSearchKeywordDark.svg';
+import NoSearchResultLight from 'assets/icons/NoSearchResultLight.svg';
+import NoSearchResultDark from 'assets/icons/NoSearchResultDark.svg';
+import { lightTheme } from 'styles/theme';
 
 interface SearchResult {
   scriptId: number;
@@ -30,6 +35,7 @@ const SearchModal: FC<Props & RouteComponentProps> = ({
   const [result, setResult] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [resultNode, setResultNode] = useState<ReactNode>(<></>);
+  const currentTheme = useRecoilValue(theme);
 
   const getSearchResult = async (keyword: string) => {
     if (keyword !== '') {
@@ -38,38 +44,66 @@ const SearchModal: FC<Props & RouteComponentProps> = ({
         const response = await axios.get(`/v1/note/search/${keyword}`, {
           headers: { Authorization: `Bearer ${authToken}` },
         });
-        const searchResult: ReactNode = response.data.map(
-          (value: SearchResult) => (
-            <Result
-              key={value.scriptId}
-              onClick={() => history.push(`/note/${value.scriptId}`)}
-            >
-              <Title>
-                <NoteIcon src={Note} />
-                {value.file_name}
-              </Title>
-              <Folder>{value.folderName}</Folder>
-              <Content>
-                {value.paragraphContent.split(keyword).map((value, index) => {
-                  if (index !== 0)
-                    return (
-                      <>
-                        <Highlighted>{keyword}</Highlighted>
-                        {value}
-                      </>
-                    );
-                  return <>{value}</>;
-                })}
-              </Content>
-            </Result>
-          )
-        );
-        setResultNode(searchResult);
         setResult(response.data);
+        if (response.data.length === 0) {
+          setResultNode(
+            <ImageWrapper>
+              <Image
+                src={
+                  currentTheme === lightTheme
+                    ? NoSearchResultLight
+                    : NoSearchResultDark
+                }
+              />
+              검색 결과가 없습니다
+            </ImageWrapper>
+          );
+        } else {
+          const searchResult: ReactNode = response.data.map(
+            (value: SearchResult) => (
+              <Result
+                key={value.scriptId}
+                onClick={() => history.push(`/note/${value.scriptId}`)}
+              >
+                <Title>
+                  <NoteIcon src={Note} />
+                  {value.file_name}
+                </Title>
+                <Folder>{value.folderName}</Folder>
+                <Content>
+                  {value.paragraphContent.split(keyword).map((value, index) => {
+                    if (index !== 0)
+                      return (
+                        <>
+                          <Highlighted>{keyword}</Highlighted>
+                          {value}
+                        </>
+                      );
+                    return <>{value}</>;
+                  })}
+                </Content>
+              </Result>
+            )
+          );
+          setResultNode(searchResult);
+        }
       } catch {
         alert('검색에 실패했습니다. 다시 시도해주세요');
       }
       setLoading(false);
+    } else {
+      setResultNode(
+        <ImageWrapper>
+          <Image
+            src={
+              currentTheme === lightTheme
+                ? NoSearchKeywordLight
+                : NoSearchKeywordDark
+            }
+          />
+          키워드 입력 후 검색해보세요
+        </ImageWrapper>
+      );
     }
   };
 
@@ -85,7 +119,7 @@ const SearchModal: FC<Props & RouteComponentProps> = ({
   }, [searchKeyword]);
 
   useEffect(() => {
-    if (searchKeyword !== '') getSearchResult(searchKeyword);
+    getSearchResult(searchKeyword);
   }, []);
 
   return (
@@ -110,6 +144,27 @@ const SearchModal: FC<Props & RouteComponentProps> = ({
     </>
   );
 };
+
+const Image = styled.img`
+  width: 250rem;
+`;
+
+const ImageWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  flex-direction: column;
+  font-family: Pretendard;
+  font-size: 24rem;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.5;
+  letter-spacing: normal;
+  text-align: center;
+  color: ${(props) => props.theme.color.secondaryText};
+`;
 
 const Highlighted = styled.span`
   color: ${(props) => props.theme.color.purple};
