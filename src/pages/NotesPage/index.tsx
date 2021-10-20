@@ -468,36 +468,43 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
           <ContentWrapper>
             <NoteContents half={showMemo}>
               <Fade out={!showRecordingOptions}>
-                <StartBtn
-                  disabled={!canStart}
-                  onMouseOver={() => setMouseOnCapture(true)}
-                  onMouseOut={() => setMouseOnCapture(false)}
-                  onClick={recordWithoutMic}
-                >
-                  <BtnImage
-                    src={
-                      !mouseOnCapture && currentTheme === lightTheme
-                        ? MicGrey
-                        : MicWhite
-                    }
-                  />
-                  마이크 없이 녹음하기
-                </StartBtn>
-                <StartBtn
-                  disabled={!canStart}
-                  onMouseOver={() => setMouseOnMic(true)}
-                  onMouseOut={() => setMouseOnMic(false)}
-                  onClick={recordWithMic}
-                >
-                  <BtnImage
-                    src={
-                      !mouseOnMic && currentTheme === lightTheme
-                        ? MicGrey
-                        : MicWhite
-                    }
-                  />
-                  마이크로 녹음하기
-                </StartBtn>
+                {!canStart && (
+                  <Message>
+                    서버의 오류로 녹음을 시작할 수 없습니다. 잠시 기다려주세요
+                  </Message>
+                )}
+                <Flex>
+                  <StartBtn
+                    disabled={!canStart}
+                    onMouseOver={() => setMouseOnCapture(true)}
+                    onMouseOut={() => setMouseOnCapture(false)}
+                    onClick={recordWithoutMic}
+                  >
+                    <BtnImage
+                      src={
+                        !mouseOnCapture && currentTheme === lightTheme
+                          ? MicGrey
+                          : MicWhite
+                      }
+                    />
+                    마이크 없이 녹음하기
+                  </StartBtn>
+                  <StartBtn
+                    disabled={!canStart}
+                    onMouseOver={() => setMouseOnMic(true)}
+                    onMouseOut={() => setMouseOnMic(false)}
+                    onClick={recordWithMic}
+                  >
+                    <BtnImage
+                      src={
+                        !mouseOnMic && currentTheme === lightTheme
+                          ? MicGrey
+                          : MicWhite
+                      }
+                    />
+                    마이크로 녹음하기
+                  </StartBtn>
+                </Flex>
               </Fade>
               {content.map((paragraph) => (
                 <Paragraph
@@ -523,6 +530,25 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
     </BaseLayout>
   );
 };
+
+const Flex = styled.div`
+  display: flex;
+`;
+
+const Message = styled.div`
+  height: 20rem;
+  font-family: Pretendard;
+  font-size: 20rem;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  letter-spacing: normal;
+  text-align: center;
+  white-space: break-spaces;
+  color: ${(props) => props.theme.color.tertiaryText};
+  padding-bottom: 100rem;
+  margin-top: -120rem;
+`;
 
 const DotWrapper = styled.div`
   display: flex;
@@ -640,6 +666,7 @@ const fadeOut = keyframes`
 
 const Fade = styled.div<{ out: boolean }>`
   display: ${(props) => (props.out ? 'none' : 'flex')};
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   visibility: ${(props) => (props.out ? 'hidden' : 'visible')};
@@ -668,11 +695,6 @@ const StartBtn = styled.button`
   letter-spacing: normal;
   text-align: left;
   color: ${(props) => props.theme.color.contrast};
-  &:hover {
-    color: #fff;
-    box-shadow: 0 0 20rem 0 rgba(123, 104, 238, 0.6);
-    background-color: #7b68ee;
-  }
 
   border: none;
 
@@ -683,6 +705,8 @@ const StartBtn = styled.button`
   &:hover,
   &:active {
     &:not([disabled]) {
+      color: #fff;
+      box-shadow: 0 0 20rem 0 rgba(123, 104, 238, 0.6);
       cursor: pointer;
       background-color: #6a58d3;
     }
