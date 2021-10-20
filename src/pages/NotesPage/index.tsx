@@ -86,7 +86,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
   const [mouseOnCapture, setMouseOnCapture] = useState<boolean>(false);
   const [lastSequence, setSequence] = useState<number>(0);
   const [lastContent, setLastContent] = useState<string>('');
-  const [lastId, setLastId] = useState<number>();
+  const [lastId, setLastId] = useState<number | null>(null);
 
   const addToLogs = (newLog: string) => {
     setLog((prevLogs) => [...prevLogs, newLog]);
@@ -167,7 +167,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
           paragraphData.append('scriptId', match.params.noteId);
           paragraphData.append('startTime', '00:00');
           paragraphData.append('endTime', '00:00');
-          paragraphData.append('paragraphContent', ' ');
+          paragraphData.append('paragraphContent', '');
           paragraphData.append('paragraphSequence', String(lastSequence));
           paragraphData.append('isBookmarked', '0');
           axios
@@ -223,7 +223,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
           paragraphData.append('scriptId', match.params.noteId);
           paragraphData.append('startTime', '00:00');
           paragraphData.append('endTime', '00:00');
-          paragraphData.append('paragraphContent', ' ');
+          paragraphData.append('paragraphContent', '');
           paragraphData.append('paragraphSequence', String(lastSequence));
           paragraphData.append('isBookmarked', '0');
           axios
@@ -264,7 +264,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
   }, [lastId]);
 
   useEffect(() => {
-    if (lastId !== undefined && lastContent !== '') {
+    if (lastId !== null && lastContent !== '') {
       console.log(`last Content changed to ${lastContent} and id is ${lastId}`);
       // 이전 문단 정보 저장
       const prevData = new FormData();
@@ -588,9 +588,10 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
               {content
                 .filter(
                   (paragraph, index) =>
-                    paragraph.paragraphId === lastId ||
+                    (waiting && paragraph.paragraphId === lastId) ||
                     (paragraph.paragraphContent !== '' &&
-                      paragraph.paragraphContent !== '0')
+                      paragraph.paragraphContent !== '0' &&
+                      paragraph.paragraphContent !== ' ')
                 )
                 .map((paragraph, index) => (
                   <Paragraph

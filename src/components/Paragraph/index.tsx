@@ -125,7 +125,7 @@ const Paragraph: FC<Props> = ({
   };
 
   const editParagraph = () => {
-    console.log('edit Paragraph');
+    console.log(`content : ${content.length}`);
   };
 
   const handleMouseEnter = useCallback(
