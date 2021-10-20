@@ -1,5 +1,5 @@
 import React, { FC, useState, useCallback, useRef } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import axios from 'axios';
 import ParagraphMenu from 'components/ParagraphMenu';
 import { useRecoilValue } from 'recoil';
@@ -19,6 +19,7 @@ interface Props {
   time: string;
   note: string | null;
   recording: boolean;
+  waiting: boolean;
 }
 
 const Paragraph: FC<Props> = ({
@@ -28,6 +29,7 @@ const Paragraph: FC<Props> = ({
   time,
   note,
   recording,
+  waiting,
 }) => {
   const [bookmark, setBookmark] = useState<boolean>(bookmarked);
   const [noted, setNoted] = useState<boolean>(note !== null);
@@ -43,17 +45,15 @@ const Paragraph: FC<Props> = ({
   const authToken = useRecoilValue(authenticateToken);
 
   const bookmarkParagraph = async () => {
-    if (!recording) {
-      try {
-        const bookmarkData = new FormData();
-        bookmarkData.append('paragraphId', String(paragraphId));
-        bookmarkData.append('isBookmarked', bookmark ? '0' : '1');
-        await axios.put(`/v1/script/paragraph/${paragraphId}`, bookmarkData, {
-          headers: { Authorization: `Bearer ${authToken}` },
-        });
-      } catch {
-        alert('북마크에 실패했습니다. 다시 시도해주세요');
-      }
+    try {
+      const bookmarkData = new FormData();
+      bookmarkData.append('paragraphId', String(paragraphId));
+      bookmarkData.append('isBookmarked', bookmark ? '0' : '1');
+      await axios.put(`/v1/script/paragraph/${paragraphId}`, bookmarkData, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+    } catch {
+      alert('북마크에 실패했습니다. 다시 시도해주세요');
     }
     setBookmark(!bookmark);
   };
@@ -103,7 +103,7 @@ const Paragraph: FC<Props> = ({
 
   const endEditing = async () => {
     setMemoEditMode(false);
-    if (!recording && newMemo !== '') {
+    if (newMemo !== '') {
       try {
         const memoData = new FormData();
         memoData.append('paragraphId', String(paragraphId));
@@ -148,6 +148,11 @@ const Paragraph: FC<Props> = ({
       </PreventClick>
       <Contents onMouseUp={highlightSelection} bookmarked={bookmark}>
         {content}
+        {waiting && (
+          <DotWrapper>
+            <DotFalling />
+          </DotWrapper>
+        )}
       </Contents>
       <FlexColumn>
         <BtnWrapper>
@@ -339,6 +344,100 @@ const PreventClick = styled.div<{ visible: boolean }>`
 
 const Relative = styled.div`
   position: relative;
+`;
+
+const DotWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  border: none;
+  margin: 10px;
+  width: 40rem;
+`;
+
+const dotFalling = keyframes`
+  0% {
+    box-shadow: 9999rem -15rem 0 0 rgba(152, 128, 255, 0);
+  }
+  25%,
+  50%,
+  75% {
+    box-shadow: 9999rem 0 0 0 #9A9BA6;
+  }
+  100% {
+    box-shadow: 9999rem 15rem 0 0 rgba(152, 128, 255, 0);
+  }
+`;
+
+const dotFallingBefore = keyframes`
+  0% {
+    box-shadow: 9984rem -15rem 0 0 rgba(152, 128, 255, 0);
+  }
+  25%,
+  50%,
+  75% {
+    box-shadow: 9984rem 0 0 0 #9A9BA6;
+  }
+  100% {
+    box-shadow: 9984rem 15rem 0 0 rgba(152, 128, 255, 0);
+  }
+`;
+
+const dotFallingAfter = keyframes`
+  0% {
+    box-shadow: 10014rem -15rem 0 0 rgba(152, 128, 255, 0);
+  }
+  25%,
+  50%,
+  75% {
+    box-shadow: 10014rem 0 0 0 #9A9BA6;
+  }
+  100% {
+    box-shadow: 10014rem 15rem 0 0 rgba(152, 128, 255, 0);
+  }
+`;
+
+const DotFalling = styled.div`
+  position: relative;
+  left: -9999rem;
+  width: 10rem;
+  height: 10rem;
+  border-radius: 5rem;
+  background-color: #9a9ba6;
+  color: #9a9ba6;
+  box-shadow: 9999rem 0 0 0 #9a9ba6;
+  animation: ${dotFalling} 1s infinite linear;
+  animation-delay: 0.1s;
+
+  &::before {
+    content: '';
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    width: 10rem;
+    height: 10rem;
+    border-radius: 5rem;
+    background-color: #9a9ba6;
+    color: #9a9ba6;
+    animation: ${dotFallingBefore} 1s infinite linear;
+    animation-delay: 0s;
+  }
+
+  &::after {
+    content: '';
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    width: 10rem;
+    height: 10rem;
+    border-radius: 5rem;
+    background-color: #9a9ba6;
+    color: #9a9ba6;
+    animation: ${dotFallingAfter} 1s infinite linear;
+    animation-delay: 0.2s;
+  }
 `;
 
 export default Paragraph;

@@ -33,7 +33,7 @@ import MicGrey from 'assets/icons/MicGrey.svg';
 import MicWhite from 'assets/icons/MicWhite.svg';
 
 interface ParagraphData {
-  paragraphId?: number;
+  paragraphId: number;
   scriptId?: number;
   userId?: number;
   paragraphSequence: number;
@@ -84,6 +84,9 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
     useState<boolean>(false);
   const [mouseOnMic, setMouseOnMic] = useState<boolean>(false);
   const [mouseOnCapture, setMouseOnCapture] = useState<boolean>(false);
+  const [lastSequence, setSequence] = useState<number>(0);
+  const [lastContent, setLastContent] = useState<string>('');
+  const [lastId, setLastId] = useState<number>();
 
   const addToLogs = (newLog: string) => {
     setLog((prevLogs) => [...prevLogs, newLog]);
@@ -99,54 +102,38 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
         }\n${newContent}`,
       },
     ]);
+    setLastContent((prev) => `${prev}\n${newContent}`);
   };
 
   const addNewParagraph = (remaining: string) => {
-    if (remaining !== '') {
-      setContent((prevContent) => [
-        ...prevContent.slice(0, -1),
-        {
-          ...prevContent[prevContent.length - 1],
-          paragraphContent: `${
-            prevContent[prevContent.length - 1].paragraphContent
-          }
-          \n
-          ${remaining}`,
-        },
-        {
-          paragraphSequence:
-            prevContent[prevContent.length - 1].paragraphSequence + 1,
-          startTime: '00:00',
-          endTime: '00:00',
-          paragraphContent: '',
-          memoContent: null,
-          isBookmarked: 0,
-        },
-      ]);
-    } else {
-      setContent((prevContent) => [
-        ...prevContent,
-        {
-          paragraphSequence:
-            prevContent[prevContent.length - 1].paragraphSequence + 1,
-          startTime: '00:00',
-          endTime: '00:00',
-          paragraphContent: '',
-          memoContent: null,
-          isBookmarked: 0,
-        },
-      ]);
-    }
-    // TODO : 끝난 paragraph api로 보내주기
-  };
-
-  const recordWithMic = () => {
-    if (dictate !== undefined) {
-      dictate.init(0).then((result) => {
-        if (result) {
-          setContent([
+    const paragraphData = new FormData();
+    paragraphData.append('scriptId', match.params.noteId);
+    paragraphData.append('startTime', '00:00');
+    paragraphData.append('endTime', '00:00');
+    paragraphData.append('paragraphContent', String(lastSequence));
+    paragraphData.append('paragraphSequence', '0');
+    paragraphData.append('isBookmarked', '0');
+    axios
+      .post(`/v1/script/paragraph/${match.params.noteId}`, paragraphData, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      })
+      .then((response) => {
+        const id = response.data.paragraphId;
+        setLastId((prev) => id);
+        if (remaining !== '') {
+          setContent((prevContent) => [
+            ...prevContent.slice(0, -1),
             {
-              paragraphSequence: 0,
+              ...prevContent[prevContent.length - 1],
+              paragraphContent: `${
+                prevContent[prevContent.length - 1].paragraphContent
+              }
+        \n
+        ${remaining}`,
+            },
+            {
+              paragraphId: id,
+              paragraphSequence: lastSequence,
               startTime: '00:00',
               endTime: '00:00',
               paragraphContent: '',
@@ -154,10 +141,63 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
               isBookmarked: 0,
             },
           ]);
-          dictate.startListening();
-          setRecording(true);
-          setShowRecordingOptions(false);
-          setWaiting(true);
+        } else {
+          setContent((prevContent) => [
+            ...prevContent,
+            {
+              paragraphId: id,
+              paragraphSequence: lastSequence,
+              startTime: '00:00',
+              endTime: '00:00',
+              paragraphContent: '',
+              memoContent: null,
+              isBookmarked: 0,
+            },
+          ]);
+        }
+        setSequence((prev) => prev + 1);
+      });
+  };
+
+  const recordWithMic = () => {
+    if (dictate !== undefined) {
+      dictate.init(0).then((result) => {
+        if (result) {
+          const paragraphData = new FormData();
+          paragraphData.append('scriptId', match.params.noteId);
+          paragraphData.append('startTime', '00:00');
+          paragraphData.append('endTime', '00:00');
+          paragraphData.append('paragraphContent', ' ');
+          paragraphData.append('paragraphSequence', String(lastSequence));
+          paragraphData.append('isBookmarked', '0');
+          axios
+            .post(
+              `/v1/script/paragraph/${match.params.noteId}`,
+              paragraphData,
+              {
+                headers: { Authorization: `Bearer ${authToken}` },
+              }
+            )
+            .then((response) => {
+              const id = response.data.paragraphId;
+              setLastId((prev) => id);
+              setContent([
+                {
+                  paragraphId: id,
+                  paragraphSequence: lastSequence,
+                  startTime: '00:00',
+                  endTime: '00:00',
+                  paragraphContent: '',
+                  memoContent: null,
+                  isBookmarked: 0,
+                },
+              ]);
+              setSequence((prev) => prev + 1);
+              dictate.startListening();
+              setRecording(true);
+              setShowRecordingOptions(false);
+              setWaiting(true);
+            });
         }
       });
     }
@@ -179,24 +219,62 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
     if (dictate !== undefined) {
       dictate.init(1).then((result) => {
         if (result) {
-          setContent([
-            {
-              paragraphSequence: 0,
-              startTime: '00:00',
-              endTime: '00:00',
-              paragraphContent: '',
-              memoContent: null,
-              isBookmarked: 0,
-            },
-          ]);
-          dictate.startListening();
-          setRecording(true);
-          setShowRecordingOptions(false);
-          setWaiting(true);
+          const paragraphData = new FormData();
+          paragraphData.append('scriptId', match.params.noteId);
+          paragraphData.append('startTime', '00:00');
+          paragraphData.append('endTime', '00:00');
+          paragraphData.append('paragraphContent', ' ');
+          paragraphData.append('paragraphSequence', String(lastSequence));
+          paragraphData.append('isBookmarked', '0');
+          axios
+            .post(
+              `/v1/script/paragraph/${match.params.noteId}`,
+              paragraphData,
+              {
+                headers: { Authorization: `Bearer ${authToken}` },
+              }
+            )
+            .then((response) => {
+              const id = response.data.paragraphId;
+              setLastId((prev) => id);
+              setContent([
+                {
+                  paragraphId: id,
+                  paragraphSequence: lastSequence,
+                  startTime: '00:00',
+                  endTime: '00:00',
+                  paragraphContent: '',
+                  memoContent: null,
+                  isBookmarked: 0,
+                },
+              ]);
+              setSequence((prev) => prev + 1);
+              dictate.startListening();
+              setRecording(true);
+              setShowRecordingOptions(false);
+              setWaiting(true);
+            });
         }
       });
     }
   };
+
+  useEffect(() => {
+    console.log(`id changed to ${lastId}`);
+  }, [lastId]);
+
+  useEffect(() => {
+    if (lastId !== undefined && lastContent !== '') {
+      console.log(`last Content changed to ${lastContent} and id is ${lastId}`);
+      // 이전 문단 정보 저장
+      const prevData = new FormData();
+      prevData.append('paragraphId', String(lastId));
+      prevData.append('paragraphContent', lastContent);
+      axios.put(`/v1/script/paragraph/${lastId}`, prevData, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+    }
+  }, [lastContent]);
 
   useEffect(() => {
     const dictate = new Dictate({
@@ -236,6 +314,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
         );
         // addToTranscription(result);
         if (result.includes('^')) {
+          setLastContent((prev) => '');
           addNewParagraph(result.split('^')[0]);
         } else if (result !== '' && result !== '.') {
           addToContent(result);
@@ -506,22 +585,25 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
                   </StartBtn>
                 </Flex>
               </Fade>
-              {content.map((paragraph) => (
-                <Paragraph
-                  key={paragraph.paragraphId ?? paragraph.paragraphSequence}
-                  recording={recording}
-                  paragraphId={paragraph.paragraphId ?? 0}
-                  bookmarked={paragraph.isBookmarked === 1}
-                  content={paragraph.paragraphContent}
-                  time={paragraph.startTime}
-                  note={paragraph.memoContent}
-                />
-              ))}
-              {waiting && (
-                <DotWrapper>
-                  <DotFalling />
-                </DotWrapper>
-              )}
+              {content
+                .filter(
+                  (paragraph, index) =>
+                    paragraph.paragraphId === lastId ||
+                    (paragraph.paragraphContent !== '' &&
+                      paragraph.paragraphContent !== '0')
+                )
+                .map((paragraph, index) => (
+                  <Paragraph
+                    key={paragraph.paragraphId}
+                    recording={recording}
+                    paragraphId={paragraph.paragraphId}
+                    bookmarked={paragraph.isBookmarked === 1}
+                    content={paragraph.paragraphContent}
+                    time={paragraph.startTime}
+                    note={paragraph.memoContent}
+                    waiting={waiting && paragraph.paragraphId === lastId}
+                  />
+                ))}
             </NoteContents>
             <Memos visible={showMemo} />
           </ContentWrapper>
