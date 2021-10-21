@@ -4,7 +4,7 @@
 
 [비전 노트에 놀러오세요](https://visionnote.io)
 
-[비전 노트 시연 영상보기](https://drive.google.com/file/d/1ckol_MabqlhtlS_G2viEho1xCJfzXzT5/view?usp=sharing)
+[비전 노트 시연 영상보기 - 화질 720p, 재생속도 2배속을 권장합니다 :)](https://drive.google.com/file/d/1ckol_MabqlhtlS_G2viEho1xCJfzXzT5/view?usp=sharing)
 
 ### 기술 스택
 - [x] React.js
