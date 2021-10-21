@@ -103,7 +103,7 @@ const UserModal: FC<Props & RouteComponentProps> = ({
   const authenticate = async () => {
     const frm = new FormData();
     frm.append('email', user.email);
-    frm.append('password', 'coco1003!');
+    frm.append('password', newPassword);
     try {
       const response = await axios.post('/v1/authenticate', frm);
       localStorage.setItem('user', JSON.stringify(response.data.token));
@@ -150,11 +150,23 @@ const UserModal: FC<Props & RouteComponentProps> = ({
     setShowPasswordAlert(false);
   };
 
+  const testPassword = (password: string) => {
+    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%*?&]{8,20}/.test(
+      password
+    );
+  };
+
   const confirmNewPassword = () => {
     if (newPassword !== confirmPassword) {
       setNewPassword('');
       setConfirmPassword('');
       alert('비밀번호를 다시 확인해주세요');
+    } else if (!testPassword(newPassword)) {
+      setNewPassword('');
+      setConfirmPassword('');
+      alert(
+        '비밀번호는 영문 대소문자, 숫자, 특수문자를 포함하여 8-20자로 설정해주세요'
+      );
     } else setShowPasswordAlert(false);
   };
 
