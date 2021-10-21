@@ -65,10 +65,10 @@ const ParagraphMenu: FC<Props> = ({
           <ContextImage src={Edit} />
           강의록 수정
         </MenuList>
-        <MenuList onClick={playParagraph}>
+        {/* <MenuList onClick={playParagraph}>
           <ContextImage src={Play} />
           구간 다시 듣기
-        </MenuList>
+        </MenuList> */}
       </Menu>
     </>
   );

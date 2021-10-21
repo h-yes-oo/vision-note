@@ -538,9 +538,9 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
                     녹음 멈추기
                   </RecordingStatus>
                 )}
-                <MemoBtn onClick={() => setShowMemo(!showMemo)}>
+                {/* <MemoBtn onClick={() => setShowMemo(!showMemo)}>
                   {showMemo ? '전체 메모 닫기' : '전체 메모 보기'}
-                </MemoBtn>
+                </MemoBtn> */}
               </RecordingWrapper>
             </InfoBottom>
           </NoteInfo>
@@ -596,7 +596,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
                 .map((paragraph, index) => (
                   <Paragraph
                     key={paragraph.paragraphId}
-                    recording={recording}
+                    recording={waiting}
                     paragraphId={paragraph.paragraphId}
                     bookmarked={paragraph.isBookmarked === 1}
                     content={paragraph.paragraphContent}

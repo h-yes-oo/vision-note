@@ -1,4 +1,4 @@
-import React, { FC, useState, useCallback, useRef } from 'react';
+import React, { FC, useState, useCallback, useRef, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import axios from 'axios';
 import ParagraphMenu from 'components/ParagraphMenu';
@@ -40,9 +40,19 @@ const Paragraph: FC<Props> = ({
   const [memo, setMemo] = useState<string | null>(note);
   const [memoEditMode, setMemoEditMode] = useState<boolean>(false);
   const [newMemo, setNewMemo] = useState<string>(note ?? '');
+  const [contentToShow, setContentToShow] = useState<string>(content);
+  const [paragraphEditMode, setParagraphEditMode] = useState<boolean>(false);
+  const [newContent, setNewContent] = useState<string>(content);
   const memoRef: React.RefObject<HTMLTextAreaElement> =
     useRef<HTMLTextAreaElement>(null);
+  const contentRef: React.RefObject<HTMLTextAreaElement> =
+    useRef<HTMLTextAreaElement>(null);
   const authToken = useRecoilValue(authenticateToken);
+
+  useEffect(() => {
+    setContentToShow(content);
+    setNewContent(content);
+  }, [content]);
 
   const bookmarkParagraph = async () => {
     try {
@@ -101,7 +111,7 @@ const Paragraph: FC<Props> = ({
     setMemoEditMode(true);
   };
 
-  const endEditing = async () => {
+  const endEditingMemo = async () => {
     setMemoEditMode(false);
     if (newMemo !== '') {
       try {
@@ -113,19 +123,45 @@ const Paragraph: FC<Props> = ({
         });
         setMemo(newMemo);
       } catch {
+        alert('메모를 변경하지 못했습니다');
+      }
+    }
+  };
+
+  const endEditingContent = async () => {
+    setParagraphEditMode(false);
+    if (newContent !== '') {
+      try {
+        const paragraphData = new FormData();
+        paragraphData.append('paragraphId', String(paragraphId));
+        paragraphData.append('paragraphContent', newContent);
+        await axios.put(`/v1/script/paragraph/${paragraphId}`, paragraphData, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+        setContentToShow(newContent);
+      } catch {
         alert('폴더 이름을 변경하지 못했습니다');
       }
     }
   };
 
-  const onPressEnter = async (e: React.KeyboardEvent) => {
+  const onPressEnterMemo = async (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      await endEditing();
+      await endEditingMemo();
+    }
+  };
+
+  const onPressEnterContent = async (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      await endEditingContent();
     }
   };
 
   const editParagraph = () => {
-    console.log(`content : ${content.length}`);
+    if (contentRef.current !== null) {
+      setTimeout(() => contentRef.current!.focus(), 10);
+    }
+    setParagraphEditMode(true);
   };
 
   const handleMouseEnter = useCallback(
@@ -146,14 +182,24 @@ const Paragraph: FC<Props> = ({
           onClick={onClickHighlight}
         />
       </PreventClick>
-      <Contents onMouseUp={highlightSelection} bookmarked={bookmark}>
-        {content}
-        {waiting && (
-          <DotWrapper>
-            <DotFalling />
-          </DotWrapper>
-        )}
-      </Contents>
+      {paragraphEditMode ? (
+        <EditContent
+          bookmarked={bookmark}
+          ref={contentRef}
+          value={newContent}
+          onChange={(e) => setNewContent(e.target.value)}
+          onKeyPress={onPressEnterContent}
+        />
+      ) : (
+        <Contents onMouseUp={highlightSelection} bookmarked={bookmark}>
+          {contentToShow}
+          {waiting && (
+            <DotWrapper>
+              <DotFalling />
+            </DotWrapper>
+          )}
+        </Contents>
+      )}
       <FlexColumn>
         <BtnWrapper>
           <TimeStamp>{time}</TimeStamp>
@@ -163,7 +209,7 @@ const Paragraph: FC<Props> = ({
                 src={bookmark ? BookMarkFull : BookMarkEmpty}
                 onClick={bookmarkParagraph}
               />
-              <Note src={noted ? NoteFull : NoteEmpty} />
+              <Note src={noted ? NoteFull : NoteEmpty} onClick={editMemo} />
             </>
           ) : (
             <Relative
@@ -190,12 +236,36 @@ const Paragraph: FC<Props> = ({
           ref={memoRef}
           value={newMemo}
           onChange={(e) => setNewMemo(e.target.value)}
-          onKeyPress={onPressEnter}
+          onKeyPress={onPressEnterMemo}
         />
       </FlexColumn>
     </Root>
   );
 };
+
+const EditContent = styled.textarea<{ bookmarked: boolean }>`
+  font-family: Pretendard;
+  font-size: 19rem;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.63;
+  letter-spacing: normal;
+  text-align: left;
+  color: ${(props) => props.theme.color.primaryText};
+  white-space: pre-wrap;
+  user-select: text !important;
+  border-radius: 3rem;
+  padding: 20rem 0;
+  min-width: 500rem;
+  max-width: 90%;
+  background-color: ${(props) =>
+    props.bookmarked ? props.theme.color.highlightBackground : ''};
+  ${(props) =>
+    props.bookmarked
+      ? 'border-left: 5rem solid #7b68ee; padding: 20rem 15rem 20rem 20rem;'
+      : ''}
+`;
 
 const FlexColumn = styled.div`
   display: flex;
@@ -279,6 +349,8 @@ const Contents = styled.div<{ bookmarked: boolean }>`
   user-select: text !important;
   border-radius: 3rem;
   padding: 20rem 0;
+  min-width: 500rem;
+  max-width: 90%;
   background-color: ${(props) =>
     props.bookmarked ? props.theme.color.highlightBackground : ''};
   ${(props) =>
