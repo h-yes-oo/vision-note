@@ -168,7 +168,7 @@ const FolderPage: FC<Props> = () => {
       //       value.noteFile!.createdAt.slice(0, 10).replace(/-/gi, '.') >
       //         beforeOneMonth)
       // );
-      const allNotes = await getAllNotes(rootFolderId);
+      const allNotes = await getAllNotes(response.data.rootFolderId);
       if (allNotes.length === 0) {
         setNoNotes(true);
         return;
