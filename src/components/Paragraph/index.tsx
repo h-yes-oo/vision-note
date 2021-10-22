@@ -33,7 +33,7 @@ const Paragraph: FC<Props> = ({
   waiting,
 }) => {
   const [bookmark, setBookmark] = useState<boolean>(bookmarked);
-  const [noted, setNoted] = useState<boolean>(note !== null);
+  const [noted, setNoted] = useState<boolean>(note !== null && note !== '');
   const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
   const [showHighlightBtn, setShowHighlightBtn] = useState<boolean>(false);
   const [showMenu, setShowMenu] = useState<boolean>(false);
@@ -148,6 +148,20 @@ const Paragraph: FC<Props> = ({
           headers: { Authorization: `Bearer ${authToken}` },
         });
         setMemo(newMemo);
+        setNoted(true);
+      } catch {
+        alert('메모를 변경하지 못했습니다');
+      }
+    } else {
+      try {
+        const memoData = new FormData();
+        memoData.append('paragraphId', String(paragraphId));
+        memoData.append('memoContent', '');
+        await axios.put(`/v1/script/paragraph/${paragraphId}`, memoData, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+        setMemo(newMemo);
+        setNoted(false);
       } catch {
         alert('메모를 변경하지 못했습니다');
       }
@@ -298,7 +312,7 @@ const Paragraph: FC<Props> = ({
             </Relative>
           )}
         </BtnWrapper>
-        {!memoEditMode && memo !== null && <Memo>{memo}</Memo>}
+        {!memoEditMode && noted && <Memo>{memo}</Memo>}
         <EditMemo
           visible={memoEditMode}
           ref={memoRef}
@@ -326,7 +340,7 @@ const EditContent = styled.textarea<{ bookmarked: boolean }>`
   border-radius: 3rem;
   padding: 20rem 0;
   min-width: 500rem;
-  max-width: 90%;
+  max-width: 70%;
   background-color: ${(props) =>
     props.bookmarked ? props.theme.color.highlightBackground : ''};
   ${(props) =>
@@ -426,7 +440,7 @@ const Contents = styled.div<{ bookmarked: boolean }>`
   border-radius: 3rem;
   padding: 20rem 0;
   min-width: 500rem;
-  max-width: 90%;
+  max-width: 70%;
   background-color: ${(props) =>
     props.bookmarked ? props.theme.color.highlightBackground : ''};
   ${(props) =>
