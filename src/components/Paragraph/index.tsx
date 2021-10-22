@@ -10,6 +10,7 @@ import BookMarkFull from 'assets/icons/BookMarkFull.svg';
 import NoteEmpty from 'assets/icons/NoteEmpty.svg';
 import NoteFull from 'assets/icons/NoteFull.svg';
 import HighlightButton from 'assets/icons/HighlightButton.svg';
+import HighlightCancel from 'assets/icons/HighlightCancel.png';
 import MoreHorizontal from 'assets/icons/MoreHorizontal.svg';
 
 interface Props {
@@ -34,7 +35,6 @@ const Paragraph: FC<Props> = ({
   const [bookmark, setBookmark] = useState<boolean>(bookmarked);
   const [noted, setNoted] = useState<boolean>(note !== null);
   const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
-  const [selectedRange, setSelectedRange] = useState<Range | null>(null);
   const [showHighlightBtn, setShowHighlightBtn] = useState<boolean>(false);
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const [memo, setMemo] = useState<string | null>(note);
@@ -48,6 +48,10 @@ const Paragraph: FC<Props> = ({
   const contentRef: React.RefObject<HTMLTextAreaElement> =
     useRef<HTMLTextAreaElement>(null);
   const authToken = useRecoilValue(authenticateToken);
+  const [highlightKeyword, setHighlightKeyword] = useState<string[]>([]);
+  const [selectedKeyword, setSelectedKeyword] = useState<string>('');
+  const [showHighlightCancelBtn, setShowHighlightCancelBtn] =
+    useState<boolean>(false);
 
   useEffect(() => {
     setContentToShow(content);
@@ -74,34 +78,49 @@ const Paragraph: FC<Props> = ({
       if (userSelection !== undefined && userSelection.toString()) {
         setAnchorPoint({ x: event.pageX, y: event.pageY });
         setShowHighlightBtn(true);
-        setSelectedRange(userSelection);
+        setSelectedKeyword(userSelection.toString());
       }
     } catch {
       console.log('highlight error');
     }
   };
 
-  const highlightRange = (range) => {
-    try {
-      const newNode = document.createElement('span');
-      newNode.setAttribute('style', 'color: #7b68ee; display: inline;');
-      range.surroundContents(newNode);
-      // TODO : 하이라이트된 내용 서버에 저장
-    } catch {
-      alert('이미 하이라이팅된 부분은 다시 하이라이트할 수 없습니다');
-    }
+  const highlightRange = (keyword) => {
+    setHighlightKeyword((prev) => [...prev, keyword]);
     window.getSelection()?.removeAllRanges();
   };
+
+  useEffect(() => {
+    console.log(`keywords : ${highlightKeyword.join(' ')}`);
+    // TODO : 데이터베이스로 highlight keyword 보내기
+  }, [highlightKeyword]);
 
   const onClickHighlight = () => {
     setShowHighlightBtn(false);
-    highlightRange(selectedRange);
+    highlightRange(selectedKeyword);
+  };
+
+  const onClickHighlighted = (event: React.MouseEvent, word: string) => {
+    setAnchorPoint({ x: event.pageX, y: event.pageY });
+    setShowHighlightCancelBtn(true);
+    setSelectedKeyword(word);
+  };
+
+  const cancelHighlight = () => {
+    setHighlightKeyword((prev) =>
+      prev.filter((val) => val !== selectedKeyword)
+    );
+    setShowHighlightCancelBtn(false);
   };
 
   const onClickOther = () => {
-    setShowHighlightBtn(false);
+    if (showHighlightBtn) {
+      setShowHighlightBtn(false);
+      window.getSelection()?.removeAllRanges();
+    } else {
+      setShowHighlightCancelBtn(false);
+    }
     setAnchorPoint({ x: 0, y: 0 });
-    window.getSelection()?.removeAllRanges();
   };
 
   const editMemo = () => {
@@ -172,14 +191,50 @@ const Paragraph: FC<Props> = ({
     [setShowMenu]
   );
 
+  const highlightContent = () => {
+    const splited = [contentToShow];
+    highlightKeyword
+      .sort((a, b) => b.length - a.length)
+      .forEach((keyword) => {
+        for (let idx = 0; idx < splited.length; ) {
+          if (highlightKeyword.includes(splited[idx])) {
+            // 이미 중요 단어 단계까지 쪼개져 있으면 더 쪼개지 않음
+            idx += 1;
+          } else {
+            // 해당 키워드를 포함하여 쪼개기
+            const trick = splited[idx].split(new RegExp(`(${keyword})`));
+            splited.splice(idx, 1, ...trick);
+            idx += trick.length;
+          }
+        }
+      });
+    const toShow = splited.map((word) => {
+      if (highlightKeyword.includes(word))
+        return (
+          <Highlighted
+            onClick={(event: React.MouseEvent) =>
+              onClickHighlighted(event, word)
+            }
+          >
+            {word}
+          </Highlighted>
+        );
+      return <>{word}</>;
+    });
+    return toShow;
+  };
+
   return (
     <Root>
-      <PreventClick visible={showHighlightBtn} onClick={onClickOther}>
+      <PreventClick
+        visible={showHighlightBtn || showHighlightCancelBtn}
+        onClick={onClickOther}
+      >
         <HighligtBtn
           top={anchorPoint.y - 58}
           left={anchorPoint.x - 30}
-          src={HighlightButton}
-          onClick={onClickHighlight}
+          src={showHighlightBtn ? HighlightButton : HighlightCancel}
+          onClick={showHighlightBtn ? onClickHighlight : cancelHighlight}
         />
       </PreventClick>
       {paragraphEditMode ? (
@@ -192,7 +247,7 @@ const Paragraph: FC<Props> = ({
         />
       ) : (
         <Contents onMouseUp={highlightSelection} bookmarked={bookmark}>
-          {contentToShow}
+          {highlightContent()}
           {waiting && (
             <DotWrapper>
               <DotFalling />
@@ -265,6 +320,14 @@ const EditContent = styled.textarea<{ bookmarked: boolean }>`
     props.bookmarked
       ? 'border-left: 5rem solid #7b68ee; padding: 20rem 15rem 20rem 20rem;'
       : ''}
+`;
+
+const Highlighted = styled.span`
+  color: ${(props) => props.theme.color.purple};
+  &:hover {
+    text-shadow: 0 0 black;
+    cursor: pointer;
+  }
 `;
 
 const FlexColumn = styled.div`
@@ -399,6 +462,7 @@ const HighligtBtn = styled.img<{ top: number; left: number }>`
   transition: opacity 0.5s linear;
   top: ${(props) => props.top}px;
   left: ${(props) => props.left}px;
+  height: 68rem;
   &:hover {
     cursor: pointer;
   }

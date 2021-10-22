@@ -71,16 +71,18 @@ const SearchModal: FC<Props & RouteComponentProps> = ({
                 </Title>
                 <Folder>{value.folderName}</Folder>
                 <Content>
-                  {value.paragraphContent.split(keyword).map((value, index) => {
-                    if (index !== 0)
-                      return (
-                        <>
-                          <Highlighted>{keyword}</Highlighted>
-                          {value}
-                        </>
-                      );
-                    return <>{value}</>;
-                  })}
+                  {value.paragraphContent
+                    .split(keyword)
+                    .map((notKeyword, index) => {
+                      if (index !== 0)
+                        return (
+                          <>
+                            <Highlighted>{keyword}</Highlighted>
+                            {notKeyword}
+                          </>
+                        );
+                      return <>{notKeyword}</>;
+                    })}
                 </Content>
               </Result>
             )
