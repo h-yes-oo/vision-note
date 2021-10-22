@@ -78,20 +78,27 @@ const Paragraph: FC<Props> = ({
       if (userSelection !== undefined && userSelection.toString()) {
         setAnchorPoint({ x: event.pageX, y: event.pageY });
         setShowHighlightBtn(true);
-        setSelectedKeyword(userSelection.toString());
+        setSelectedKeyword(userSelection.toString().trim());
       }
     } catch {
       console.log('highlight error');
     }
   };
 
-  const highlightRange = (keyword) => {
-    setHighlightKeyword((prev) => [...prev, keyword]);
+  const highlightRange = (keyword: string) => {
+    if (keyword.includes('?')) {
+      setHighlightKeyword((prev) => [
+        ...prev,
+        ...keyword.split('?').map((value: string) => value.trim()),
+      ]);
+    } else {
+      setHighlightKeyword((prev) => [...prev, keyword]);
+    }
     window.getSelection()?.removeAllRanges();
   };
 
   useEffect(() => {
-    console.log(`keywords : ${highlightKeyword.join(' ')}`);
+    console.log(highlightKeyword);
     // TODO : 데이터베이스로 highlight keyword 보내기
   }, [highlightKeyword]);
 
@@ -196,16 +203,22 @@ const Paragraph: FC<Props> = ({
     highlightKeyword
       .sort((a, b) => b.length - a.length)
       .forEach((keyword) => {
-        for (let idx = 0; idx < splited.length; ) {
-          if (highlightKeyword.includes(splited[idx])) {
-            // 이미 중요 단어 단계까지 쪼개져 있으면 더 쪼개지 않음
-            idx += 1;
-          } else {
-            // 해당 키워드를 포함하여 쪼개기
-            const trick = splited[idx].split(new RegExp(`(${keyword})`));
-            splited.splice(idx, 1, ...trick);
-            idx += trick.length;
+        try {
+          const regExp = new RegExp(`(${keyword})`);
+          for (let idx = 0; idx < splited.length; ) {
+            if (highlightKeyword.includes(splited[idx])) {
+              // 이미 중요 단어 단계까지 쪼개져 있으면 더 쪼개지 않음
+              idx += 1;
+            } else {
+              // 해당 키워드를 포함하여 쪼개기
+              const trick = splited[idx].split(regExp);
+              splited.splice(idx, 1, ...trick);
+              idx += trick.length;
+            }
           }
+        } catch (error) {
+          // 물음표를 포함하는 경우 간혹 에러 발생
+          console.log(error);
         }
       });
     const toShow = splited.map((word) => {
