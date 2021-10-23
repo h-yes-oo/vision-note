@@ -1,4 +1,4 @@
-import { FC, useState, ReactNode, useEffect } from 'react';
+import React, { FC, useState, ReactNode, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import axios from 'axios';
@@ -124,6 +124,12 @@ const SearchModal: FC<Props & RouteComponentProps> = ({
     getSearchResult(searchKeyword);
   }, []);
 
+  const getLength = (input: any[]) => {
+    return input.length;
+  };
+
+  const resultLength = useMemo(() => getLength(result), [result]);
+
   return (
     <>
       <SearchBar
@@ -138,7 +144,7 @@ const SearchModal: FC<Props & RouteComponentProps> = ({
           <ToggleIcon src={ToggleDown} />
         </Num>
         <Num>
-          <Span>{`${result.length} `}</Span>
+          <Span>{`${resultLength} `}</Span>
           개의 결과
         </Num>
       </Sort>
@@ -275,4 +281,4 @@ const NoteIcon = styled.img`
   margin-right: 13rem;
 `;
 
-export default withRouter(SearchModal);
+export default withRouter(React.memo(SearchModal));

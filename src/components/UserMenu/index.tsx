@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useState, useCallback } from 'react';
 import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import { useRecoilState, useSetRecoilState } from 'recoil';
@@ -25,9 +25,9 @@ const UserMenu: FC<Props & RouteComponentProps> = ({
   const setAuthToken = useSetRecoilState(authenticateToken);
   const [currentTheme, setTheme] = useRecoilState(theme);
 
-  const closeModal = () => {
+  const closeModal = useCallback(() => {
     setUserModal(false);
-  };
+  }, []);
 
   const darkmode = () => {
     if (currentTheme === lightTheme) {

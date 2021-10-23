@@ -1,4 +1,4 @@
-import React, { FC, useState, useRef } from 'react';
+import React, { FC, useState, useRef, useMemo, useEffect } from 'react';
 import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import { useRecoilValue, useRecoilState } from 'recoil';
@@ -175,6 +175,21 @@ const UserModal: FC<Props & RouteComponentProps> = ({
     return editType ? ToggleUpDark : ToggleDownDark;
   };
 
+  const toggleSrc = useMemo(() => getToggleSrc(), [currentTheme, editType]);
+
+  const getTypeName = (input: number) => {
+    return input === 1 ? '초/중/고' : '대학생/일반인';
+  };
+
+  const getEmail = () => {
+    console.log('get user email');
+    return user ? user.email : '';
+  };
+
+  const userEmail = useMemo(() => getEmail(), [user]);
+
+  const typeName = useMemo(() => getTypeName(type), [type]);
+
   const ModalInner = (
     <>
       <Top>
@@ -192,11 +207,7 @@ const UserModal: FC<Props & RouteComponentProps> = ({
         <Wrapper>
           <FlexCenter>
             <Title>이메일</Title>
-            <Content
-              disabled
-              type="email"
-              placeholder={user ? user.email : ''}
-            />
+            <Content disabled type="email" placeholder={userEmail} />
           </FlexCenter>
           <FlexCenter>
             <Title>닉네임</Title>
@@ -215,9 +226,7 @@ const UserModal: FC<Props & RouteComponentProps> = ({
           <FlexCenter>
             <Title>학생 구분</Title>
             <Relative>
-              <TypeContent>
-                {type === 1 ? '초/중/고' : '대학생/일반인'}
-              </TypeContent>
+              <TypeContent>{typeName}</TypeContent>
               <Menu show={editType}>
                 <TypeOption onClick={() => onClickOption(1)}>
                   <UserIcon src={UserEdit} />
@@ -230,7 +239,7 @@ const UserModal: FC<Props & RouteComponentProps> = ({
               </Menu>
             </Relative>
             <EditButton
-              src={getToggleSrc()}
+              src={toggleSrc}
               onClick={() => setEditType(!editType)}
             />
           </FlexCenter>
@@ -578,4 +587,4 @@ const UploadButton = styled.input`
   clip: rect(0, 0, 0, 0);
 `;
 
-export default withRouter(UserModal);
+export default withRouter(React.memo(UserModal));
