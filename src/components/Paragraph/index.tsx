@@ -21,6 +21,7 @@ interface Props {
   note: string | null;
   recording: boolean;
   waiting: boolean;
+  partialResult: string;
 }
 
 const Paragraph: FC<Props> = ({
@@ -31,6 +32,7 @@ const Paragraph: FC<Props> = ({
   note,
   recording,
   waiting,
+  partialResult,
 }) => {
   const [bookmark, setBookmark] = useState<boolean>(bookmarked);
   const [noted, setNoted] = useState<boolean>(note !== null && note !== '');
@@ -276,9 +278,12 @@ const Paragraph: FC<Props> = ({
         <Contents onMouseUp={highlightSelection} bookmarked={bookmark}>
           {highlightContent()}
           {waiting && (
-            <DotWrapper>
-              <DotFalling />
-            </DotWrapper>
+            <>
+              <PartialResult>{partialResult}</PartialResult>
+              <DotWrapper>
+                <DotFalling />
+              </DotWrapper>
+            </>
           )}
         </Contents>
       )}
@@ -324,6 +329,11 @@ const Paragraph: FC<Props> = ({
     </Root>
   );
 };
+
+const PartialResult = styled.div`
+  font-style: oblique;
+  color: ${(props) => props.theme.color.tertiaryText};
+`;
 
 const EditContent = styled.textarea<{ bookmarked: boolean }>`
   font-family: Pretendard;

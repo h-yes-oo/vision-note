@@ -1,4 +1,4 @@
-import React, { FC, useState, useRef, useMemo, useEffect } from 'react';
+import React, { FC, useState, useRef, useMemo } from 'react';
 import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import { useRecoilValue, useRecoilState } from 'recoil';
@@ -133,7 +133,7 @@ const UserModal: FC<Props & RouteComponentProps> = ({
       await axios.put('/v1/user', userData, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
-      await authenticate();
+      if (newPassword !== '') await authenticate();
       onClose();
     } catch {
       alert('회원정보를 변경하지 못했습니다');

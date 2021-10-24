@@ -87,6 +87,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
   const [lastSequence, setSequence] = useState<number>(0);
   const [lastContent, setLastContent] = useState<string>('');
   const [lastId, setLastId] = useState<number | null>(null);
+  const [partialResult, setPartialResult] = useState<string>('');
 
   const addToLogs = (newLog: string) => {
     setLog((prevLogs) => [...prevLogs, newLog]);
@@ -305,7 +306,9 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
         }
       },
       onPartialResults: (hypos) => {
-        console.log(`partial result : ${decodeUnicode(hypos[0].transcript)}`);
+        const result = decodeUnicode(hypos[0].transcript);
+        console.log(`partial result : ${result}`);
+        setPartialResult((prev) => result);
       },
       onResults: (hypos) => {
         const result = decodeUnicode(hypos[0].transcript).replace(
@@ -603,6 +606,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
                     time={paragraph.startTime}
                     note={paragraph.memoContent}
                     waiting={waiting && paragraph.paragraphId === lastId}
+                    partialResult={partialResult}
                   />
                 ))}
             </NoteContents>
