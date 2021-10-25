@@ -21,6 +21,7 @@ interface Config {
   user_id?: any;
   content_id?: any;
   onWsClose?: any;
+  onShareStop?: () => void;
 }
 
 interface AudioSourceConstraints {
@@ -237,6 +238,10 @@ export class Dictate {
               navigator.mediaDevices
                 .getDisplayMedia(displayMediaConstraints)
                 .then((stream) => {
+                  stream.getVideoTracks()[0].onended = () => {
+                    this.stopListening();
+                    if (config.onShareStop !== undefined) config.onShareStop();
+                  };
                   setStream(stream);
                   /* use the stream */
                   try {

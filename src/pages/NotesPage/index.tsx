@@ -352,6 +352,10 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
       onWsClose: () => {
         setWaiting(false);
       },
+      onShareStop: () => {
+        console.log('on share stop');
+        setRecording(false);
+      },
     });
 
     setDictate(dictate);
