@@ -182,7 +182,6 @@ const UserModal: FC<Props & RouteComponentProps> = ({
   };
 
   const getEmail = () => {
-    console.log('get user email');
     return user ? user.email : '';
   };
 

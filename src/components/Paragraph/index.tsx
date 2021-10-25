@@ -237,10 +237,12 @@ const Paragraph: FC<Props> = ({
           console.log(error);
         }
       });
+    let highlighted = 0;
     const toShow = splited.map((word) => {
-      if (highlightKeyword.includes(word))
+      if (highlightKeyword.includes(word)) {
         return (
           <Highlighted
+            key={highlighted++}
             onClick={(event: React.MouseEvent) =>
               onClickHighlighted(event, word)
             }
@@ -248,6 +250,7 @@ const Paragraph: FC<Props> = ({
             {word}
           </Highlighted>
         );
+      }
       return <>{word}</>;
     });
     return toShow;
