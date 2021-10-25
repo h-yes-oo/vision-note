@@ -57,7 +57,7 @@ const BaseLayout: FC<Props & RouteComponentProps> = ({
     <Root grey={grey}>
       {showSearch && (
         <PopupModal onClose={closeModal} visible={showSearch}>
-          <SearchModal searchKeyword={searchKeyword} />
+          <SearchModal onClose={closeModal} searchKeyword={searchKeyword} />
         </PopupModal>
       )}
       <Header>

@@ -24,10 +24,12 @@ interface SearchResult {
 
 interface Props {
   searchKeyword: string;
+  onClose: () => void;
 }
 
 const SearchModal: FC<Props & RouteComponentProps> = ({
   searchKeyword,
+  onClose,
   history,
 }) => {
   const [keyword, setKeyword] = useState<string>(searchKeyword);
@@ -63,7 +65,10 @@ const SearchModal: FC<Props & RouteComponentProps> = ({
             (value: SearchResult) => (
               <Result
                 key={value.scriptId}
-                onClick={() => history.push(`/note/${value.scriptId}`)}
+                onClick={() => {
+                  history.push(`/note/${value.scriptId}`);
+                  onClose();
+                }}
               >
                 <Title>
                   <NoteIcon src={Note} />

@@ -52,10 +52,7 @@ interface MatchParams {
   noteId: string;
 }
 
-const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
-  match,
-  history,
-}) => {
+const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
   const [dictate, setDictate] = useState<Dictate>();
   const [noteId, setNoteId] = useState<string>('');
   const [title, setTitle] = useState<string>('');
@@ -347,7 +344,6 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
       const { data } = await axios.get(`/v1/script/${noteId}`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
-      console.log(data);
       setFolderName(data.parentFolder.folderName);
       setStarred(data.script.isImportant);
       setTitle(data.script.fileName);
@@ -418,12 +414,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
 
   useEffect(() => {
     getStarted();
-    return () => {
-      // TODO : 녹음중이면, 지금까지 올라온 내용 스크립트로 저장 후 녹음 상태 전환
-      console.log('byebye');
-    };
-  }, []);
-  // temp end
+  }, [match.params.noteId]);
 
   const handleMouseEnter = useCallback(
     (event: React.MouseEvent) => {
@@ -994,4 +985,4 @@ const FolderNext = styled.img`
   margin: 0 10rem 0 3rem;
 `;
 
-export default withRouter(NotesPage);
+export default NotesPage;
