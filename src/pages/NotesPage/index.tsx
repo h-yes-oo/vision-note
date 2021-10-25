@@ -195,23 +195,33 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
               setRecording(true);
               setShowRecordingOptions(false);
               setWaiting(true);
+              const fileData = new FormData();
+              fileData.append('scriptId', match.params.noteId);
+              fileData.append('isRecording', '0');
+              axios.post(
+                `/v1/script/recording/${match.params.noteId}`,
+                fileData,
+                {
+                  headers: { Authorization: `Bearer ${authToken}` },
+                }
+              );
             });
         }
       });
     }
   };
 
-  const stopRecording = async () => {
+  const stopRecording = () => {
     if (dictate !== undefined) dictate.stopListening();
     setRecording(false);
-    // TODO : recording status 변경 해결하기
-    const fileData = new FormData();
-    fileData.append('scriptId', match.params.noteId);
-    fileData.append('isRecording', '0');
-    await axios.post(`/v1/script/recording/${match.params.noteId}`, fileData, {
-      headers: { Authorization: `Bearer ${authToken}` },
-    });
   };
+
+  useEffect(() => {
+    return () => {
+      console.log('bye dictate');
+      stopRecording();
+    };
+  }, [dictate]);
 
   const recordWithoutMic = () => {
     if (dictate !== undefined) {
@@ -251,6 +261,16 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
               setRecording(true);
               setShowRecordingOptions(false);
               setWaiting(true);
+              const fileData = new FormData();
+              fileData.append('scriptId', match.params.noteId);
+              fileData.append('isRecording', '0');
+              axios.post(
+                `/v1/script/recording/${match.params.noteId}`,
+                fileData,
+                {
+                  headers: { Authorization: `Bearer ${authToken}` },
+                }
+              );
             });
         }
       });
@@ -308,6 +328,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
         setPartialResult((prev) => result);
       },
       onResults: (hypos) => {
+        setPartialResult((prev) => '');
         const result = decodeUnicode(hypos[0].transcript).replace(
           /<UNK>/gi,
           ''
