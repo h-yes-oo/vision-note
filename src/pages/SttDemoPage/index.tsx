@@ -55,7 +55,7 @@ const SttDemoPage: FC<Props> = () => {
       onPartialResults: (hypos) => {
         console.log(`partial result : ${decodeUnicode(hypos[0].transcript)}`);
       },
-      onResults: (hypos) => {
+      onResults: (hypos, time) => {
         const result = decodeUnicode(hypos[0].transcript);
         addToTranscription(result);
         console.log(`result : ${result}`);

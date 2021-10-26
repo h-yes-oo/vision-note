@@ -333,7 +333,7 @@ const Paragraph: FC<Props> = ({
   );
 };
 
-const PartialResult = styled.div`
+const PartialResult = styled.span`
   font-style: oblique;
   color: ${(props) => props.theme.color.tertiaryText};
 `;
@@ -369,9 +369,11 @@ const Highlighted = styled.span`
     cursor: pointer;
   }
 `;
-
-const FlexColumn = styled.div`
+const Flex = styled.div`
   display: flex;
+`;
+
+const FlexColumn = styled(Flex)`
   flex-direction: column;
 `;
 
@@ -522,7 +524,7 @@ const Relative = styled.div`
   position: relative;
 `;
 
-const DotWrapper = styled.div`
+const DotWrapper = styled.span`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -530,7 +532,9 @@ const DotWrapper = styled.div`
   overflow: hidden;
   border: none;
   margin: 10px;
-  width: 40rem;
+  min-width: 40rem;
+  max-width: 40rem;
+  height: fit-content;
 `;
 
 const dotFalling = keyframes`

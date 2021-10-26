@@ -103,10 +103,10 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
     setLastContent((prev) => `${prev}\n${newContent}`);
   };
 
-  const addNewParagraph = (remaining: string) => {
+  const addNewParagraph = (remaining: string, time: string) => {
     const paragraphData = new FormData();
     paragraphData.append('scriptId', match.params.noteId);
-    paragraphData.append('startTime', '00:00');
+    paragraphData.append('startTime', time);
     paragraphData.append('endTime', '00:00');
     paragraphData.append('paragraphContent', String(lastSequence));
     paragraphData.append('paragraphSequence', '0');
@@ -132,7 +132,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
             {
               paragraphId: id,
               paragraphSequence: lastSequence,
-              startTime: '00:00',
+              startTime: time,
               endTime: '00:00',
               paragraphContent: '',
               memoContent: null,
@@ -145,7 +145,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
             {
               paragraphId: id,
               paragraphSequence: lastSequence,
-              startTime: '00:00',
+              startTime: time,
               endTime: '00:00',
               paragraphContent: '',
               memoContent: null,
@@ -327,7 +327,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
         console.log(`partial result : ${result}`);
         setPartialResult((prev) => result);
       },
-      onResults: (hypos) => {
+      onResults: (hypos, time: number) => {
         setPartialResult((prev) => '');
         const result = decodeUnicode(hypos[0].transcript).replace(
           /<UNK>/gi,
@@ -335,8 +335,14 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
         );
         // addToTranscription(result);
         if (result.includes('^')) {
+          console.log(`original time : ${time}`);
+          const startTime = Math.floor(time);
+          const formattedTime = `${Math.floor(startTime / 60)}:${
+            startTime % 60
+          }`;
+          console.log(`formatted time : ${formattedTime}`);
           setLastContent((prev) => '');
-          addNewParagraph(result.split('^')[0]);
+          addNewParagraph(result.split('^')[0], formattedTime);
         } else if (result !== '' && result !== '.') {
           addToContent(result);
         }

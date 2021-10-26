@@ -11,7 +11,7 @@ interface Config {
   onReadyForSpeech: () => void;
   onEndOfSpeech: () => void;
   onPartialResults: (data: any) => void;
-  onResults: (data: any) => void;
+  onResults: (data: any, time: number) => void;
   onEndOfSession: () => void;
   onEvent: (e: any, data: any) => void;
   onError: (e: any, data: any) => void;
@@ -475,7 +475,7 @@ export class Dictate {
           if (res.status === 0) {
             if (res.result) {
               if (res.result.final) {
-                config.onResults(res.result.hypotheses);
+                config.onResults(res.result.hypotheses, res['segment-start']);
               } else {
                 config.onPartialResults(res.result.hypotheses);
               }
