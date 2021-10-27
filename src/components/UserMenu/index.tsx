@@ -31,17 +31,17 @@ const UserMenu: FC<Props & RouteComponentProps> = ({
 
   const darkmode = () => {
     if (currentTheme === lightTheme) {
-      localStorage.setItem('theme', '1');
+      localStorage.setItem('VisionNoteTheme', '1');
       setTheme(darkTheme);
     } else {
-      localStorage.setItem('theme', '0');
+      localStorage.setItem('VisionNoteTheme', '0');
       setTheme(lightTheme);
     }
     setShow(false);
   };
 
   const logout = () => {
-    localStorage.removeItem('user');
+    localStorage.removeItem('VisionNoteUser');
     setAuthToken(null);
     history.push('/');
   };

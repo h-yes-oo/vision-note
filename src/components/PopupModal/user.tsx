@@ -56,7 +56,7 @@ const UserModal: FC<Props & RouteComponentProps> = ({
   const currentTheme = useRecoilValue(theme);
 
   const logout = () => {
-    localStorage.removeItem('user');
+    localStorage.removeItem('VisionNoteUser');
     setAuthToken(null);
     history.push('/');
   };
@@ -106,7 +106,10 @@ const UserModal: FC<Props & RouteComponentProps> = ({
     frm.append('password', newPassword);
     try {
       const response = await axios.post('/v1/authenticate', frm);
-      localStorage.setItem('user', JSON.stringify(response.data.token));
+      localStorage.setItem(
+        'VisionNoteUser',
+        JSON.stringify(response.data.token)
+      );
       setAuthToken(response.data.token);
     } catch (e) {
       history.push('/');

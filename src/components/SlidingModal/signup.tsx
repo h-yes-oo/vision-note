@@ -397,7 +397,10 @@ const SignUp: FC<Props> = ({ toLogin }) => {
     frm.append('password', password);
     try {
       const response = await axios.post('/v1/authenticate', frm);
-      localStorage.setItem('user', JSON.stringify(response.data.token));
+      localStorage.setItem(
+        'VisionNoteUser',
+        JSON.stringify(response.data.token)
+      );
       setAuthToken(response.data.token);
     } catch (e) {
       console.log(e);

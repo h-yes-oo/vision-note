@@ -6,7 +6,7 @@ import { DefaultTheme } from 'styled-components';
 
 const getToken = () => {
   try {
-    return JSON.parse(localStorage.getItem('user') ?? 'null');
+    return JSON.parse(localStorage.getItem('VisionNoteUser') ?? 'null');
   } catch {
     return null;
   }
@@ -29,7 +29,7 @@ export const userInfo = selector({
       return response.data;
     } catch {
       // 기존에 저장되어 있던 토큰이 변경되어 인증이 불가한 경우
-      localStorage.removeItem('user');
+      localStorage.removeItem('VisionNoteUser');
       return null;
     }
   },
@@ -79,7 +79,7 @@ export const sortMode = atom<SortMode>({
 });
 
 export const getTheme = (): DefaultTheme => {
-  const storedTheme = localStorage.getItem('theme');
+  const storedTheme = localStorage.getItem('VisionNoteTheme');
 
   if (storedTheme === '1') {
     return darkTheme;

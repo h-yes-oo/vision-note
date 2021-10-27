@@ -103,7 +103,10 @@ interface Props {
 
 const Loading: FC<Props> = ({ notes }) => {
   return (
-    <Root notes={notes} darkmode={localStorage.getItem('theme') === '1'}>
+    <Root
+      notes={notes}
+      darkmode={localStorage.getItem('VisionNoteTheme') === '1'}
+    >
       <DotFalling />
     </Root>
   );
