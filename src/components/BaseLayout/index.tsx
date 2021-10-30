@@ -1,4 +1,4 @@
-import React, { FC, ReactNode, useState, useEffect } from 'react';
+import { FC, ReactNode, useState } from 'react';
 import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
@@ -8,11 +8,10 @@ import { darkTheme } from 'styles/theme';
 import LogoLight from 'assets/icons/LogoLight.png';
 import LogoDark from 'assets/icons/LogoDark.png';
 import SearchIcon from 'assets/icons/SearchIcon.svg';
-import ProfileImage from 'assets/images/SampleProfile.svg';
 import ProfileToggleDown from 'assets/icons/ProfileToggleDown.svg';
 import ProfileToggleUp from 'assets/icons/ProfileToggleUp.svg';
 
-import { userInfo, userName, theme } from 'state';
+import { userInfo, theme } from 'state';
 import UserMenu from 'components/UserMenu';
 import PopupModal from 'components/PopupModal';
 import SearchModal from 'components/PopupModal/search';
@@ -30,7 +29,6 @@ const BaseLayout: FC<Props & RouteComponentProps> = ({
   const [showUserMenu, setShowUserMenu] = useState<boolean>(false);
   const [showSearch, setShowSearch] = useState<boolean>(false);
   const [searchKeyword, setSearchKeyword] = useState<string>('');
-  const userNickname = useRecoilValue(userName);
   const currentTheme = useRecoilValue(theme);
   const user = useRecoilValue(userInfo);
 
@@ -86,7 +84,9 @@ const BaseLayout: FC<Props & RouteComponentProps> = ({
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
           >
-            <ProfileImg src={ProfileImage} />
+            <ProfileImg
+              src={`https://visionnote-static.s3.ap-northeast-2.amazonaws.com/avatar/${user.avatar}`}
+            />
             <ProfileName>{user.nickname ?? '비회원'}님</ProfileName>
             <Relative>
               <ProfileToggle

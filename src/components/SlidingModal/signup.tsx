@@ -409,7 +409,7 @@ const SignUp: FC<Props> = ({ toLogin }) => {
 
   const signUp = async () => {
     const userData = new FormData();
-    userData.append('avatar', '0');
+    userData.append('avatar', 'avatar.svg');
     userData.append('email', email);
     userData.append('nickname', nickname);
     userData.append('password', password);

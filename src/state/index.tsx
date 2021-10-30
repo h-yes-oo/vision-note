@@ -4,6 +4,12 @@ import { NotesMode, SortMode } from 'types';
 import { lightTheme, darkTheme } from 'styles/theme';
 import { DefaultTheme } from 'styled-components';
 
+interface EditStatus {
+  isEdited: boolean;
+  newNickname?: string;
+  newAvatar?: string;
+}
+
 const getToken = () => {
   try {
     return JSON.parse(localStorage.getItem('VisionNoteUser') ?? 'null');
@@ -17,29 +23,38 @@ export const authenticateToken = atom<string | null>({
   default: getToken(),
 });
 
+export const editStatus = atom<EditStatus>({
+  key: 'editStatus',
+  default: {
+    isEdited: false,
+  },
+});
+
 export const userInfo = selector({
   key: 'UserInfo',
   get: async ({ get }) => {
     const token = get(authenticateToken);
+    const edited = get(editStatus);
     if (token === null) return null;
     try {
       const response = await axios.get('/v1/user', {
         headers: { Authorization: `Bearer ${get(authenticateToken)}` },
       });
-      return response.data;
+      let user = response.data;
+      if (edited.isEdited) {
+        if (edited.newNickname) {
+          user = { ...user, nickname: edited.newNickname };
+        }
+        if (edited.newAvatar) {
+          user = { ...user, avatar: edited.newAvatar };
+        }
+      }
+      return user;
     } catch {
       // 기존에 저장되어 있던 토큰이 변경되어 인증이 불가한 경우
       localStorage.removeItem('VisionNoteUser');
       return null;
     }
-  },
-});
-
-export const userName = selector({
-  key: 'UserName',
-  get: ({ get }) => {
-    const user = get(userInfo);
-    return user ? user.nickname : '비회원';
   },
 });
 

@@ -7,7 +7,7 @@ import DarkMode from 'assets/icons/DarkMode.svg';
 import Logout from 'assets/icons/Logout.svg';
 import UserEdit from 'assets/icons/UserEdit.svg';
 
-import { authenticateToken, theme } from 'state';
+import { authenticateToken, theme, editStatus } from 'state';
 import UserModal from 'components/PopupModal/user';
 import { darkTheme, lightTheme } from 'styles/theme';
 
@@ -24,9 +24,11 @@ const UserMenu: FC<Props & RouteComponentProps> = ({
   const [userModal, setUserModal] = useState<boolean>(false);
   const setAuthToken = useSetRecoilState(authenticateToken);
   const [currentTheme, setTheme] = useRecoilState(theme);
+  const setEditInfo = useSetRecoilState(editStatus);
 
   const closeModal = useCallback(() => {
     setUserModal(false);
+    setEditInfo({ isEdited: false });
   }, []);
 
   const darkmode = () => {

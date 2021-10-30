@@ -1,10 +1,10 @@
 import React, { FC, useState, useRef, useMemo } from 'react';
 import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
-import { useRecoilValue, useRecoilState } from 'recoil';
+import { useRecoilValue, useRecoilState, useSetRecoilState } from 'recoil';
 import axios from 'axios';
 
-import { userInfo, authenticateToken, theme } from 'state';
+import { userInfo, authenticateToken, theme, editStatus } from 'state';
 import LoadingDots from 'components/LoadingDots';
 import Alert from 'components/Alert';
 import AlertWithMessage from 'components/Alert/message';
@@ -17,7 +17,6 @@ import EditTypeUp from 'assets/icons/EditTypeUp.svg';
 import ToggleUpDark from 'assets/icons/ToggleUpDark.svg';
 import ToggleDownDark from 'assets/icons/ToggleDownDark.svg';
 import UserEdit from 'assets/icons/UserEdit.svg';
-import SampleProfile from 'assets/images/SampleProfile.svg';
 import ProfileChange from 'assets/icons/ProfileChange.svg';
 import PopupModal from '.';
 
@@ -34,6 +33,7 @@ const UserModal: FC<Props & RouteComponentProps> = ({
   // recoil states
   const user = useRecoilValue(userInfo);
   const [authToken, setAuthToken] = useRecoilState(authenticateToken);
+  const setEditInfo = useSetRecoilState(editStatus);
   // editing status
   const [editNickname, setEditNickname] = useState<boolean>(false);
   const [editType, setEditType] = useState<boolean>(false);
@@ -78,8 +78,23 @@ const UserModal: FC<Props & RouteComponentProps> = ({
     setShowSignOutAlert(false);
   };
 
-  const onAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-    setAvatar(e.target.value);
+  const onAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    // setAvatar(e.target.value);
+    const profileFile: File | null = e.target.files ? e.target.files[0] : null;
+    if (profileFile !== null) {
+      const fileData = new FormData();
+      fileData.append('profile', profileFile);
+      try {
+        const response = await axios.put(`/v1/user/avatar`, fileData, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+        setAvatar(response.data.avatarName);
+        setEditInfo({ isEdited: true, newAvatar: response.data.avatarName });
+      } catch {
+        alert('다시 시도해주세요');
+      }
+    }
+  };
 
   const onClickChangeProfile = () => {
     if (fileRef.current !== null) fileRef.current.click();
@@ -127,16 +142,21 @@ const UserModal: FC<Props & RouteComponentProps> = ({
     setEditType(false);
     setLoading(true);
     const userData = new FormData();
-    if (avatar !== user.avatar) userData.append('avatar', avatar);
     if (nickname !== user.nickname) userData.append('nickname', nickname);
     if (newPassword !== '') userData.append('password', newPassword);
     if (type !== user.type) userData.append('typeId', String(type));
-
     try {
       await axios.put('/v1/user', userData, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
-      if (newPassword !== '') await authenticate();
+      if (newPassword !== '') {
+        await authenticate();
+        setNewPassword('');
+        setConfirmPassword('');
+      }
+      if (nickname !== user.nickname) {
+        setEditInfo({ isEdited: true, newNickname: nickname });
+      }
       onClose();
     } catch {
       alert('회원정보를 변경하지 못했습니다');
@@ -198,12 +218,14 @@ const UserModal: FC<Props & RouteComponentProps> = ({
     <>
       <Top>
         <div style={{ position: 'relative' }}>
-          <ProfileImage src={SampleProfile} />
+          <ProfileImage
+            src={`https://visionnote-static.s3.ap-northeast-2.amazonaws.com/avatar/${avatar}`}
+          />
           <ChangeProfile onClick={onClickChangeProfile}>
             <UploadButton
               ref={fileRef}
               type="file"
-              accept=".jpg, .png"
+              accept=".jpg, .png, .svg"
               onChange={onAvatarChange}
             />
           </ChangeProfile>
