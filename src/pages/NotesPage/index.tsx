@@ -90,7 +90,16 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
     setLog((prevLogs) => [...prevLogs, newLog]);
   };
 
-  const addToContent = (newContent: string) => {
+  const addToContent = async (newContent: string) => {
+    try {
+      const SpacingApi = axios.create({
+        baseURL: 'http://13.125.242.133:80',
+      });
+      const response = await SpacingApi.post('', { text: newContent });
+      newContent = response.data.result;
+    } catch {
+      console.log('not spaced');
+    }
     setContent((prevContent) => [
       ...prevContent.slice(0, -1),
       {
@@ -100,7 +109,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
         }\n${newContent}`,
       },
     ]);
-    setLastContent((prev) => `${prev}\n${newContent}`);
+    setLastContent((prev) => `${prev}\n${content}`);
   };
 
   const addNewParagraph = (remaining: string, time: string) => {
