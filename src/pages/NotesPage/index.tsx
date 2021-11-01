@@ -93,7 +93,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
   const addToContent = async (newContent: string) => {
     try {
       const SpacingApi = axios.create({
-        baseURL: 'http://13.125.242.133:80',
+        baseURL: 'https://spacing.visionnote.io',
       });
       const response = await SpacingApi.post('', { text: newContent });
       newContent = response.data.result;
