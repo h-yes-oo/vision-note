@@ -94,6 +94,11 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
     try {
       const SpacingApi = axios.create({
         baseURL: 'https://spacing.visionnote.io',
+        headers: {
+          common: {
+            'Access-Control-Allow-Origin': '*',
+          },
+        },
       });
       const response = await SpacingApi.post('', { text: newContent });
       newContent = response.data.result;
