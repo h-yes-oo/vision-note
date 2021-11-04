@@ -107,9 +107,13 @@ const Paragraph: FC<Props> = ({
       const keywordData = new FormData();
       keywordData.append('paragraphId', String(paragraphId));
       keywordData.append('keyword', keyword);
-      // axios.delete(`/v1/script/paragraph/keyword/${paragraphId}`, keywordData, {
-      //   headers: { Authorization: `Bearer ${authToken}` },
-      // });
+      axios.post(
+        `/v1/script/paragraph/keyword/delete/${paragraphId}`,
+        keywordData,
+        {
+          headers: { Authorization: `Bearer ${authToken}` },
+        }
+      );
     } catch {
       console.log(`${keyword} 등록 실패`);
     }
