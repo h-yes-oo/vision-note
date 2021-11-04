@@ -44,6 +44,7 @@ interface ParagraphData {
   isBookmarked: number;
   createdAt?: string;
   updatedAt?: string | null;
+  keywords: any[];
 }
 
 interface Props {}
@@ -146,6 +147,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
               paragraphContent: '',
               memoContent: null,
               isBookmarked: 0,
+              keywords: [],
             },
           ]);
         } else {
@@ -159,6 +161,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
               paragraphContent: '',
               memoContent: null,
               isBookmarked: 0,
+              keywords: [],
             },
           ]);
         }
@@ -197,6 +200,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
                   paragraphContent: '',
                   memoContent: null,
                   isBookmarked: 0,
+                  keywords: [],
                 },
               ]);
               setSequence((prev) => prev + 1);
@@ -263,6 +267,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
                   paragraphContent: '',
                   memoContent: null,
                   isBookmarked: 0,
+                  keywords: [],
                 },
               ]);
               setSequence((prev) => prev + 1);
@@ -638,6 +643,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
                     note={paragraph.memoContent}
                     waiting={waiting && paragraph.paragraphId === lastId}
                     partialResult={partialResult}
+                    keywords={paragraph.keywords.map(({ keyword }) => keyword)}
                   />
                 ))}
             </NoteContents>

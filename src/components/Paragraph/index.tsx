@@ -22,6 +22,7 @@ interface Props {
   recording: boolean;
   waiting: boolean;
   partialResult: string;
+  keywords: string[];
 }
 
 const Paragraph: FC<Props> = ({
@@ -33,6 +34,7 @@ const Paragraph: FC<Props> = ({
   recording,
   waiting,
   partialResult,
+  keywords,
 }) => {
   const [bookmark, setBookmark] = useState<boolean>(bookmarked);
   const [noted, setNoted] = useState<boolean>(note !== null && note !== '');
@@ -50,7 +52,7 @@ const Paragraph: FC<Props> = ({
   const contentRef: React.RefObject<HTMLTextAreaElement> =
     useRef<HTMLTextAreaElement>(null);
   const authToken = useRecoilValue(authenticateToken);
-  const [highlightKeyword, setHighlightKeyword] = useState<string[]>([]);
+  const [highlightKeyword, setHighlightKeyword] = useState<string[]>(keywords);
   const [selectedKeyword, setSelectedKeyword] = useState<string>('');
   const [showHighlightCancelBtn, setShowHighlightCancelBtn] =
     useState<boolean>(false);
@@ -87,14 +89,42 @@ const Paragraph: FC<Props> = ({
     }
   };
 
+  const addNewKeyword = (keyword: string) => {
+    try {
+      const keywordData = new FormData();
+      keywordData.append('paragraphId', String(paragraphId));
+      keywordData.append('keyword', keyword);
+      axios.post(`/v1/script/paragraph/keyword/${paragraphId}`, keywordData, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+    } catch {
+      console.log(`${keyword} 등록 실패`);
+    }
+  };
+
+  const deleteKeyword = (keyword: string) => {
+    try {
+      const keywordData = new FormData();
+      keywordData.append('paragraphId', String(paragraphId));
+      keywordData.append('keyword', keyword);
+      // axios.delete(`/v1/script/paragraph/keyword/${paragraphId}`, keywordData, {
+      //   headers: { Authorization: `Bearer ${authToken}` },
+      // });
+    } catch {
+      console.log(`${keyword} 등록 실패`);
+    }
+  };
+
   const highlightRange = (keyword: string) => {
     if (keyword.includes('?')) {
-      setHighlightKeyword((prev) => [
-        ...prev,
-        ...keyword.split('?').map((value: string) => value.trim()),
-      ]);
+      const newKeywords = keyword
+        .split('?')
+        .map((value: string) => value.trim());
+      setHighlightKeyword((prev) => [...prev, ...newKeywords]);
+      newKeywords.forEach((keyword) => addNewKeyword(keyword));
     } else {
       setHighlightKeyword((prev) => [...prev, keyword]);
+      addNewKeyword(keyword);
     }
     window.getSelection()?.removeAllRanges();
   };
@@ -119,6 +149,7 @@ const Paragraph: FC<Props> = ({
     setHighlightKeyword((prev) =>
       prev.filter((val) => val !== selectedKeyword)
     );
+    deleteKeyword(selectedKeyword);
     setShowHighlightCancelBtn(false);
   };
 
@@ -334,6 +365,7 @@ const Paragraph: FC<Props> = ({
 };
 
 const PartialResult = styled.span`
+  user-select: none;
   font-style: oblique;
   color: ${(props) => props.theme.color.tertiaryText};
 `;
@@ -363,6 +395,7 @@ const EditContent = styled.textarea<{ bookmarked: boolean }>`
 `;
 
 const Highlighted = styled.span`
+  user-select: none;
   color: ${(props) => props.theme.color.purple};
   &:hover {
     text-shadow: 0 0 black;
