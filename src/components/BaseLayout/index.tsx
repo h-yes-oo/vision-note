@@ -85,9 +85,13 @@ const BaseLayout: FC<Props & RouteComponentProps> = ({
             onMouseLeave={handleMouseLeave}
           >
             <ProfileImg
-              src={`https://visionnote-static.s3.ap-northeast-2.amazonaws.com/avatar/${user.avatar}`}
+              src={
+                user
+                  ? `https://visionnote-static.s3.ap-northeast-2.amazonaws.com/avatar/${user.avatar}`
+                  : ''
+              }
             />
-            <ProfileName>{user.nickname ?? '비회원'}님</ProfileName>
+            <ProfileName>{user ? user.nickname : '비회원'}님</ProfileName>
             <Relative>
               <ProfileToggle
                 src={showUserMenu ? ProfileToggleUp : ProfileToggleDown}

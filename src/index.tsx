@@ -7,7 +7,7 @@ import reportWebVitals from './reportWebVitals';
 
 axios.defaults.baseURL = 'https://api.visionnote.io';
 axios.defaults.headers.post['Content-Type'] = 'multipart/form-data';
-axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+// axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
 
 ReactDOM.render(
   <React.StrictMode>
