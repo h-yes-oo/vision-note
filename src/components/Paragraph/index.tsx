@@ -78,7 +78,7 @@ const Paragraph: FC<Props> = ({
     try {
       const userSelection = window.getSelection()?.getRangeAt(0);
       if (userSelection !== undefined && userSelection.toString()) {
-        setAnchorPoint({ x: event.pageX, y: event.pageY });
+        setAnchorPoint({ x: event.clientX, y: event.clientY });
         setShowHighlightBtn(true);
         setSelectedKeyword(userSelection.toString().trim());
       }
@@ -110,7 +110,7 @@ const Paragraph: FC<Props> = ({
   };
 
   const onClickHighlighted = (event: React.MouseEvent, word: string) => {
-    setAnchorPoint({ x: event.pageX, y: event.pageY });
+    setAnchorPoint({ x: event.clientX, y: event.clientY });
     setShowHighlightCancelBtn(true);
     setSelectedKeyword(word);
   };
