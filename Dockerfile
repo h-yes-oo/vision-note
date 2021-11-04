@@ -2,12 +2,10 @@ FROM node:16-alpine
 
 WORKDIR /usr/src/app
 
-COPY package.json ./
-
-RUN npm install coa
+COPY package.json /usr/src/app/
 
 RUN npm install
 
-COPY ./ ./
+COPY . /usr/src/app
 
 CMD ["npm", "run", "start"]
