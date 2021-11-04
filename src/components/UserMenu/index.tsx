@@ -26,10 +26,10 @@ const UserMenu: FC<Props & RouteComponentProps> = ({
   const [currentTheme, setTheme] = useRecoilState(theme);
   const setEditInfo = useSetRecoilState(editStatus);
 
-  const closeModal = useCallback(() => {
+  const closeModal = (isEdited: boolean) => {
     setUserModal(false);
-    setEditInfo({ isEdited: false });
-  }, []);
+    if (isEdited) setEditInfo({ isEdited: false });
+  };
 
   const darkmode = () => {
     if (currentTheme === lightTheme) {

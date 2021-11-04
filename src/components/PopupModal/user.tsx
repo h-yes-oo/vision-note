@@ -134,7 +134,7 @@ const UserModal: FC<Props & RouteComponentProps> = ({
   const closeModal = () => {
     setEditNickname(false);
     setEditType(false);
-    onClose();
+    onClose(false);
   };
 
   const saveChanges = async () => {
@@ -157,7 +157,7 @@ const UserModal: FC<Props & RouteComponentProps> = ({
       if (nickname !== user.nickname) {
         setEditInfo({ isEdited: true, newNickname: nickname });
       }
-      onClose();
+      onClose(true);
     } catch {
       alert('회원정보를 변경하지 못했습니다');
       setNickname(user.nickname);
@@ -281,9 +281,13 @@ const UserModal: FC<Props & RouteComponentProps> = ({
             <Title>저장용량</Title>
             <FlexColumn>
               <StatusBar>
-                <CurrentStatus current={user ? 6 / 15 : 0 / 15} />
+                <CurrentStatus
+                  current={user ? user.totalMemoryUsage / 1500 : 0 / 15}
+                />
               </StatusBar>
-              <StorageInfo>{`15GB 중 ${user ? 6 : 0}GB 사용`}</StorageInfo>
+              <StorageInfo>{`15GB 중 ${
+                user ? user.totalMemoryUsage / 1000 : 0
+              }GB 사용`}</StorageInfo>
             </FlexColumn>
           </FlexCenter>
         </Wrapper>
@@ -330,7 +334,7 @@ const UserModal: FC<Props & RouteComponentProps> = ({
           />
         </>
       </Alert>
-      <PopupModal onClose={onClose} visible={visible}>
+      <PopupModal onClose={() => onClose(false)} visible={visible}>
         {ModalInner}
       </PopupModal>
     </>
