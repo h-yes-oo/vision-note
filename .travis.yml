@@ -6,7 +6,6 @@ services:
   - docker
 
 before_install:
-  - npm install -g npm@8.1.2
   - echo "start creating an image with dockerfile"
   - docker build -t hyesoo/visionnote -f Dockerfile .
 
