@@ -641,7 +641,7 @@ const FolderPage: FC<Props> = () => {
     <BaseLayout grey>
       <AlertWithMessage
         visible={showAlert}
-        message="선택하신 모든 폴더를 삭제합니다. 계속하시겠습니까 ?"
+        message="선택하신 모든 노트를 삭제합니다. 계속하시겠습니까 ?"
         cancel={onCancelAlert}
         confirm={onConfirmAlert}
       />
