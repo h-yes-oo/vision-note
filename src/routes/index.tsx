@@ -10,6 +10,7 @@ import NotesPage from 'pages/NotesPage';
 import FolderPage from 'pages/FolderPage';
 import StartNotePage from 'pages/StartNotePage';
 import SttDemoPage from 'pages/SttDemoPage';
+import DemoPage from 'pages/DemoPage';
 
 interface Props {}
 
@@ -29,6 +30,7 @@ const Root: FC<Props> = () => {
           <Route path="/recording" component={RecordingPage} />
           <Route path="/startnote" component={StartNotePage} />
           <Route path="/demo" component={SttDemoPage} />
+          <Route path="/userDemo" component={DemoPage} />
         </Switch>
       </BrowserRouter>
     </ThemeProvider>

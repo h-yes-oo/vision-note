@@ -1,14 +1,9 @@
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import styled from 'styled-components';
-import { withRouter, RouteComponentProps } from 'react-router-dom';
-import { useRecoilState, useSetRecoilState } from 'recoil';
+import { useRecoilState } from 'recoil';
 
 import DarkMode from 'assets/icons/DarkMode.svg';
-import Logout from 'assets/icons/Logout.svg';
-import UserEdit from 'assets/icons/UserEdit.svg';
-
-import { authenticateToken, theme, editStatus } from 'state';
-import UserModal from 'components/PopupModal/user';
+import { theme } from 'state';
 import { darkTheme, lightTheme } from 'styles/theme';
 
 interface Props {
@@ -16,20 +11,8 @@ interface Props {
   setShow: any;
 }
 
-const UserMenu: FC<Props & RouteComponentProps> = ({
-  show,
-  setShow,
-  history,
-}) => {
-  const [userModal, setUserModal] = useState<boolean>(false);
-  const setAuthToken = useSetRecoilState(authenticateToken);
+const UserMenuForDemo: FC<Props> = ({ show, setShow }) => {
   const [currentTheme, setTheme] = useRecoilState(theme);
-  const setEditInfo = useSetRecoilState(editStatus);
-
-  const closeModal = (isEdited: boolean) => {
-    setUserModal(false);
-    if (isEdited) setEditInfo({ isEdited: false });
-  };
 
   const darkmode = () => {
     if (currentTheme === lightTheme) {
@@ -42,31 +25,12 @@ const UserMenu: FC<Props & RouteComponentProps> = ({
     setShow(false);
   };
 
-  const logout = () => {
-    localStorage.removeItem('VisionNoteUser');
-    setAuthToken(null);
-    history.push('/');
-  };
-
-  const userEdit = () => {
-    setUserModal(true);
-    setShow(false);
-  };
-
   return (
     <>
-      <UserModal onClose={closeModal} visible={userModal} />
       <Menu show={show}>
         <MenuList onClick={darkmode}>
           <ContextImage src={DarkMode} />
           {currentTheme === lightTheme ? '다크모드' : '다크모드 해제'}
-        </MenuList>
-        <MenuList onClick={logout}>
-          <ContextImage src={Logout} />
-          로그아웃
-        </MenuList>
-        <MenuList onClick={userEdit}>
-          <ContextImage src={UserEdit} />내 정보 수정
         </MenuList>
       </Menu>
     </>
@@ -124,4 +88,4 @@ const ContextImage = styled.img`
   margin: 0 10rem 0 20rem;
 `;
 
-export default withRouter(UserMenu);
+export default UserMenuForDemo;
