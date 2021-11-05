@@ -1,10 +1,10 @@
 import { FC, useState, useEffect, useRef } from 'react';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import styled, { keyframes } from 'styled-components';
-import axios from 'axios';
 import { useRecoilValue } from 'recoil';
-import { authenticateToken, theme } from 'state';
-import { isChrome, isWindows } from 'functions';
+import { Dictate } from 'stt/dictate';
+import { theme } from 'state';
+import { isChrome, isWindows, decodeUnicode } from 'functions';
 import { Subject } from 'types';
 
 import LogoLight from 'assets/icons/LogoLight.png';
@@ -35,6 +35,10 @@ import MicWhite from 'assets/icons/MicWhite.svg';
 import GreyFolder from 'assets/icons/GreyFolder.svg';
 import ProfileToggleDown from 'assets/icons/ProfileToggleDown.svg';
 import ProfileToggleUp from 'assets/icons/ProfileToggleUp.svg';
+import Recording from 'assets/icons/Recording.svg';
+import Mic from 'assets/icons/Mic.svg';
+import RecordingDark from 'assets/icons/RecordingDark.svg';
+import MicDark from 'assets/icons/MicDark.svg';
 
 import { lightTheme, darkTheme } from 'styles/theme';
 import UserMenuForDemo from 'components/UserMenu/demo';
@@ -61,9 +65,25 @@ const getCurrentDate = () => {
   return datetime;
 };
 
+interface ParagraphData {
+  paragraphId: number;
+  scriptId?: number;
+  userId?: number;
+  paragraphSequence: number;
+  startTime: string;
+  endTime: string;
+  paragraphContent: string;
+  memoContent: string | null;
+  isBookmarked: number;
+  createdAt?: string;
+  updatedAt?: string | null;
+  keywords: any[];
+}
+
 interface Props {}
 
 const DemoPage: FC<Props & RouteComponentProps> = ({ history }) => {
+  const [dictate, setDictate] = useState<Dictate>();
   const [showUserMenu, setShowUserMenu] = useState<boolean>(false);
   const [placeholder, setPlaceholder] = useState<string>(getTitle());
   const [title, setTitle] = useState<string>('');
@@ -74,6 +94,8 @@ const DemoPage: FC<Props & RouteComponentProps> = ({ history }) => {
   const [canStart, setCanStart] = useState<boolean>(false);
   const [mouseOnMic, setMouseOnMic] = useState<boolean>(false);
   const [mouseOnCapture, setMouseOnCapture] = useState<boolean>(false);
+  const [recording, setRecording] = useState<boolean>(false);
+  const [noteMade, setNoteMade] = useState<boolean>(false);
 
   const handleMouseEnter = () => {
     setShowUserMenu(true);
@@ -82,11 +104,22 @@ const DemoPage: FC<Props & RouteComponentProps> = ({ history }) => {
   const handleMouseLeave = () => setShowUserMenu(false);
 
   const recordWithoutMic = () => {
+    setNoteMade(true);
     console.log('record without mic');
   };
 
   const recordWithMic = () => {
+    setNoteMade(true);
     console.log('record with mic');
+  };
+
+  const stopRecording = () => {
+    console.log('stop recording');
+  };
+
+  const getRecordingSrc = () => {
+    if (currentTheme === lightTheme) return recording ? Recording : Mic;
+    return recording ? RecordingDark : MicDark;
   };
 
   const full = {};
@@ -162,10 +195,18 @@ const DemoPage: FC<Props & RouteComponentProps> = ({ history }) => {
           </InfoMiddle>
           <InfoBottom>
             <NoteDate>{date}</NoteDate>
+            <RecordingWrapper>
+              {recording && (
+                <RecordingStatus onClick={stopRecording}>
+                  <RecordingBtn src={getRecordingSrc()} />
+                  녹음 멈추기
+                </RecordingStatus>
+              )}
+            </RecordingWrapper>
           </InfoBottom>
         </NoteInfo>
         <NoteContents>
-          <StartNote>
+          <StartNote noteMade={noteMade}>
             <Info>
               카테고리 선택 후, 녹음을 시작해보세요 {'\n'}
               체험 페이지에서는 생성된 노트가 저장되지 않습니다. {'\n'}
@@ -239,7 +280,8 @@ const DemoPage: FC<Props & RouteComponentProps> = ({ history }) => {
             <Fade out={course === undefined}>
               {!canStart && (
                 <Message>
-                  서버의 오류로 녹음을 시작할 수 없습니다. 잠시 기다려주세요
+                  {/* 서버의 오류로 녹음을 시작할 수 없습니다. 잠시 기다려주세요 */}
+                  체험하기 기능을 준비 중에 있습니다 조금만 기다려주세요 :)
                 </Message>
               )}
               <Flex>
@@ -281,6 +323,33 @@ const DemoPage: FC<Props & RouteComponentProps> = ({ history }) => {
     </Root>
   );
 };
+
+const RecordingWrapper = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const RecordingBtn = styled.img`
+  width: 18rem;
+  margin-right: 8rem;
+`;
+
+const RecordingStatus = styled.a`
+  font-family: Pretendard;
+  font-size: 16rem;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.19;
+  letter-spacing: normal;
+  text-align: left;
+  color: ${(props) => props.theme.color.primaryText};
+  display: flex;
+  align-items: center;
+  &:hover {
+    cursor: pointer;
+  }
+`;
 
 const Flex = styled.div`
   display: flex;
@@ -454,8 +523,8 @@ const NoteFolder = styled.img`
 
 const NoteContents = styled.div``;
 
-const StartNote = styled.div`
-  display: flex;
+const StartNote = styled.div<{ noteMade: boolean }>`
+  display: ${(props) => (props.noteMade ? 'none' : 'flex')};
   flex-direction: column;
   align-items: center;
 `;

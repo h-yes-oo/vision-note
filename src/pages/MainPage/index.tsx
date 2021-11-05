@@ -23,7 +23,7 @@ const MainPage: FC<Props & RouteComponentProps> = ({ history }) => {
   };
 
   const goToDemo = () => {
-    history.push('/demo');
+    history.push('/userDemo');
   };
 
   const signUpModal = () => {
@@ -79,7 +79,7 @@ const MainPage: FC<Props & RouteComponentProps> = ({ history }) => {
             <SmallText>
               비전노트는 모두를 위한 자동 강의록 서비스입니다
             </SmallText>
-            <GetStarted onClick={loginModal}>Get Started</GetStarted>
+            <GetStarted onClick={goToDemo}>체험하기</GetStarted>
           </Info>
           <MainImage src={MainImage1} />
         </TopDiv>
