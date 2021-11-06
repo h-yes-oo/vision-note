@@ -4,6 +4,7 @@ import { RouteComponentProps } from 'react-router-dom';
 import * as T from 'types';
 
 import SlidingModal from 'components/SlidingModal';
+import AlertTimeout from 'components/Alert/timeout';
 
 import LogoLight from 'assets/icons/LogoLight.png';
 import MainImage1 from 'assets/images/MainImage1.svg';
@@ -56,6 +57,7 @@ const MainPage: FC<Props & RouteComponentProps> = ({ history }) => {
 
   return (
     <Root>
+      <AlertTimeout />
       <HeaderViewWidth>
         <Header>
           <Logo>

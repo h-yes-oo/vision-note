@@ -107,3 +107,15 @@ export const theme = atom<DefaultTheme>({
   key: 'theme',
   default: getTheme(),
 });
+
+interface AlertInfo {
+  show: boolean;
+  message?: string;
+}
+
+export const alertInfo = atom<AlertInfo>({
+  key: 'alertInfo',
+  default: {
+    show: false,
+  },
+});

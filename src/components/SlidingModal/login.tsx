@@ -7,8 +7,118 @@ import Kakao from 'assets/icons/Kakao.svg';
 import Facebook from 'assets/icons/Facebook.svg';
 import Google from 'assets/icons/Google.svg';
 import Naver from 'assets/icons/Naver@3x.png';
-import { authenticateToken } from 'state';
+import { authenticateToken, alertInfo } from 'state';
 import LoadingDots from 'components/LoadingDots';
+
+interface Props {
+  toFind: any;
+  toSignUp: any;
+}
+
+const Login: FC<Props> = ({ toFind, toSignUp }) => {
+  const setAuthToken = useSetRecoilState(authenticateToken);
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<boolean>(false);
+  const setAlert = useSetRecoilState(alertInfo);
+
+  const authenticate = async () => {
+    const frm = new FormData();
+    frm.append('email', email);
+    frm.append('password', password);
+    try {
+      setLoading(true);
+      const response = await axios.post('/v1/authenticate', frm);
+      localStorage.setItem(
+        'VisionNoteUser',
+        JSON.stringify(response.data.token)
+      );
+      setAuthToken(response.data.token);
+    } catch (e) {
+      setError(true);
+    }
+    setLoading(false);
+  };
+
+  const onKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') authenticate();
+  };
+
+  const onChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+    if (error) setError(false);
+  };
+
+  const onChangePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+    if (error) setError(false);
+  };
+
+  const onSocialLogin = () => {
+    setAlert({
+      show: true,
+      message:
+        '아직 지원하지 않는 기능입니다. \n빠른 시일 내에 지원하고자 노력하겠습니다',
+    });
+  };
+
+  return (
+    <>
+      <Title>로그인</Title>
+      <Info>학습 노트를 바로 만들고 관리해보세요</Info>
+      <Form
+        error={error}
+        placeholder="이메일 주소"
+        type="email"
+        onChange={onChangeEmail}
+      />
+      <Form
+        error={error}
+        placeholder="비밀번호"
+        type="password"
+        onChange={onChangePassword}
+        onKeyPress={onKeyPress}
+      />
+      <Alert>{error && '아이디와 비밀번호를 다시 확인해주세요'}</Alert>
+      <Find onClick={toFind}>아이디 / 비밀번호 찾기</Find>
+      {loading ? (
+        <LoadingDots small={false} />
+      ) : (
+        <LoginBtn onClick={authenticate}>로그인</LoginBtn>
+      )}
+      <OrWrapper>
+        <Line />
+        <OR>또는</OR>
+        <Line />
+      </OrWrapper>
+      <SocialWrapper>
+        <SocialBox onClick={onSocialLogin}>
+          <SocialImage src={Kakao} />
+          카카오 로그인
+        </SocialBox>
+        <SocialBox onClick={onSocialLogin}>
+          <SocialImage src={Naver} />
+          네이버 로그인
+        </SocialBox>
+      </SocialWrapper>
+      <SocialWrapper>
+        <SocialBox onClick={onSocialLogin}>
+          <SocialImage src={Facebook} />
+          페이스북 로그인
+        </SocialBox>
+        <SocialBox onClick={onSocialLogin}>
+          <SocialImage src={Google} />
+          구글 로그인
+        </SocialBox>
+      </SocialWrapper>
+      <Flex>
+        <NotYet>아직 회원이 아니신가요?</NotYet>
+        <SignUp onClick={toSignUp}>회원가입하기</SignUp>
+      </Flex>
+    </>
+  );
+};
 
 const Title = styled.div`
   font-family: Pretendard;
@@ -232,105 +342,5 @@ const Alert = styled.div`
   text-align: left;
   color: #ff2a2a;
 `;
-interface Props {
-  toFind: any;
-  toSignUp: any;
-}
-
-const Login: FC<Props> = ({ toFind, toSignUp }) => {
-  const setAuthToken = useSetRecoilState(authenticateToken);
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<boolean>(false);
-
-  const authenticate = async () => {
-    const frm = new FormData();
-    frm.append('email', email);
-    frm.append('password', password);
-    try {
-      setLoading(true);
-      const response = await axios.post('/v1/authenticate', frm);
-      localStorage.setItem(
-        'VisionNoteUser',
-        JSON.stringify(response.data.token)
-      );
-      setAuthToken(response.data.token);
-    } catch (e) {
-      setError(true);
-    }
-    setLoading(false);
-  };
-
-  const onKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') authenticate();
-  };
-
-  const onChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
-    if (error) setError(false);
-  };
-
-  const onChangePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
-    if (error) setError(false);
-  };
-
-  return (
-    <>
-      <Title>로그인</Title>
-      <Info>학습 노트를 바로 만들고 관리해보세요</Info>
-      <Form
-        error={error}
-        placeholder="이메일 주소"
-        type="email"
-        onChange={onChangeEmail}
-      />
-      <Form
-        error={error}
-        placeholder="비밀번호"
-        type="password"
-        onChange={onChangePassword}
-        onKeyPress={onKeyPress}
-      />
-      <Alert>{error && '아이디와 비밀번호를 다시 확인해주세요'}</Alert>
-      <Find onClick={toFind}>아이디 / 비밀번호 찾기</Find>
-      {loading ? (
-        <LoadingDots small={false} />
-      ) : (
-        <LoginBtn onClick={authenticate}>로그인</LoginBtn>
-      )}
-      <OrWrapper>
-        <Line />
-        <OR>또는</OR>
-        <Line />
-      </OrWrapper>
-      <SocialWrapper>
-        <SocialBox>
-          <SocialImage src={Kakao} />
-          카카오 로그인
-        </SocialBox>
-        <SocialBox>
-          <SocialImage src={Naver} />
-          네이버 로그인
-        </SocialBox>
-      </SocialWrapper>
-      <SocialWrapper>
-        <SocialBox>
-          <SocialImage src={Facebook} />
-          페이스북 로그인
-        </SocialBox>
-        <SocialBox>
-          <SocialImage src={Google} />
-          구글 로그인
-        </SocialBox>
-      </SocialWrapper>
-      <Flex>
-        <NotYet>아직 회원이 아니신가요?</NotYet>
-        <SignUp onClick={toSignUp}>회원가입하기</SignUp>
-      </Flex>
-    </>
-  );
-};
 
 export default Login;

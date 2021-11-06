@@ -3,7 +3,7 @@ import styled, { css, keyframes } from 'styled-components';
 import axios from 'axios';
 import { useSetRecoilState } from 'recoil';
 
-import { authenticateToken } from 'state';
+import { authenticateToken, alertInfo } from 'state';
 
 import Kakao from 'assets/icons/Kakao.svg';
 import Facebook from 'assets/icons/Facebook.svg';
@@ -15,6 +15,287 @@ import LoadingDots from 'components/LoadingDots';
 import UserEdit from 'assets/icons/UserEdit.svg';
 import EditType from 'assets/icons/EditType.svg';
 import EditTypeUp from 'assets/icons/EditTypeUp.svg';
+
+interface Props {
+  toLogin: any;
+}
+
+const SignUp: FC<Props> = ({ toLogin }) => {
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [confirm, setConfirm] = useState<string>('');
+  const [type, setType] = useState<string>('');
+  const [nickname, setNickname] = useState<string>('');
+  const [privacy, setPrivacy] = useState<boolean>(false);
+  const [agreement, setAgreement] = useState<boolean>(false);
+  const setAuthToken = useSetRecoilState(authenticateToken);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [emailError, setEmailError] = useState<boolean>(false);
+  const [passwordError, setPasswordError] = useState<boolean>(false);
+  const [nicknameError, setNicknameError] = useState<boolean>(false);
+  const [confirmError, setConfirmError] = useState<boolean>(false);
+  const [privacyError, setPrivacyError] = useState<boolean>(false);
+  const [agreementError, setAgreementError] = useState<boolean>(false);
+  const [typeError, setTypeError] = useState<boolean>(false);
+  const [editType, setEditType] = useState<boolean>(false);
+  const [emailAlert, setEmailAlert] = useState<string>('');
+  const setAlert = useSetRecoilState(alertInfo);
+
+  const authenticate = async () => {
+    const frm = new FormData();
+    frm.append('email', email);
+    frm.append('password', password);
+    try {
+      const response = await axios.post('/v1/authenticate', frm);
+      localStorage.setItem(
+        'VisionNoteUser',
+        JSON.stringify(response.data.token)
+      );
+      setAuthToken(response.data.token);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const signUp = async () => {
+    const userData = new FormData();
+    userData.append('avatar', 'avatar.svg');
+    userData.append('email', email);
+    userData.append('nickname', nickname);
+    userData.append('password', password);
+    userData.append('socialType', 'NORMAL');
+    userData.append('typeId', type);
+    try {
+      await axios.post('/v1/user', userData);
+      return true;
+    } catch (error: any) {
+      if (error.response.status === 409) {
+        setEmailError(true);
+        setEmailAlert('이미 가입된 메일입니다');
+      } else {
+        alert('회원가입에 실패했습니다. 다시 시도해주세요');
+      }
+      setEmail('');
+      setNickname('');
+      setPassword('');
+      setConfirm('');
+      return false;
+    }
+  };
+
+  const testEmail = (email: string) => {
+    return /^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/.test(email);
+  };
+
+  const testPassword = (password: string) => {
+    // 사용 불가 특수 문자 [ ＼ ] ^ ` { | } \
+    // 사용가능한 특수 문자 $ @ $ ! % _ * ? & # " ' ( ) + , - . / : ; < = > @
+    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%_*?&~#"'()+,-./:;<=>@])[A-Za-z\d$@$!%*_?&~#"'()+,-./:;<=>@]{8,20}/.test(
+      password
+    );
+  };
+
+  const goTo = async () => {
+    const emailCheck = email === '' || !testEmail(email);
+    setEmailError(emailCheck);
+    const passwordCheck = password === '' || !testPassword(password);
+    setPasswordError(passwordCheck);
+    const nicknameCheck = nickname === '';
+    setNicknameError(nicknameCheck);
+    const confirmCheck = password !== confirm;
+    setConfirmError(confirmCheck);
+    const typeCheck = type === '';
+    setTypeError(typeCheck);
+    setPrivacyError(!privacy);
+    setAgreementError(!agreement);
+    if (
+      emailCheck ||
+      passwordCheck ||
+      nicknameCheck ||
+      confirmCheck ||
+      typeCheck ||
+      !privacy ||
+      !agreement
+    ) {
+      return false;
+    }
+    setLoading(true);
+    const signUpSuccess = await signUp();
+    // 로그인 성공시 자동 로그인
+    if (signUpSuccess) authenticate();
+    else setLoading(false);
+    return true;
+  };
+
+  const onChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+    if (testEmail(e.target.value)) {
+      setEmailError(false);
+      setEmailAlert('');
+    } else {
+      setEmailAlert('이메일 형식을 확인해주세요');
+    }
+    if (e.target.value === '') setEmailAlert('이메일 형식을 확인해주세요');
+  };
+  const onChangePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+    if (testPassword(e.target.value)) setPasswordError(false);
+  };
+  const onChangeConfirm = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setConfirm(e.target.value);
+    if (e.target.value === password) setPasswordError(false);
+  };
+  const onChangeNickname = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNickname(e.target.value);
+    if (e.target.value !== '') setNicknameError(false);
+  };
+  const onClickOption = (option: string) => {
+    setType(option);
+    setEditType(false);
+    setTypeError(false);
+  };
+
+  const getTypeText = () => {
+    if (type === '1') return '초/중/고';
+    if (type === '2') return '대학생/일반인';
+    return '학생 구분';
+  };
+
+  const onChangePrivacy = () => {
+    if (!privacy) setPrivacyError(false);
+    setPrivacy((prev) => !prev);
+  };
+
+  const onChangeAgreement = () => {
+    if (!agreement) setAgreementError(false);
+    setAgreement((prev) => !prev);
+  };
+
+  const onSocialSignup = () => {
+    setAlert({
+      show: true,
+      message:
+        '아직 지원하지 않는 기능입니다. \n빠른 시일 내에 지원하고자 노력하겠습니다',
+    });
+  };
+
+  return (
+    <Wrapper>
+      <Title>회원가입</Title>
+      <Form
+        error={emailError}
+        placeholder="이메일 주소"
+        type="email"
+        value={email}
+        onChange={onChangeEmail}
+      />
+      <Alert>{emailAlert}</Alert>
+      <Form
+        error={passwordError}
+        placeholder="비밀번호"
+        type="password"
+        value={password}
+        onChange={onChangePassword}
+      />
+      <Alert>
+        {password !== '' &&
+          !testPassword(password) &&
+          '영문 대소문자, 숫자, 특수기호를 포함하여 8~20자로 설정해주세요'}
+      </Alert>
+      <Form
+        error={confirmError}
+        placeholder="비밀번호 확인"
+        type="password"
+        value={confirm}
+        onChange={onChangeConfirm}
+      />
+      <Alert>{password !== confirm && '비밀번호가 같지 않습니다'}</Alert>
+      <FlexBetween>
+        <HalfForm
+          error={nicknameError}
+          placeholder="닉네임"
+          type="text"
+          value={nickname}
+          onChange={onChangeNickname}
+        />
+        <Relative>
+          <TypeContent error={typeError}>
+            {getTypeText()}
+            <ToggleImage
+              onClick={() => setEditType((prev) => !prev)}
+              src={editType ? EditTypeUp : EditType}
+            />
+          </TypeContent>
+          <Menu show={editType}>
+            <TypeOption onClick={() => onClickOption('1')}>
+              <UserIcon src={UserEdit} />
+              초/중/고
+            </TypeOption>
+            <TypeOption onClick={() => onClickOption('2')}>
+              <UserIcon src={UserEdit} />
+              대학생/일반인
+            </TypeOption>
+          </Menu>
+        </Relative>
+      </FlexBetween>
+
+      {loading ? (
+        <LoadingDots small={false} />
+      ) : (
+        <SignupButton onClick={goTo}>가입하기</SignupButton>
+      )}
+      <FlexAlign>
+        <CheckBox
+          error={privacyError}
+          type="checkbox"
+          checked={privacy}
+          onChange={onChangePrivacy}
+        />
+        <CheckAnchor>개인정보 처리방침</CheckAnchor>
+        <CheckText>에 동의합니다.</CheckText>
+      </FlexAlign>
+      <FlexAlign>
+        <CheckBox
+          error={agreementError}
+          type="checkbox"
+          checked={agreement}
+          onChange={onChangeAgreement}
+        />
+        <CheckAnchor>서비스 이용약관</CheckAnchor>
+        <CheckText>에 동의합니다.</CheckText>
+      </FlexAlign>
+      <OrWrapper>
+        <Line />
+        <OR>또는</OR>
+        <Line />
+      </OrWrapper>
+      <SocialWrapper>
+        <SocialBox onClick={onSocialSignup}>
+          <SocialImage src={Kakao} />
+          카카오 회원가입
+        </SocialBox>
+        <SocialBox onClick={onSocialSignup}>
+          <SocialImage src={Naver} />
+          네이버 회원가입
+        </SocialBox>
+      </SocialWrapper>
+      <SocialWrapper>
+        <SocialBox onClick={onSocialSignup}>
+          <SocialImage src={Facebook} />
+          페이스북 회원가입
+        </SocialBox>
+        <SocialBox onClick={onSocialSignup}>
+          <SocialImage src={Google} />
+          구글 회원가입
+        </SocialBox>
+      </SocialWrapper>
+      <Flex>
+        <NotYet>이미 계정이 있으신가요?</NotYet>
+        <ToLogin onClick={toLogin}>로그인 하기</ToLogin>
+      </Flex>
+    </Wrapper>
+  );
+};
 
 const Title = styled.div`
   font-family: Pretendard;
@@ -366,277 +647,5 @@ const Menu = styled.div<{ show: boolean }>`
 const ToggleImage = styled.img`
   width: 24px;
 `;
-
-interface Props {
-  toLogin: any;
-}
-
-const SignUp: FC<Props> = ({ toLogin }) => {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [confirm, setConfirm] = useState<string>('');
-  const [type, setType] = useState<string>('');
-  const [nickname, setNickname] = useState<string>('');
-  const [privacy, setPrivacy] = useState<boolean>(false);
-  const [agreement, setAgreement] = useState<boolean>(false);
-  const setAuthToken = useSetRecoilState(authenticateToken);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [emailError, setEmailError] = useState<boolean>(false);
-  const [passwordError, setPasswordError] = useState<boolean>(false);
-  const [nicknameError, setNicknameError] = useState<boolean>(false);
-  const [confirmError, setConfirmError] = useState<boolean>(false);
-  const [privacyError, setPrivacyError] = useState<boolean>(false);
-  const [agreementError, setAgreementError] = useState<boolean>(false);
-  const [typeError, setTypeError] = useState<boolean>(false);
-  const [editType, setEditType] = useState<boolean>(false);
-  const [emailAlert, setEmailAlert] = useState<string>('');
-
-  const authenticate = async () => {
-    const frm = new FormData();
-    frm.append('email', email);
-    frm.append('password', password);
-    try {
-      const response = await axios.post('/v1/authenticate', frm);
-      localStorage.setItem(
-        'VisionNoteUser',
-        JSON.stringify(response.data.token)
-      );
-      setAuthToken(response.data.token);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const signUp = async () => {
-    const userData = new FormData();
-    userData.append('avatar', 'avatar.svg');
-    userData.append('email', email);
-    userData.append('nickname', nickname);
-    userData.append('password', password);
-    userData.append('socialType', 'NORMAL');
-    userData.append('typeId', type);
-    try {
-      await axios.post('/v1/user', userData);
-      return true;
-    } catch (error: any) {
-      if (error.response.status === 409) {
-        setEmailError(true);
-        setEmailAlert('이미 가입된 메일입니다');
-      } else {
-        alert('회원가입에 실패했습니다. 다시 시도해주세요');
-      }
-      setEmail('');
-      setNickname('');
-      setPassword('');
-      setConfirm('');
-      return false;
-    }
-  };
-
-  const testEmail = (email: string) => {
-    return /^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/.test(email);
-  };
-
-  const testPassword = (password: string) => {
-    // 사용 불가 특수 문자 [ ＼ ] ^ ` { | } \
-    // 사용가능한 특수 문자 $ @ $ ! % _ * ? & # " ' ( ) + , - . / : ; < = > @
-    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%_*?&~#"'()+,-./:;<=>@])[A-Za-z\d$@$!%*_?&~#"'()+,-./:;<=>@]{8,20}/.test(
-      password
-    );
-  };
-
-  const goTo = async () => {
-    const emailCheck = email === '' || !testEmail(email);
-    setEmailError(emailCheck);
-    const passwordCheck = password === '' || !testPassword(password);
-    setPasswordError(passwordCheck);
-    const nicknameCheck = nickname === '';
-    setNicknameError(nicknameCheck);
-    const confirmCheck = password !== confirm;
-    setConfirmError(confirmCheck);
-    const typeCheck = type === '';
-    setTypeError(typeCheck);
-    setPrivacyError(!privacy);
-    setAgreementError(!agreement);
-    if (
-      emailCheck ||
-      passwordCheck ||
-      nicknameCheck ||
-      confirmCheck ||
-      typeCheck ||
-      !privacy ||
-      !agreement
-    ) {
-      return false;
-    }
-    setLoading(true);
-    const signUpSuccess = await signUp();
-    // 로그인 성공시 자동 로그인
-    if (signUpSuccess) authenticate();
-    else setLoading(false);
-    return true;
-  };
-
-  const onChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
-    if (testEmail(e.target.value)) {
-      setEmailError(false);
-      setEmailAlert('');
-    } else {
-      setEmailAlert('이메일 형식을 확인해주세요');
-    }
-    if (e.target.value === '') setEmailAlert('이메일 형식을 확인해주세요');
-  };
-  const onChangePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
-    if (testPassword(e.target.value)) setPasswordError(false);
-  };
-  const onChangeConfirm = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setConfirm(e.target.value);
-    if (e.target.value === password) setPasswordError(false);
-  };
-  const onChangeNickname = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNickname(e.target.value);
-    if (e.target.value !== '') setNicknameError(false);
-  };
-  const onClickOption = (option: string) => {
-    setType(option);
-    setEditType(false);
-    setTypeError(false);
-  };
-
-  const getTypeText = () => {
-    if (type === '1') return '초/중/고';
-    if (type === '2') return '대학생/일반인';
-    return '학생 구분';
-  };
-
-  const onChangePrivacy = () => {
-    if (!privacy) setPrivacyError(false);
-    setPrivacy((prev) => !prev);
-  };
-
-  const onChangeAgreement = () => {
-    if (!agreement) setAgreementError(false);
-    setAgreement((prev) => !prev);
-  };
-
-  return (
-    <Wrapper>
-      <Title>회원가입</Title>
-      <Form
-        error={emailError}
-        placeholder="이메일 주소"
-        type="email"
-        value={email}
-        onChange={onChangeEmail}
-      />
-      <Alert>{emailAlert}</Alert>
-      <Form
-        error={passwordError}
-        placeholder="비밀번호"
-        type="password"
-        value={password}
-        onChange={onChangePassword}
-      />
-      <Alert>
-        {password !== '' &&
-          !testPassword(password) &&
-          '영문 대소문자, 숫자, 특수기호를 포함하여 8~20자로 설정해주세요'}
-      </Alert>
-      <Form
-        error={confirmError}
-        placeholder="비밀번호 확인"
-        type="password"
-        value={confirm}
-        onChange={onChangeConfirm}
-      />
-      <Alert>{password !== confirm && '비밀번호가 같지 않습니다'}</Alert>
-      <FlexBetween>
-        <HalfForm
-          error={nicknameError}
-          placeholder="닉네임"
-          type="text"
-          value={nickname}
-          onChange={onChangeNickname}
-        />
-        <Relative>
-          <TypeContent error={typeError}>
-            {getTypeText()}
-            <ToggleImage
-              onClick={() => setEditType((prev) => !prev)}
-              src={editType ? EditTypeUp : EditType}
-            />
-          </TypeContent>
-          <Menu show={editType}>
-            <TypeOption onClick={() => onClickOption('1')}>
-              <UserIcon src={UserEdit} />
-              초/중/고
-            </TypeOption>
-            <TypeOption onClick={() => onClickOption('2')}>
-              <UserIcon src={UserEdit} />
-              대학생/일반인
-            </TypeOption>
-          </Menu>
-        </Relative>
-      </FlexBetween>
-
-      {loading ? (
-        <LoadingDots small={false} />
-      ) : (
-        <SignupButton onClick={goTo}>가입하기</SignupButton>
-      )}
-      <FlexAlign>
-        <CheckBox
-          error={privacyError}
-          type="checkbox"
-          checked={privacy}
-          onChange={onChangePrivacy}
-        />
-        <CheckAnchor>개인정보 처리방침</CheckAnchor>
-        <CheckText>에 동의합니다.</CheckText>
-      </FlexAlign>
-      <FlexAlign>
-        <CheckBox
-          error={agreementError}
-          type="checkbox"
-          checked={agreement}
-          onChange={onChangeAgreement}
-        />
-        <CheckAnchor>서비스 이용약관</CheckAnchor>
-        <CheckText>에 동의합니다.</CheckText>
-      </FlexAlign>
-      <OrWrapper>
-        <Line />
-        <OR>또는</OR>
-        <Line />
-      </OrWrapper>
-      <SocialWrapper>
-        <SocialBox>
-          <SocialImage src={Kakao} />
-          카카오 회원가입
-        </SocialBox>
-        <SocialBox>
-          <SocialImage src={Naver} />
-          네이버 회원가입
-        </SocialBox>
-      </SocialWrapper>
-      <SocialWrapper>
-        <SocialBox>
-          <SocialImage src={Facebook} />
-          페이스북 회원가입
-        </SocialBox>
-        <SocialBox>
-          <SocialImage src={Google} />
-          구글 회원가입
-        </SocialBox>
-      </SocialWrapper>
-      <Flex>
-        <NotYet>이미 계정이 있으신가요?</NotYet>
-        <ToLogin onClick={toLogin}>로그인 하기</ToLogin>
-      </Flex>
-    </Wrapper>
-  );
-};
 
 export default SignUp;
