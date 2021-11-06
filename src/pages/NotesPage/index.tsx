@@ -2,11 +2,11 @@ import React, { FC, useState, useEffect, useCallback, useRef } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import axios from 'axios';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { decodeUnicode } from 'functions';
 import { Dictate } from 'stt/dictate';
 
-import { authenticateToken, theme, userInfo } from 'state';
+import { authenticateToken, theme, userInfo, alertInfo } from 'state';
 import { lightTheme } from 'styles/theme';
 import BaseLayout from 'components/BaseLayout';
 import Paragraph from 'components/Paragraph';
@@ -53,7 +53,10 @@ interface MatchParams {
   noteId: string;
 }
 
-const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
+const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
+  match,
+  history,
+}) => {
   const [dictate, setDictate] = useState<Dictate>();
   const [noteId, setNoteId] = useState<string>('');
   const [title, setTitle] = useState<string>('');
@@ -86,6 +89,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
   const [lastContent, setLastContent] = useState<string>('');
   const [lastId, setLastId] = useState<number | null>(null);
   const [partialResult, setPartialResult] = useState<string>('');
+  const setAlert = useSetRecoilState(alertInfo);
 
   const addToLogs = (newLog: string) => {
     setLog((prevLogs) => [...prevLogs, newLog]);
@@ -401,7 +405,11 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
         isRecording: data.script.isRecording,
       };
     } catch {
-      alert('노트 정보를 가져올 수 없습니다');
+      setAlert({
+        show: true,
+        message: '해당 노트 정보를 가져올 수 없습니다. \n다시 시도해주세요.',
+      });
+      history.push('/');
       return {
         folderId: null,
         isRecording: 0,
@@ -441,7 +449,10 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
         );
       }
     } catch {
-      alert('노트 정보를 가져올 수 없습니다');
+      setAlert({
+        show: true,
+        message: '폴더 정보를 가져오지 못했습니다.',
+      });
     }
   };
 
@@ -487,7 +498,10 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
         });
         setTitle(newName);
       } catch {
-        alert('노트 제목을 변경하지 못했습니다');
+        setAlert({
+          show: true,
+          message: '노트 제목을 변경하지 못했습니다. \n다시 시도해주세요.',
+        });
       }
     }
   };
@@ -508,7 +522,10 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({ match }) => {
       });
       setStarred(!starred);
     } catch {
-      alert('중요 표시 변경에 실패했습니다');
+      setAlert({
+        show: true,
+        message: '중요 표시를 변경하지 못했습니다. \n다시 시도해주세요.',
+      });
     }
   };
 
@@ -937,4 +954,4 @@ const FolderNext = styled.img`
   margin: 0 10rem 0 3rem;
 `;
 
-export default NotesPage;
+export default withRouter(NotesPage);

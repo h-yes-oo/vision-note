@@ -2,9 +2,9 @@ import React, { FC, useState, useCallback, useRef, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import axios from 'axios';
 import ParagraphMenu from 'components/ParagraphMenu';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 
-import { authenticateToken } from 'state';
+import { authenticateToken, alertInfo } from 'state';
 import BookMarkEmpty from 'assets/icons/BookMarkEmpty.svg';
 import BookMarkFull from 'assets/icons/BookMarkFull.svg';
 import NoteEmpty from 'assets/icons/NoteEmpty.svg';
@@ -56,6 +56,7 @@ const Paragraph: FC<Props> = ({
   const [selectedKeyword, setSelectedKeyword] = useState<string>('');
   const [showHighlightCancelBtn, setShowHighlightCancelBtn] =
     useState<boolean>(false);
+  const setAlert = useSetRecoilState(alertInfo);
 
   useEffect(() => {
     setContentToShow(content);
@@ -71,7 +72,10 @@ const Paragraph: FC<Props> = ({
         headers: { Authorization: `Bearer ${authToken}` },
       });
     } catch {
-      alert('북마크에 실패했습니다. 다시 시도해주세요');
+      setAlert({
+        show: true,
+        message: '북마트에 실패했습니다. \n다시 시도해주세요.',
+      });
     }
     setBookmark(!bookmark);
   };
@@ -176,32 +180,21 @@ const Paragraph: FC<Props> = ({
 
   const endEditingMemo = async () => {
     setMemoEditMode(false);
-    if (newMemo !== '') {
-      try {
-        const memoData = new FormData();
-        memoData.append('paragraphId', String(paragraphId));
-        memoData.append('memoContent', newMemo);
-        await axios.put(`/v1/script/paragraph/${paragraphId}`, memoData, {
-          headers: { Authorization: `Bearer ${authToken}` },
-        });
-        setMemo(newMemo);
-        setNoted(true);
-      } catch {
-        alert('메모를 변경하지 못했습니다');
-      }
-    } else {
-      try {
-        const memoData = new FormData();
-        memoData.append('paragraphId', String(paragraphId));
-        memoData.append('memoContent', '');
-        await axios.put(`/v1/script/paragraph/${paragraphId}`, memoData, {
-          headers: { Authorization: `Bearer ${authToken}` },
-        });
-        setMemo(newMemo);
-        setNoted(false);
-      } catch {
-        alert('메모를 변경하지 못했습니다');
-      }
+    try {
+      const memoData = new FormData();
+      memoData.append('paragraphId', String(paragraphId));
+      memoData.append('memoContent', newMemo);
+      await axios.put(`/v1/script/paragraph/${paragraphId}`, memoData, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      setMemo(newMemo);
+      if (newMemo !== '') setNoted(true);
+      else setNoted(false);
+    } catch {
+      setAlert({
+        show: true,
+        message: '메모를 변경하지 못했습니다. \n다시 시도해주세요.',
+      });
     }
   };
 
@@ -217,7 +210,10 @@ const Paragraph: FC<Props> = ({
         });
         setContentToShow(newContent);
       } catch {
-        alert('폴더 이름을 변경하지 못했습니다');
+        setAlert({
+          show: true,
+          message: '스크립트를 변경하지 못했습니다. \n다시 시도해주세요.',
+        });
       }
     }
   };

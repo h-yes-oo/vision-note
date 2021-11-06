@@ -4,7 +4,13 @@ import { withRouter, RouteComponentProps } from 'react-router-dom';
 import { useRecoilValue, useRecoilState, useSetRecoilState } from 'recoil';
 import axios from 'axios';
 
-import { userInfo, authenticateToken, theme, editStatus } from 'state';
+import {
+  userInfo,
+  authenticateToken,
+  theme,
+  editStatus,
+  alertInfo,
+} from 'state';
 import LoadingDots from 'components/LoadingDots';
 import Alert from 'components/Alert';
 import AlertWithMessage from 'components/Alert/message';
@@ -54,6 +60,7 @@ const UserModal: FC<Props & RouteComponentProps> = ({
   const [showSignOutAlert, setShowSignOutAlert] = useState<boolean>(false);
   const [showPasswordAlert, setShowPasswordAlert] = useState<boolean>(false);
   const currentTheme = useRecoilValue(theme);
+  const setAlert = useSetRecoilState(alertInfo);
 
   const logout = () => {
     localStorage.removeItem('VisionNoteUser');
@@ -70,7 +77,10 @@ const UserModal: FC<Props & RouteComponentProps> = ({
       history.push('/');
       logout();
     } catch {
-      alert('탈퇴에 실패했습니다. 다시 시도해주세요');
+      setAlert({
+        show: true,
+        message: '탈퇴에 실패했습니다. \n다시 시도해주세요.',
+      });
     }
   };
 
@@ -91,7 +101,10 @@ const UserModal: FC<Props & RouteComponentProps> = ({
         setAvatar(response.data.avatarName);
         setEditInfo({ isEdited: true, newAvatar: response.data.avatarName });
       } catch {
-        alert('다시 시도해주세요');
+        setAlert({
+          show: true,
+          message: '회원 사진을 변경하지 못했습니다. \n다시 시도해주세요.',
+        });
       }
     }
   };
@@ -159,7 +172,10 @@ const UserModal: FC<Props & RouteComponentProps> = ({
       }
       onClose(true);
     } catch {
-      alert('회원정보를 변경하지 못했습니다');
+      setAlert({
+        show: true,
+        message: '회원 정보를 변경하지 못했습니다. \n다시 시도해주세요.',
+      });
       setNickname(user.nickname);
       setType(user.type);
       setAvatar(user.avatar);

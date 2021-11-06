@@ -1,7 +1,7 @@
 import { FC, useState, ReactNode, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
-import { useRecoilValue, useRecoilState } from 'recoil';
+import { useRecoilValue, useRecoilState, useSetRecoilState } from 'recoil';
 
 import { NotesMode, SortMode } from 'types';
 import BaseLayout from 'components/BaseLayout';
@@ -18,6 +18,7 @@ import {
   selectedRefresh,
   sortMode,
   theme,
+  alertInfo,
 } from 'state';
 
 import Check from 'assets/icons/Check.svg';
@@ -65,6 +66,7 @@ const FolderPage: FC<Props> = () => {
   const [showAlert, setShowAlert] = useState<boolean>(false);
   const [noNotes, setNoNotes] = useState<boolean>(false);
   const currentTheme = useRecoilValue(theme);
+  const setAlert = useSetRecoilState(alertInfo);
 
   const sortFolder = (a, b) => {
     // 한글 오름차순
@@ -288,7 +290,10 @@ const FolderPage: FC<Props> = () => {
       });
       getRootItems();
     } catch {
-      alert('새 폴더를 생성하지 못했습니다');
+      setAlert({
+        show: true,
+        message: '새폴더를 만들지 못했습니다. \n다시 시도해주세요.',
+      });
     }
   };
 
@@ -322,7 +327,10 @@ const FolderPage: FC<Props> = () => {
       setSelectedIds([]);
       setSelecting(false);
     } else {
-      alert('문제가 발생했습니다');
+      setAlert({
+        show: true,
+        message: '문제가 발생했습니다. \n다시 시도해주세요.',
+      });
     }
   };
 
@@ -347,7 +355,10 @@ const FolderPage: FC<Props> = () => {
       setSelectedIds([]);
       setSelecting(false);
     } else {
-      alert('문제가 발생했습니다');
+      setAlert({
+        show: true,
+        message: '메모를 변경하지 못했습니다. \n다시 시도해주세요.',
+      });
     }
   };
 

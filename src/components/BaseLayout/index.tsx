@@ -1,7 +1,7 @@
 import { FC, ReactNode, useState } from 'react';
 import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { isMobile } from 'functions';
 import { darkTheme } from 'styles/theme';
 
@@ -11,10 +11,11 @@ import SearchIcon from 'assets/icons/SearchIcon.svg';
 import ProfileToggleDown from 'assets/icons/ProfileToggleDown.svg';
 import ProfileToggleUp from 'assets/icons/ProfileToggleUp.svg';
 
-import { userInfo, theme } from 'state';
+import { userInfo, theme, alertInfo } from 'state';
 import UserMenu from 'components/UserMenu';
 import PopupModal from 'components/PopupModal';
 import SearchModal from 'components/PopupModal/search';
+import AlertTimeout from 'components/Alert/timeout';
 
 interface Props {
   children: ReactNode;
@@ -31,6 +32,7 @@ const BaseLayout: FC<Props & RouteComponentProps> = ({
   const [searchKeyword, setSearchKeyword] = useState<string>('');
   const currentTheme = useRecoilValue(theme);
   const user = useRecoilValue(userInfo);
+  const setAlert = useSetRecoilState(alertInfo);
 
   const search = () => {
     setShowSearch(true);
@@ -48,7 +50,11 @@ const BaseLayout: FC<Props & RouteComponentProps> = ({
   const handleMouseLeave = () => setShowUserMenu(false);
 
   const startNote = () => {
-    if (isMobile()) alert('노트 생성은 pc에서만 가능합니다');
+    if (isMobile())
+      setAlert({
+        show: true,
+        message: '노트 생성은 pc에서만 가능합니다',
+      });
     else history.push('/startnote');
   };
 
@@ -59,6 +65,7 @@ const BaseLayout: FC<Props & RouteComponentProps> = ({
           <SearchModal onClose={closeModal} searchKeyword={searchKeyword} />
         </PopupModal>
       )}
+      <AlertTimeout />
       <Header>
         <HeaderInside>
           <Logo onClick={() => history.push('/')}>

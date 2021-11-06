@@ -8,11 +8,10 @@ import React, {
 } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
-import { useRecoilValue, useRecoilState } from 'recoil';
+import { useRecoilValue, useRecoilState, useSetRecoilState } from 'recoil';
 
 import { NotesMode, SortMode } from 'types';
 import ContextMenuFolder from 'components/ContextMenu/folder';
-import { checkTime } from 'functions';
 
 import FolderPurple from 'assets/icons/FolderPurple.svg';
 import FolderBlue from 'assets/icons/FolderBlue.svg';
@@ -24,6 +23,7 @@ import {
   notesMode,
   selectMode,
   sortMode,
+  alertInfo,
 } from 'state';
 import ListData, { NoteResponse } from './list';
 
@@ -51,6 +51,7 @@ const FolderData: FC<Props> = ({
   const selecting = useRecoilValue(selectMode);
   const authToken = useRecoilValue(authenticateToken);
   const [folderTitle, setFolderTitle] = useState<string>(title ?? '');
+  const setAlert = useSetRecoilState(alertInfo);
   // about context menu
   const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
   const [contextMode, setShowContextMenu] = useState<boolean>(false);
@@ -253,7 +254,10 @@ const FolderData: FC<Props> = ({
         });
         setFolderTitle(newName);
       } catch {
-        alert('폴더 이름을 변경하지 못했습니다');
+        setAlert({
+          show: true,
+          message: '폴더 이름을 변경하지 못했습니다. \n다시 시도해주세요.',
+        });
       }
     }
   };

@@ -2,8 +2,8 @@ import React, { FC, useState, ReactNode, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import axios from 'axios';
-import { useRecoilValue } from 'recoil';
-import { authenticateToken, theme } from 'state';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { authenticateToken, theme, alertInfo } from 'state';
 
 import Loading from 'components/Loading';
 import Note from 'assets/icons/Note.svg';
@@ -38,6 +38,7 @@ const SearchModal: FC<Props & RouteComponentProps> = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [resultNode, setResultNode] = useState<ReactNode>(<></>);
   const currentTheme = useRecoilValue(theme);
+  const setAlert = useSetRecoilState(alertInfo);
 
   const getSearchResult = async (keyword: string) => {
     if (keyword !== '') {
@@ -95,7 +96,10 @@ const SearchModal: FC<Props & RouteComponentProps> = ({
           setResultNode(searchResult);
         }
       } catch {
-        alert('검색에 실패했습니다. 다시 시도해주세요');
+        setAlert({
+          show: true,
+          message: '검색에 실패했습니다. \n다시 시도해주세요.',
+        });
       }
       setLoading(false);
     } else {

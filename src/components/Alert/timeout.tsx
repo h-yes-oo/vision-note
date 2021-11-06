@@ -1,24 +1,23 @@
 import { FC, useEffect } from 'react';
 import styled from 'styled-components';
-import { lightTheme } from 'styles/theme';
 import { useRecoilState } from 'recoil';
 import { alertInfo } from 'state';
 
 interface ModalProps {}
 
 const AlertTimeout: FC<ModalProps> = () => {
-  const [visible, setVisible] = useRecoilState(alertInfo);
+  const [alert, setAlert] = useRecoilState(alertInfo);
 
   useEffect(() => {
-    if (visible.show) {
-      setTimeout(() => setVisible({ show: false }), 2000);
+    if (alert.show) {
+      setTimeout(() => setAlert({ ...alert, show: false }), 3000);
     }
-  }, [visible]);
+  }, [alert]);
 
   return (
-    <Root visible={visible.show}>
+    <Root visible={alert.show}>
       <Sorry>죄송합니다</Sorry>
-      <Message>{visible.message ?? ''}</Message>
+      <Message>{alert.message ?? ''}</Message>
     </Root>
   );
 };
@@ -51,7 +50,7 @@ const Root = styled.div<{ visible: boolean }>`
   width: 442rem;
   border-radius: 14rem;
   box-shadow: 0 3rem 16rem 0 rgba(0, 0, 0, 0.16);
-  background-color: ${(props) => props.theme.color.alertBackground};
+  background-color: ${(props) => props.theme.color.contextBackground};
 
   padding: 20rem 30rem 30rem;
   box-sizing: border-box;

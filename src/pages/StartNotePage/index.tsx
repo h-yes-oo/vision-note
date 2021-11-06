@@ -2,9 +2,9 @@ import { FC, useState, useEffect, useRef } from 'react';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import styled, { keyframes } from 'styled-components';
 import axios from 'axios';
-import { useRecoilValue } from 'recoil';
-import { authenticateToken, theme } from 'state';
-import { isChrome, isWindows } from 'functions';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { authenticateToken, theme, alertInfo } from 'state';
+import { isChrome } from 'functions';
 import { Subject } from 'types';
 
 import BaseLayout from 'components/BaseLayout';
@@ -73,6 +73,7 @@ const StartNotePage: FC<Props & RouteComponentProps> = ({ history }) => {
     useRef<HTMLInputElement>(null);
   const authToken = useRecoilValue(authenticateToken);
   const currentTheme = useRecoilValue(theme);
+  const setAlert = useSetRecoilState(alertInfo);
 
   const sendFile = async (fileToSend: File) => {
     const data = new FormData();
@@ -113,7 +114,10 @@ const StartNotePage: FC<Props & RouteComponentProps> = ({ history }) => {
       });
       return response.data.scriptId;
     } catch {
-      alert('노트 생성 중 문제가 발생했습니다');
+      setAlert({
+        show: true,
+        message: '노트 생성 중 문제가 발생했습니다. \n다시 시도해주세요.',
+      });
       return null;
     }
   };
@@ -129,7 +133,13 @@ const StartNotePage: FC<Props & RouteComponentProps> = ({ history }) => {
     if (isChrome()) {
       const id = await makeNote(1);
       if (id !== null) history.push(`/note/${id}`);
-    } else alert('녹음은 크롬 브라우저에서만 가능합니다');
+    } else {
+      setAlert({
+        show: true,
+        message:
+          '녹음은 크롬 브라우저에서만 가능합니다. \n크롬에서 다시 시도해주세요.',
+      });
+    }
   };
 
   // 음원 파일이 업로드 되면 노트 생성 후 페이지 이동
@@ -142,7 +152,12 @@ const StartNotePage: FC<Props & RouteComponentProps> = ({ history }) => {
   };
 
   const onClickUpload = () => {
-    if (fileRef.current !== null) fileRef.current.click();
+    setAlert({
+      show: true,
+      message:
+        '아직 지원하지 않는 기능입니다. \n빠른 시일 내에 지원하고자 노력하겠습니다',
+    });
+    // if (fileRef.current !== null) fileRef.current.click();
   };
 
   const full = {};
