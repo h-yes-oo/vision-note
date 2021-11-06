@@ -22,6 +22,7 @@ interface Config {
   content_id?: any;
   onWsClose?: any;
   onShareStop?: () => void;
+  onEndRecording: (blob: Blob) => void;
 }
 
 interface AudioSourceConstraints {
@@ -69,14 +70,6 @@ const SERVER_STATUS_CODE = {
   2: 'Aborted', // Recognition was aborted for some reason
   9: 'No available', // Recognizer processes are currently in use and recognition cannot be performed
 };
-
-interface CustomWindow {
-  source?: any;
-  userSpeechAnalyser?: any;
-  Dictate?: any;
-  Transcription?: any;
-  Recorder?: any;
-}
 
 export class Dictate {
   stream: MediaStream;
@@ -155,6 +148,8 @@ export class Dictate {
     // Initialized by init()
     let audioContext: any;
     let recorder: any;
+    let downloader;
+    let chunks: Blob[] = [];
     // Initialized by startListening()
     let ws: WebSocket | null;
     let intervalKey: any;
@@ -309,6 +304,25 @@ export class Dictate {
       }
 
       try {
+        // recorder 생성
+        const options = {
+          audioBitsPerSecond: 16000,
+          mimeType: 'audio/webm;codecs=opus',
+        };
+        // 녹음된 음성을 서버로 보내기 위한 downloader 생성
+        downloader = new MediaRecorder(this.stream, options);
+
+        chunks = [];
+        downloader.ondataavailable = (e: BlobEvent) => {
+          chunks.push(e.data);
+        };
+
+        downloader.onstop = (e) => {
+          const blob = new Blob(chunks, { type: chunks[0].type });
+          chunks = [];
+          config.onEndRecording(blob);
+        };
+        downloader.start();
         ws = createWebSocket();
         audioContext.resume().then(() => {
           config.onEvent(MSG_AUDIOCONTEXT_RESUMED, 'Audio context resumed');
@@ -324,6 +338,11 @@ export class Dictate {
       clearInterval(intervalKey);
       // Stop recording
       if (recorder) {
+        try {
+          downloader.stop();
+        } catch {
+          console.log('downloader error');
+        }
         recorder.stop();
         config.onEvent(MSG_STOP, 'Stopped recording');
         // Push the remaining audio to the server

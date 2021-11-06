@@ -8,7 +8,7 @@
         <path id="패스_843751" data-name="패스 843751" class="cls-1" d="M0 0h24v24H0z" transform="translate(490 345)"/>
         <g id="그룹_457522" data-name="그룹 457522" transform="translate(490 344)">
             <path id="패스_843972" data-name="패스 843972" class="cls-1" d="M0 0h25v25H0z"/>
-            <path id="패스_843973" data-name="패스 843973" d="m7.783 5.442 10.946 6.385a.521.521 0 0 1 0 .9L7.783 19.112A.521.521 0 0 1 7 18.66V5.892a.521.521 0 0 1 .783-.45z" transform="translate(.292 .224)"/>
+            <path id="패스_843973" data-name="패스 843973" d="m7.783 5.442 10.946 6.385a.521.521 0 0 1 0 .9L7.783 19.112A.521.521 0 0 1 7 18.66V5.892a.521.521 0 0 1 .783-.45z" transform="translate(.292 .224)" style="fill:#e6e6e6"/>
         </g>
     </g>
 </svg>

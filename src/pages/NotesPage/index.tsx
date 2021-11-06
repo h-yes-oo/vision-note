@@ -31,6 +31,15 @@ import ToggleDownDark from 'assets/icons/ToggleDownDark.svg';
 import Loading from 'components/Loading';
 import MicGrey from 'assets/icons/MicGrey.svg';
 import MicWhite from 'assets/icons/MicWhite.svg';
+import Play from 'assets/icons/Play.svg';
+import Backward from 'assets/icons/Backward.svg';
+import Forward from 'assets/icons/Forward.svg';
+import PlayWhite from 'assets/icons/PlayWhite.svg';
+import BackwardWhite from 'assets/icons/BackwardWhite.svg';
+import ForwardWhite from 'assets/icons/ForwardWhite.svg';
+import Pause from 'assets/icons/Pause.svg';
+import PauseWhite from 'assets/icons/PauseWhite.svg';
+import ProgressDot from 'assets/icons/ProgressDot.svg';
 
 interface ParagraphData {
   paragraphId: number;
@@ -90,6 +99,8 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
   const [lastId, setLastId] = useState<number | null>(null);
   const [partialResult, setPartialResult] = useState<string>('');
   const setAlert = useSetRecoilState(alertInfo);
+  const [player, setPlayer] = useState<HTMLAudioElement | null>(null);
+  const [playing, setPlaying] = useState<boolean>(false);
 
   const addToLogs = (newLog: string) => {
     setLog((prevLogs) => [...prevLogs, newLog]);
@@ -353,12 +364,10 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
         );
         // addToTranscription(result);
         if (result.includes('^')) {
-          console.log(`original time : ${time}`);
           const startTime = Math.floor(time);
           const formattedTime = `${Math.floor(startTime / 60)}:${
             startTime % 60
           }`;
-          console.log(`formatted time : ${formattedTime}`);
           setLastContent((prev) => '');
           addNewParagraph(result.split('^')[0], formattedTime);
         } else if (result !== '' && result !== '.') {
@@ -377,8 +386,31 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
         setWaiting(false);
       },
       onShareStop: () => {
-        console.log('on share stop');
         setRecording(false);
+      },
+      onEndRecording: (blob: Blob) => {
+        try {
+          const audioData = new FormData();
+          audioData.append('scriptId', String(match.params.noteId));
+          audioData.append('audio', blob);
+          axios
+            .post(`/v1/script/audio/${match.params.noteId}`, audioData, {
+              headers: { Authorization: `Bearer ${authToken}` },
+            })
+            .then((response) =>
+              setPlayer(
+                (prev) =>
+                  new Audio(
+                    `https://visionnote-static.s3.ap-northeast-2.amazonaws.com/audio/${response.data.savedAudioName}`
+                  )
+              )
+            );
+        } catch {
+          setAlert({
+            show: true,
+            message: '강의 음성을 저장하지 못했습니다. \n',
+          });
+        }
       },
     });
 
@@ -393,12 +425,20 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
       const { data } = await axios.get(`/v1/script/${noteId}`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
+      console.log(data);
       setFolderName(data.parentFolder.folderName);
       setStarred(data.script.isImportant);
       setTitle(data.script.fileName);
       setDate(data.script.createdAt.slice(0, 10).replace(/-/gi, '.'));
       if (!data.script.isRecording) {
         setContent(data.scriptParagraphs);
+        const audioName = data.script.audioFileName;
+        if (audioName !== null)
+          setPlayer(
+            new Audio(
+              `https://visionnote-static.s3.ap-northeast-2.amazonaws.com/audio/${data.script.audioFileName}`
+            )
+          );
       }
       return {
         folderId: data.parentFolder.folderId,
@@ -539,6 +579,16 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
     return showRecord ? ToggleUpDark : ToggleDownDark;
   };
 
+  const onClickPlay = () => {
+    player?.play();
+    setPlaying(true);
+  };
+
+  const onClickPause = () => {
+    player?.pause();
+    setPlaying(false);
+  };
+
   return (
     <BaseLayout grey={false}>
       {loading ? (
@@ -597,8 +647,39 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
                 {/* <MemoBtn onClick={() => setShowMemo(!showMemo)}>
                   {showMemo ? '전체 메모 닫기' : '전체 메모 보기'}
                 </MemoBtn> */}
+                {player !== null && (
+                  <MemoBtn onClick={() => setShowRecord(!showRecord)}>
+                    다시 듣기
+                    <ToggleBtn src={getToggleSrc()} />
+                  </MemoBtn>
+                )}
               </RecordingWrapper>
             </InfoBottom>
+            {showRecord && (
+              <PlayBar>
+                <Control>
+                  <ControlButton
+                    src={currentTheme === lightTheme ? Backward : BackwardWhite}
+                  />
+                  {playing ? (
+                    <ControlButton
+                      src={currentTheme === lightTheme ? Pause : PauseWhite}
+                      onClick={onClickPause}
+                    />
+                  ) : (
+                    <ControlButton
+                      src={currentTheme === lightTheme ? Play : PlayWhite}
+                      onClick={onClickPlay}
+                    />
+                  )}
+                  <ControlButton
+                    src={currentTheme === lightTheme ? Forward : ForwardWhite}
+                  />
+                </Control>
+                <ProgressBar />
+                <CurrentTime>00:00</CurrentTime>
+              </PlayBar>
+            )}
           </NoteInfo>
           <ContentWrapper>
             <NoteContents half={showMemo}>
@@ -674,6 +755,56 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
 
 const Flex = styled.div`
   display: flex;
+`;
+
+const PlayBar = styled(Flex)`
+  width: 100%;
+  justify-content: space-between;
+  margin-top: 34px;
+  align-items: center;
+`;
+
+const Control = styled(Flex)`
+  width: 81rem;
+  justify-content: space-between;
+`;
+
+const ControlButton = styled.img`
+  width: 25rem;
+`;
+
+const ProgressBar = styled.div`
+  width: 837rem;
+  height: 4rem;
+  border-radius: 5rem;
+  background-color: ${(props) => props.theme.color.lightBorder};
+`;
+
+const CurrentTime = styled.div`
+  object-fit: contain;
+  font-family: Pretendard;
+  font-size: 16rem;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.19;
+  letter-spacing: normal;
+  text-align: left;
+  color: #a2a2a2;
+`;
+
+const Progress = styled.div`
+  width: 176rem;
+  height: 4rem;
+  border-radius: 5rem;
+  background-color: #7b68ee;
+`;
+
+const ProgressBtn = styled.img`
+  width: 12rem;
+  height: 12rem;
+  object-fit: contain;
+  box-shadow: 0 0 4rem 0 rgba(0, 0, 0, 0.2);
 `;
 
 const Message = styled.div`
