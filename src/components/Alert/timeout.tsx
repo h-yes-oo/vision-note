@@ -60,7 +60,7 @@ const Root = styled.div<{ visible: boolean }>`
   position: fixed;
   top: 5%;
   left: ${(props) => (props.visible ? '5%' : '-100rem')};
-  z-index: 9999;
+  z-index: ${(props) => (props.visible ? '9999' : '-9999')};
   transition: 0.5s;
 `;
 
