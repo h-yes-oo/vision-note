@@ -387,10 +387,14 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
         }
       },
       onPartialResults: (hypos) => {
-        const result = decodeUnicode(hypos[0].transcript).replace(
-          /<UNK>/gi,
-          ''
-        );
+        const result = decodeUnicode(hypos[0].transcript)
+          .replace(/<UNK>/gi, '')
+          .replace(/{/gi, '')
+          .replace(/}/gi, '')
+          .replace(/\[/gi, '')
+          .replace(/\]/gi, '')
+          .replace(/\(/gi, '')
+          .replace(/\)/gi, '');
         if (result !== '.' && !result.includes('^'))
           setPartialResult((prev) => result);
       },
