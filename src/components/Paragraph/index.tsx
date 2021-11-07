@@ -441,7 +441,7 @@ const Memo = styled.div`
   margin-top: 4px;
 
   font-family: Pretendard;
-  font-size: 14px;
+  font-size: 14rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -493,7 +493,7 @@ const Root = styled.div`
   display: flex;
   align-itmes: flex-start;
   justify-content: space-between;
-  margin-top: 80rem;
+  margin-top: 50rem;
 `;
 
 const MoreBtn = styled.img`
