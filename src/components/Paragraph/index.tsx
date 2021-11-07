@@ -229,12 +229,6 @@ const Paragraph: FC<Props> = ({
     }
   };
 
-  const onPressEnterContent = async (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      await endEditingContent();
-    }
-  };
-
   const editParagraph = () => {
     if (contentRef.current !== null) {
       setTimeout(() => contentRef.current!.focus(), 10);
@@ -296,6 +290,14 @@ const Paragraph: FC<Props> = ({
     return toShow;
   };
 
+  useEffect(() => {
+    if (contentRef.current !== null) {
+      contentRef.current.style.height = '0px';
+      const { scrollHeight } = contentRef.current;
+      contentRef.current.style.height = scrollHeight + 'px';
+    }
+  }, [newContent, paragraphEditMode]);
+
   return (
     <Root>
       <PreventClick
@@ -310,13 +312,15 @@ const Paragraph: FC<Props> = ({
         />
       </PreventClick>
       {paragraphEditMode ? (
-        <EditContent
-          bookmarked={bookmark}
-          ref={contentRef}
-          value={newContent}
-          onChange={(e) => setNewContent(e.target.value)}
-          onKeyPress={onPressEnterContent}
-        />
+        <>
+          <Mask visible={paragraphEditMode} onClick={endEditingContent} />
+          <EditContent
+            bookmarked={bookmark}
+            ref={contentRef}
+            value={newContent}
+            onChange={(e) => setNewContent(e.target.value)}
+          />
+        </>
       ) : (
         <Contents onMouseUp={highlightSelection} bookmarked={bookmark}>
           {highlightContent()}
@@ -361,12 +365,12 @@ const Paragraph: FC<Props> = ({
           )}
         </BtnWrapper>
         {!memoEditMode && noted && <Memo>{memo}</Memo>}
+        <Mask visible={memoEditMode} onClick={endEditingMemo} />
         <EditMemo
           visible={memoEditMode}
           ref={memoRef}
           value={newMemo}
           onChange={(e) => setNewMemo(e.target.value)}
-          onKeyPress={onPressEnterMemo}
         />
       </FlexColumn>
     </Root>
@@ -391,10 +395,15 @@ const EditContent = styled.textarea<{ bookmarked: boolean }>`
   color: ${(props) => props.theme.color.primaryText};
   white-space: pre-wrap;
   user-select: text !important;
+
   border-radius: 3rem;
   padding: 20rem 0;
-  min-width: 500rem;
-  max-width: 70%;
+  width: 700rem;
+  border: none;
+  background: transparent;
+  z-index: 1001;
+  overflow: visible;
+
   background-color: ${(props) =>
     props.bookmarked ? props.theme.color.highlightBackground : ''};
   ${(props) =>
@@ -442,6 +451,18 @@ const Memo = styled.div`
   color: ${(props) => props.theme.color.semiText};
 `;
 
+const Mask = styled.div<{ visible: boolean }>`
+  display: ${(props) => (props.visible ? '' : 'none')};
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1000;
+  overflow: auto;
+  outline: 0;
+`;
+
 const EditMemo = styled.textarea<{ visible: boolean }>`
   display: ${(props) => (props.visible ? '' : 'none')};
   width: 201rem;
@@ -465,6 +486,7 @@ const EditMemo = styled.textarea<{ visible: boolean }>`
   letter-spacing: normal;
   text-align: left;
   color: ${(props) => props.theme.color.semiText};
+  z-index: 1001;
 `;
 
 const Root = styled.div`
@@ -494,10 +516,9 @@ const Contents = styled.div<{ bookmarked: boolean }>`
   color: ${(props) => props.theme.color.primaryText};
   white-space: pre-wrap;
   user-select: text !important;
-  border-radius: 3rem;
+  border-radius: 5rem;
   padding: 20rem 0;
-  min-width: 500rem;
-  max-width: 70%;
+  width: 700rem;
   background-color: ${(props) =>
     props.bookmarked ? props.theme.color.highlightBackground : ''};
   ${(props) =>
