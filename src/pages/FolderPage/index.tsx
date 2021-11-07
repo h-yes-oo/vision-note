@@ -298,7 +298,11 @@ const FolderPage: FC<Props> = () => {
   };
 
   const downloadAll = () => {
-    console.log('download all');
+    setAlert({
+      show: true,
+      message:
+        '아직 지원하지 않는 기능입니다. \n빠른 시일 내에 지원하고자 노력하겠습니다',
+    });
     setSelectedIds([]);
     setSelecting(false);
   };

@@ -1,7 +1,7 @@
 import { FC, useState } from 'react';
 import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import axios from 'axios';
 
 import AlertWithMessage from 'components/Alert/message';
@@ -11,7 +11,7 @@ import ContextStar from 'assets/icons/ContextStar.svg';
 import FilledStar from 'assets/icons/FilledStar.svg';
 import ContextDelete from 'assets/icons/ContextDelete.svg';
 
-import { authenticateToken } from 'state';
+import { authenticateToken, alertInfo } from 'state';
 
 interface Props {
   show: boolean;
@@ -33,9 +33,14 @@ const NoteMenu: FC<Props & RouteComponentProps> = ({
 }) => {
   const authToken = useRecoilValue(authenticateToken);
   const [showAlert, setShowAlert] = useState<boolean>(false);
+  const setAlert = useSetRecoilState(alertInfo);
 
   const download = () => {
-    console.log(`download ${noteId}`);
+    setAlert({
+      show: true,
+      message:
+        '아직 지원하지 않는 기능입니다. \n빠른 시일 내에 지원하고자 노력하겠습니다',
+    });
     closeMenu();
   };
 

@@ -1,11 +1,11 @@
 import { FC, useState } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 
 import AlertWithMessage from 'components/Alert/message';
 
-import { authenticateToken } from 'state';
+import { authenticateToken, alertInfo } from 'state';
 import ContextDelete from 'assets/icons/ContextDelete.svg';
 import ContextDownload from 'assets/icons/ContextDownload.svg';
 import ContextStar from 'assets/icons/ContextStar.svg';
@@ -32,10 +32,14 @@ const ContextMenu: FC<Props> = ({
 }) => {
   const authToken = useRecoilValue(authenticateToken);
   const [showAlert, setShowAlert] = useState<boolean>(false);
+  const setAlert = useSetRecoilState(alertInfo);
 
   const downloadNote = () => {
-    console.log(`${noteId} download`);
-    // event.stopPropagation();
+    setAlert({
+      show: true,
+      message:
+        '아직 지원하지 않는 기능입니다. \n빠른 시일 내에 지원하고자 노력하겠습니다',
+    });
   };
 
   const starNote = async () => {
