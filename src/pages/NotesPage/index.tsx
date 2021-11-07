@@ -66,26 +66,31 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
   match,
   history,
 }) => {
-  const [dictate, setDictate] = useState<Dictate>();
+  // about basic note info
   const [noteId, setNoteId] = useState<string>('');
   const [title, setTitle] = useState<string>('');
   const [date, setDate] = useState<string>('');
-  const [recording, setRecording] = useState<boolean>(false);
-  const [showMemo, setShowMemo] = useState<boolean>(false);
-  const [showRecord, setShowRecord] = useState<boolean>(false);
-  const authToken = useRecoilValue(authenticateToken);
-  const [showContextMenu, setShowContextMenu] = useState<boolean>(false);
   const [folderName, setFolderName] = useState<string>('');
   const [folderElement, setFolderElement] = useState<JSX.Element>(<></>);
+  const [starred, setStarred] = useState<boolean>(false);
+  // about modes
+  const [showMemo, setShowMemo] = useState<boolean>(false);
+  const [showRecord, setShowRecord] = useState<boolean>(false);
+  const [showContextMenu, setShowContextMenu] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  // about recoil states
+  const authToken = useRecoilValue(authenticateToken);
+  const currentTheme = useRecoilValue(theme);
+  const user = useRecoilValue(userInfo);
+  const setAlert = useSetRecoilState(alertInfo);
   // about editing title
   const [editing, setEditing] = useState<boolean>(false);
   const [newName, setNewName] = useState<string>('');
   const noteNameRef: React.RefObject<HTMLInputElement> =
     useRef<HTMLInputElement>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [starred, setStarred] = useState<boolean>(false);
-  const currentTheme = useRecoilValue(theme);
-  const user = useRecoilValue(userInfo);
+  // about stt
+  const [recording, setRecording] = useState<boolean>(false);
+  const [dictate, setDictate] = useState<Dictate>();
   const [content, setContent] = useState<ParagraphData[]>([]);
   const [log, setLog] = useState<string[]>([]);
   const [canStart, setCanStart] = useState<boolean>(false);
@@ -98,9 +103,12 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
   const [lastContent, setLastContent] = useState<string>('');
   const [lastId, setLastId] = useState<number | null>(null);
   const [partialResult, setPartialResult] = useState<string>('');
-  const setAlert = useSetRecoilState(alertInfo);
+  // about audio play
   const [player, setPlayer] = useState<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState<boolean>(false);
+  const [currLength, setCurrLength] = useState<number>(0);
+  const [audioLength, setAudioLength] = useState<number>(0);
+  const [timer, setTimer] = useState<NodeJS.Timeout>();
 
   const addToLogs = (newLog: string) => {
     setLog((prevLogs) => [...prevLogs, newLog]);
@@ -580,14 +588,37 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
   };
 
   const onClickPlay = () => {
-    player?.play();
-    setPlaying(true);
+    if (player !== null) {
+      player.play();
+      setPlaying(true);
+      setAudioLength(Math.ceil(player.duration));
+      setTimer(
+        setInterval(() => {
+          setCurrLength(Math.ceil(player.currentTime));
+        }, 200)
+      );
+    }
   };
 
   const onClickPause = () => {
-    player?.pause();
-    setPlaying(false);
+    if (player !== null) {
+      player.pause();
+      if (timer) clearInterval(timer);
+      setPlaying(false);
+    }
   };
+
+  const formatTime = (s) => {
+    const result = Number.isNaN(s)
+      ? '0:00'
+      : (s - (s %= 60)) / 60 + (s > 9 ? ':' : ':0') + s;
+    return result;
+  };
+
+  useEffect(() => {
+    console.log(currLength);
+    console.log(audioLength);
+  }, [currLength]);
 
   return (
     <BaseLayout grey={false}>
@@ -676,8 +707,10 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
                     src={currentTheme === lightTheme ? Forward : ForwardWhite}
                   />
                 </Control>
-                <ProgressBar />
-                <CurrentTime>00:00</CurrentTime>
+                <ProgressBar>
+                  <CurrentProgress current={currLength / audioLength} />
+                </ProgressBar>
+                <CurrentTime>{formatTime(currLength)}</CurrentTime>
               </PlayBar>
             )}
           </NoteInfo>
@@ -774,6 +807,7 @@ const ControlButton = styled.img`
 `;
 
 const ProgressBar = styled.div`
+  position: relative;
   width: 837rem;
   height: 4rem;
   border-radius: 5rem;
@@ -793,8 +827,10 @@ const CurrentTime = styled.div`
   color: #a2a2a2;
 `;
 
-const Progress = styled.div`
-  width: 176rem;
+const CurrentProgress = styled.div<{ current: number }>`
+  position: absolute;
+  left: 0;
+  width: ${(props) => props.current * 837}rem;
   height: 4rem;
   border-radius: 5rem;
   background-color: #7b68ee;
