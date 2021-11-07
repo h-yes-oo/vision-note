@@ -3,7 +3,7 @@ import styled, { keyframes } from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import axios from 'axios';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { decodeUnicode } from 'functions';
+import { decodeUnicode, formatTime } from 'functions';
 import { Dictate } from 'stt/dictate';
 
 import { authenticateToken, theme, userInfo, alertInfo } from 'state';
@@ -46,8 +46,8 @@ interface ParagraphData {
   scriptId?: number;
   userId?: number;
   paragraphSequence: number;
-  startTime: string;
-  endTime: string;
+  startTime: number;
+  endTime: number;
   paragraphContent: string;
   memoContent: string | null;
   isBookmarked: number;
@@ -102,6 +102,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
   const [lastSequence, setSequence] = useState<number>(0);
   const [lastContent, setLastContent] = useState<string>('');
   const [lastId, setLastId] = useState<number | null>(null);
+  const [lastEndTime, setLastEndTime] = useState<number>(0);
   const [partialResult, setPartialResult] = useState<string>('');
   // about audio play
   const [player, setPlayer] = useState<HTMLAudioElement | null>(null);
@@ -114,7 +115,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
     setLog((prevLogs) => [...prevLogs, newLog]);
   };
 
-  const addToContent = async (newContent: string) => {
+  const addToContent = async (newContent: string, endTime: number) => {
     try {
       const SpacingApi = axios.create({
         baseURL: 'https://spacing.visionnote.io',
@@ -128,6 +129,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
       ...prevContent.slice(0, -1),
       {
         ...prevContent[prevContent.length - 1],
+        endTime,
         paragraphContent: `${
           prevContent[prevContent.length - 1].paragraphContent
         }\n${newContent}`,
@@ -136,11 +138,11 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
     setLastContent((prev) => `${prev}\n${newContent}`);
   };
 
-  const addNewParagraph = (remaining: string, time: string) => {
+  const addNewParagraph = (time: number) => {
     const paragraphData = new FormData();
     paragraphData.append('scriptId', match.params.noteId);
-    paragraphData.append('startTime', time);
-    paragraphData.append('endTime', '00:00');
+    paragraphData.append('startTime', String(time));
+    paragraphData.append('endTime', String(time));
     paragraphData.append('paragraphContent', String(lastSequence));
     paragraphData.append('paragraphSequence', '0');
     paragraphData.append('isBookmarked', '0');
@@ -151,43 +153,43 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
       .then((response) => {
         const id = response.data.paragraphId;
         setLastId((prev) => id);
-        if (remaining !== '') {
-          setContent((prevContent) => [
-            ...prevContent.slice(0, -1),
-            {
-              ...prevContent[prevContent.length - 1],
-              paragraphContent: `${
-                prevContent[prevContent.length - 1].paragraphContent
-              }
-        \n
-        ${remaining}`,
-            },
-            {
-              paragraphId: id,
-              paragraphSequence: lastSequence,
-              startTime: time,
-              endTime: '00:00',
-              paragraphContent: '',
-              memoContent: null,
-              isBookmarked: 0,
-              keywords: [],
-            },
-          ]);
-        } else {
-          setContent((prevContent) => [
-            ...prevContent,
-            {
-              paragraphId: id,
-              paragraphSequence: lastSequence,
-              startTime: time,
-              endTime: '00:00',
-              paragraphContent: '',
-              memoContent: null,
-              isBookmarked: 0,
-              keywords: [],
-            },
-          ]);
-        }
+        // if (remaining !== '') {
+        //   setContent((prevContent) => [
+        //     ...prevContent.slice(0, -1),
+        //     {
+        //       ...prevContent[prevContent.length - 1],
+        //       paragraphContent: `${
+        //         prevContent[prevContent.length - 1].paragraphContent
+        //       }
+        // \n
+        // ${remaining}`,
+        //     },
+        //     {
+        //       paragraphId: id,
+        //       paragraphSequence: lastSequence,
+        //       startTime: time,
+        //       endTime: time,
+        //       paragraphContent: '',
+        //       memoContent: null,
+        //       isBookmarked: 0,
+        //       keywords: [],
+        //     },
+        //   ]);
+        // } else {
+        setContent((prevContent) => [
+          ...prevContent,
+          {
+            paragraphId: id,
+            paragraphSequence: lastSequence,
+            startTime: time,
+            endTime: time,
+            paragraphContent: '',
+            memoContent: null,
+            isBookmarked: 0,
+            keywords: [],
+          },
+        ]);
+        // }
         setSequence((prev) => prev + 1);
       });
   };
@@ -198,8 +200,8 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
         if (result) {
           const paragraphData = new FormData();
           paragraphData.append('scriptId', match.params.noteId);
-          paragraphData.append('startTime', '00:00');
-          paragraphData.append('endTime', '00:00');
+          paragraphData.append('startTime', '0');
+          paragraphData.append('endTime', '0');
           paragraphData.append('paragraphContent', '');
           paragraphData.append('paragraphSequence', String(lastSequence));
           paragraphData.append('isBookmarked', '0');
@@ -218,8 +220,8 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
                 {
                   paragraphId: id,
                   paragraphSequence: lastSequence,
-                  startTime: '00:00',
-                  endTime: '00:00',
+                  startTime: 0,
+                  endTime: 0,
                   paragraphContent: '',
                   memoContent: null,
                   isBookmarked: 0,
@@ -254,7 +256,6 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
 
   useEffect(() => {
     return () => {
-      console.log('bye dictate');
       stopRecording();
     };
   }, [dictate]);
@@ -265,8 +266,8 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
         if (result) {
           const paragraphData = new FormData();
           paragraphData.append('scriptId', match.params.noteId);
-          paragraphData.append('startTime', '00:00');
-          paragraphData.append('endTime', '00:00');
+          paragraphData.append('startTime', '0');
+          paragraphData.append('endTime', '0');
           paragraphData.append('paragraphContent', '');
           paragraphData.append('paragraphSequence', String(lastSequence));
           paragraphData.append('isBookmarked', '0');
@@ -285,8 +286,8 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
                 {
                   paragraphId: id,
                   paragraphSequence: lastSequence,
-                  startTime: '00:00',
-                  endTime: '00:00',
+                  startTime: 0,
+                  endTime: 0,
                   paragraphContent: '',
                   memoContent: null,
                   isBookmarked: 0,
@@ -314,22 +315,48 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
     }
   };
 
-  useEffect(() => {
-    console.log(`id changed to ${lastId}`);
-  }, [lastId]);
+  // useEffect(() => {
+  //   console.log(`id changed to ${lastId}`);
+  // }, [lastId]);
 
   useEffect(() => {
     if (lastId !== null && lastContent !== '') {
-      console.log(`last Content changed to ${lastContent} and id is ${lastId}`);
+      // console.log(`last Content changed to ${lastContent} and id is ${lastId}`);
       // 이전 문단 정보 저장
-      const prevData = new FormData();
-      prevData.append('paragraphId', String(lastId));
-      prevData.append('paragraphContent', lastContent);
-      axios.put(`/v1/script/paragraph/${lastId}`, prevData, {
-        headers: { Authorization: `Bearer ${authToken}` },
-      });
+      try {
+        const prevData = new FormData();
+        prevData.append('paragraphId', String(lastId));
+        prevData.append('paragraphContent', lastContent);
+        axios.put(`/v1/script/paragraph/${lastId}`, prevData, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+      } catch {
+        setAlert({
+          show: true,
+          message: '문단 내용에 저장에 실패했습니다. \n다시 시도해주세요.',
+        });
+      }
     }
   }, [lastContent]);
+
+  useEffect(() => {
+    if (lastId !== null && lastEndTime !== undefined) {
+      // 문단 종료시간 변경
+      try {
+        const timeData = new FormData();
+        timeData.append('paragraphId', String(lastId));
+        timeData.append('endTime', String(lastEndTime));
+        axios.put(`/v1/script/paragraph/${lastId}`, timeData, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+      } catch {
+        setAlert({
+          show: true,
+          message: '문단 시간 저장에 실패했습니다. \n다시 시도해주세요.',
+        });
+      }
+    }
+  }, [lastEndTime]);
 
   useEffect(() => {
     const dictate = new Dictate({
@@ -360,28 +387,29 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
         }
       },
       onPartialResults: (hypos) => {
-        const result = decodeUnicode(hypos[0].transcript);
-        console.log(`partial result : ${result}`);
-        setPartialResult((prev) => result);
+        const result = decodeUnicode(hypos[0].transcript).replace(
+          /<UNK>/gi,
+          ''
+        );
+        if (result !== '.' && !result.includes('^'))
+          setPartialResult((prev) => result);
       },
-      onResults: (hypos, time: number) => {
+      onResults: (hypos, start: number, end: number) => {
         setPartialResult((prev) => '');
         const result = decodeUnicode(hypos[0].transcript).replace(
           /<UNK>/gi,
           ''
         );
-        // addToTranscription(result);
+        console.log(`result : ${result}, start: ${start}, end: ${end}`);
         if (result.includes('^')) {
-          const startTime = Math.floor(time);
-          const formattedTime = `${Math.floor(startTime / 60)}:${
-            startTime % 60
-          }`;
+          const startTime = Math.floor(start);
           setLastContent((prev) => '');
-          addNewParagraph(result.split('^')[0], formattedTime);
+          addNewParagraph(startTime);
         } else if (result !== '' && result !== '.') {
-          addToContent(result);
+          const endTime = Math.floor(end);
+          addToContent(result, endTime);
+          setLastEndTime((prev) => endTime);
         }
-        console.log(`result  = ${result}`);
       },
       onError: (code, data) => {
         addToLogs(`Error: ${code}: ${data}\n`);
@@ -439,14 +467,17 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
       setTitle(data.script.fileName);
       setDate(data.script.createdAt.slice(0, 10).replace(/-/gi, '.'));
       if (!data.script.isRecording) {
-        setContent(data.scriptParagraphs);
+        const paragraphs = data.scriptParagraphs;
+        setContent(paragraphs);
         const audioName = data.script.audioFileName;
-        if (audioName !== null)
+        if (audioName !== null) {
           setPlayer(
             new Audio(
               `https://visionnote-static.s3.ap-northeast-2.amazonaws.com/audio/${data.script.audioFileName}`
             )
           );
+          setAudioLength(paragraphs[paragraphs.length - 1].endTime);
+        }
       }
       return {
         folderId: data.parentFolder.folderId,
@@ -591,7 +622,6 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
     if (player !== null) {
       player.play();
       setPlaying(true);
-      setAudioLength(Math.ceil(player.duration));
       setTimer(
         setInterval(() => {
           setCurrLength(Math.ceil(player.currentTime));
@@ -607,18 +637,6 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
       setPlaying(false);
     }
   };
-
-  const formatTime = (s) => {
-    const result = Number.isNaN(s)
-      ? '0:00'
-      : (s - (s %= 60)) / 60 + (s > 9 ? ':' : ':0') + s;
-    return result;
-  };
-
-  useEffect(() => {
-    console.log(currLength);
-    console.log(audioLength);
-  }, [currLength]);
 
   return (
     <BaseLayout grey={false}>
@@ -770,7 +788,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
                     paragraphId={paragraph.paragraphId}
                     bookmarked={paragraph.isBookmarked === 1}
                     content={paragraph.paragraphContent}
-                    time={paragraph.startTime}
+                    startTime={paragraph.startTime}
                     note={paragraph.memoContent}
                     waiting={waiting && paragraph.paragraphId === lastId}
                     partialResult={partialResult}
@@ -831,6 +849,7 @@ const CurrentProgress = styled.div<{ current: number }>`
   position: absolute;
   left: 0;
   width: ${(props) => props.current * 837}rem;
+  max-width: 837rem;
   height: 4rem;
   border-radius: 5rem;
   background-color: #7b68ee;

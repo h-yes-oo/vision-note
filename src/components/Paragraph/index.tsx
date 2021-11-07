@@ -4,6 +4,7 @@ import axios from 'axios';
 import ParagraphMenu from 'components/ParagraphMenu';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 
+import { formatTime } from 'functions';
 import { authenticateToken, alertInfo } from 'state';
 import BookMarkEmpty from 'assets/icons/BookMarkEmpty.svg';
 import BookMarkFull from 'assets/icons/BookMarkFull.svg';
@@ -17,7 +18,7 @@ interface Props {
   paragraphId: number;
   bookmarked: boolean;
   content: string;
-  time: string;
+  startTime: number;
   note: string | null;
   recording: boolean;
   waiting: boolean;
@@ -29,7 +30,7 @@ const Paragraph: FC<Props> = ({
   paragraphId,
   bookmarked,
   content,
-  time,
+  startTime,
   note,
   recording,
   waiting,
@@ -74,7 +75,7 @@ const Paragraph: FC<Props> = ({
     } catch {
       setAlert({
         show: true,
-        message: '북마트에 실패했습니다. \n다시 시도해주세요.',
+        message: '북마크에 실패했습니다. \n다시 시도해주세요.',
       });
     }
     setBookmark(!bookmark);
@@ -89,7 +90,10 @@ const Paragraph: FC<Props> = ({
         setSelectedKeyword(userSelection.toString().trim());
       }
     } catch {
-      console.log('highlight error');
+      setAlert({
+        show: true,
+        message: '하이라이팅에 실패했습니다. \n다시 시도해주세요.',
+      });
     }
   };
 
@@ -102,7 +106,10 @@ const Paragraph: FC<Props> = ({
         headers: { Authorization: `Bearer ${authToken}` },
       });
     } catch {
-      console.log(`${keyword} 등록 실패`);
+      setAlert({
+        show: true,
+        message: '하이라이팅이 저장되지 않았습니다. \n다시 시도해주세요.',
+      });
     }
   };
 
@@ -119,7 +126,10 @@ const Paragraph: FC<Props> = ({
         }
       );
     } catch {
-      console.log(`${keyword} 등록 실패`);
+      setAlert({
+        show: true,
+        message: '하이라이팅이 제거되지 않았습니다. \n다시 시도해주세요.',
+      });
     }
   };
 
@@ -136,11 +146,6 @@ const Paragraph: FC<Props> = ({
     }
     window.getSelection()?.removeAllRanges();
   };
-
-  useEffect(() => {
-    console.log(highlightKeyword);
-    // TODO : 데이터베이스로 highlight keyword 보내기
-  }, [highlightKeyword]);
 
   const onClickHighlight = () => {
     setShowHighlightBtn(false);
@@ -265,7 +270,11 @@ const Paragraph: FC<Props> = ({
           }
         } catch (error) {
           // 물음표를 포함하는 경우 간혹 에러 발생
-          console.log(error);
+          setAlert({
+            show: true,
+            message:
+              '하이라이팅에 실패했습니다. \n특수 문자를 포함하지 않도록 다시 시도해주세요.',
+          });
         }
       });
     let highlighted = 0;
@@ -323,7 +332,7 @@ const Paragraph: FC<Props> = ({
       )}
       <FlexColumn>
         <BtnWrapper>
-          <TimeStamp>{time}</TimeStamp>
+          <TimeStamp>{formatTime(startTime)}</TimeStamp>
           {recording ? (
             <>
               <BookMark

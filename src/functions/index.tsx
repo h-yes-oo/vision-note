@@ -46,3 +46,10 @@ export const isWindows = () => {
 export const checkTime = (i: number) => {
   return i < 10 ? `0${i}` : String(i);
 };
+
+export const formatTime = (s) => {
+  const result = Number.isNaN(s)
+    ? '0:00'
+    : (s - (s %= 60)) / 60 + (s > 9 ? ':' : ':0') + s;
+  return result;
+};
