@@ -396,10 +396,14 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
       },
       onResults: (hypos, start: number, end: number) => {
         setPartialResult((prev) => '');
-        const result = decodeUnicode(hypos[0].transcript).replace(
-          /<UNK>/gi,
-          ''
-        );
+        const result = decodeUnicode(hypos[0].transcript)
+          .replace(/<UNK>/gi, '')
+          .replace(/{/gi, '')
+          .replace(/}/gi, '')
+          .replace(/\[/gi, '')
+          .replace(/\]/gi, '')
+          .replace(/\(/gi, '')
+          .replace(/\)/gi, '');
         console.log(`result : ${result}, start: ${start}, end: ${end}`);
         if (result.includes('^')) {
           const startTime = Math.floor(start);
@@ -429,6 +433,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
           const audioData = new FormData();
           audioData.append('scriptId', String(match.params.noteId));
           audioData.append('audio', blob);
+          console.log(blob.size);
           axios
             .post(`/v1/script/audio/${match.params.noteId}`, audioData, {
               headers: { Authorization: `Bearer ${authToken}` },
