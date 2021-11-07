@@ -377,7 +377,7 @@ const Footer = styled.div`
 `;
 
 const FooterTitle = styled.div`
-  font-family: ProximaNova-Extrabld;
+  font-family: Pretendard;
   font-size: 24rem;
   font-weight: 900;
   font-stretch: normal;
