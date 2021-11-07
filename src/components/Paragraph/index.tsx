@@ -326,6 +326,7 @@ const Paragraph: FC<Props> = ({
           {highlightContent()}
           {waiting && (
             <>
+              {'\n'}
               <PartialResult>{partialResult}</PartialResult>
               <DotWrapper>
                 <DotFalling />
