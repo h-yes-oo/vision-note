@@ -1,9 +1,10 @@
 import { FC, useState, useEffect, useRef } from 'react';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import styled, { keyframes } from 'styled-components';
-import { useRecoilValue } from 'recoil';
+import axios from 'axios';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { Dictate } from 'stt/dictate';
-import { theme } from 'state';
+import { theme, alertInfo } from 'state';
 import { isChrome, isWindows, decodeUnicode } from 'functions';
 import { Subject } from 'types';
 
@@ -42,6 +43,8 @@ import MicDark from 'assets/icons/MicDark.svg';
 
 import { lightTheme, darkTheme } from 'styles/theme';
 import UserMenuForDemo from 'components/UserMenu/demo';
+import ParagraphForDemo from 'components/Paragraph/demo';
+import AlertTimeout from 'components/Alert/timeout';
 
 const checkTime = (i: number): string => {
   return i < 10 ? `0${i}` : String(i);
@@ -66,24 +69,18 @@ const getCurrentDate = () => {
 };
 
 interface ParagraphData {
-  paragraphId: number;
-  scriptId?: number;
-  userId?: number;
   paragraphSequence: number;
-  startTime: string;
-  endTime: string;
+  startTime: number;
+  endTime: number;
   paragraphContent: string;
   memoContent: string | null;
   isBookmarked: number;
-  createdAt?: string;
-  updatedAt?: string | null;
   keywords: any[];
 }
 
 interface Props {}
 
 const DemoPage: FC<Props & RouteComponentProps> = ({ history }) => {
-  const [dictate, setDictate] = useState<Dictate>();
   const [showUserMenu, setShowUserMenu] = useState<boolean>(false);
   const [placeholder, setPlaceholder] = useState<string>(getTitle());
   const [title, setTitle] = useState<string>('');
@@ -91,31 +88,232 @@ const DemoPage: FC<Props & RouteComponentProps> = ({ history }) => {
   const [course, setCourse] = useState<Subject | undefined>(undefined);
   const [hover, setHover] = useState<Subject | undefined>(undefined);
   const currentTheme = useRecoilValue(theme);
-  const [canStart, setCanStart] = useState<boolean>(false);
   const [mouseOnMic, setMouseOnMic] = useState<boolean>(false);
   const [mouseOnCapture, setMouseOnCapture] = useState<boolean>(false);
-  const [recording, setRecording] = useState<boolean>(false);
   const [noteMade, setNoteMade] = useState<boolean>(false);
+  const setAlert = useSetRecoilState(alertInfo);
+  // about stt
+  const [recording, setRecording] = useState<boolean>(false);
+  const [dictate, setDictate] = useState<Dictate>();
+  const [content, setContent] = useState<ParagraphData[]>([]);
+  const [log, setLog] = useState<string[]>([]);
+  const [canStart, setCanStart] = useState<boolean>(false);
+  const [waiting, setWaiting] = useState<boolean>(false);
+  const [lastSequence, setSequence] = useState<number>(0);
+  const [partialResult, setPartialResult] = useState<string>('');
+
+  const addToLogs = (newLog: string) => {
+    setLog((prevLogs) => [...prevLogs, newLog]);
+  };
+
+  const addToContent = async (newContent: string, endTime: number) => {
+    try {
+      const SpacingApi = axios.create({
+        baseURL: 'https://spacing.visionnote.io',
+      });
+      const response = await SpacingApi.post('', { text: newContent });
+      newContent = response.data.result;
+    } catch {
+      setAlert({
+        show: true,
+        message: '띄어쓰기에 실패했습니다. \n',
+      });
+    }
+    setContent((prevContent) => [
+      ...prevContent.slice(0, -1),
+      {
+        ...prevContent[prevContent.length - 1],
+        endTime,
+        paragraphContent: `${
+          prevContent[prevContent.length - 1].paragraphContent
+        }\n${newContent}`,
+      },
+    ]);
+  };
+
+  const addNewParagraph = (time: number) => {
+    setContent((prevContent) => [
+      ...prevContent,
+      {
+        paragraphSequence:
+          prevContent[prevContent.length - 1].paragraphSequence + 1,
+        startTime: time,
+        endTime: time,
+        paragraphContent: '',
+        memoContent: null,
+        isBookmarked: 0,
+        keywords: [],
+      },
+    ]);
+    setSequence((prev) => prev + 1);
+  };
+
+  const recordWithMic = () => {
+    if (isChrome()) {
+      if (dictate !== undefined) {
+        dictate.init(0).then((result) => {
+          if (result) {
+            setNoteMade(true);
+            setContent([
+              {
+                paragraphSequence: lastSequence,
+                startTime: 0,
+                endTime: 0,
+                paragraphContent: '',
+                memoContent: null,
+                isBookmarked: 0,
+                keywords: [],
+              },
+            ]);
+            setSequence((prev) => prev + 1);
+            dictate.startListening();
+            setRecording(true);
+            setWaiting(true);
+          }
+        });
+      }
+    } else {
+      setAlert({
+        show: true,
+        message:
+          '녹음은 크롬 브라우저에서만 가능합니다.\n크롬에서 다시 시도해주세요.',
+      });
+    }
+  };
+
+  const recordWithoutMic = () => {
+    if (isChrome()) {
+      if (dictate !== undefined) {
+        dictate.init(1).then((result) => {
+          if (result) {
+            setNoteMade(true);
+            setContent([
+              {
+                paragraphSequence: lastSequence,
+                startTime: 0,
+                endTime: 0,
+                paragraphContent: '',
+                memoContent: null,
+                isBookmarked: 0,
+                keywords: [],
+              },
+            ]);
+            setSequence((prev) => prev + 1);
+            dictate.startListening();
+            setRecording(true);
+            setWaiting(true);
+          }
+        });
+      }
+    } else {
+      setAlert({
+        show: true,
+        message:
+          '녹음은 크롬 브라우저에서만 가능합니다.\n크롬에서 다시 시도해주세요.',
+      });
+    }
+  };
+
+  useEffect(() => {
+    const currentDate = new Date();
+    const dictate = new Dictate({
+      server: 'wss://stt.visionnote.io/client/ws/speech',
+      serverStatus: 'wss://stt.visionnote.io/client/ws/status',
+      recorderWorkerPath: './recorderWorker.js',
+      user_id: String(currentDate.getTime()),
+      content_id: 'demo',
+      onReadyForSpeech: () => {
+        addToLogs('READY FOR SPEECH\n');
+      },
+      onEndOfSpeech: () => {
+        addToLogs('END OF SPEECH\n');
+      },
+      onEndOfSession: () => {
+        addToLogs('END OF SESSION\n');
+      },
+      onServerStatus: (json) => {
+        addToLogs(
+          json.num_workers_available + ':' + json.num_requests_processed
+        );
+        if (json.num_workers_available === 0) {
+          setCanStart(false);
+          addToLogs('unable to start\n');
+        } else {
+          setCanStart(true);
+          addToLogs('can start\n');
+        }
+      },
+      onPartialResults: (hypos) => {
+        const result = decodeUnicode(hypos[0].transcript)
+          .replace(/<UNK>/gi, '')
+          .replace(/{/gi, '')
+          .replace(/}/gi, '')
+          .replace(/\[/gi, '')
+          .replace(/\]/gi, '')
+          .replace(/\(/gi, '')
+          .replace(/\)/gi, '');
+        if (result !== '.' && !result.includes('^'))
+          setPartialResult((prev) => result);
+      },
+      onResults: (hypos, start: number, end: number) => {
+        setPartialResult((prev) => '');
+        const result = decodeUnicode(hypos[0].transcript)
+          .replace(/<UNK>/gi, '')
+          .replace(/{/gi, '')
+          .replace(/}/gi, '')
+          .replace(/\[/gi, '')
+          .replace(/\]/gi, '')
+          .replace(/\(/gi, '')
+          .replace(/\)/gi, '');
+        console.log(`result : ${result}, start: ${start}, end: ${end}`);
+        if (result.includes('^')) {
+          const startTime = Math.floor(start);
+          addNewParagraph(startTime);
+        } else if (result !== '' && result !== '.') {
+          const endTime = Math.floor(end);
+          addToContent(result, endTime);
+        }
+      },
+      onError: (code, data) => {
+        addToLogs(`Error: ${code}: ${data}\n`);
+        dictate.cancel();
+      },
+      onEvent: (code, data) => {
+        addToLogs(`msg: ${code} : ${data || ''}\n`);
+      },
+      onWsClose: () => {
+        setWaiting(false);
+      },
+      onShareStop: () => {
+        setRecording(false);
+      },
+      onEndRecording: (blob: Blob) => {
+        console.log(blob);
+      },
+    });
+
+    setDictate(dictate);
+    return () => {
+      if (dictate !== undefined) dictate.cancel();
+    };
+  }, []);
+
+  const stopRecording = () => {
+    if (dictate !== undefined) dictate.stopListening();
+    setRecording(false);
+  };
+
+  useEffect(() => {
+    return () => {
+      stopRecording();
+    };
+  }, [dictate]);
 
   const handleMouseEnter = () => {
     setShowUserMenu(true);
   };
 
   const handleMouseLeave = () => setShowUserMenu(false);
-
-  const recordWithoutMic = () => {
-    setNoteMade(true);
-    console.log('record without mic');
-  };
-
-  const recordWithMic = () => {
-    setNoteMade(true);
-    console.log('record with mic');
-  };
-
-  const stopRecording = () => {
-    console.log('stop recording');
-  };
 
   const getRecordingSrc = () => {
     if (currentTheme === lightTheme) return recording ? Recording : Mic;
@@ -158,6 +356,7 @@ const DemoPage: FC<Props & RouteComponentProps> = ({ history }) => {
 
   return (
     <Root>
+      <AlertTimeout />
       <Header>
         <HeaderInside>
           <Logo onClick={() => history.push('/')}>
@@ -280,8 +479,7 @@ const DemoPage: FC<Props & RouteComponentProps> = ({ history }) => {
             <Fade out={course === undefined}>
               {!canStart && (
                 <Message>
-                  {/* 서버의 오류로 녹음을 시작할 수 없습니다. 잠시 기다려주세요 */}
-                  체험하기 기능을 준비 중에 있습니다 조금만 기다려주세요 :)
+                  서버의 오류로 녹음을 시작할 수 없습니다. 잠시 기다려주세요
                 </Message>
               )}
               <Flex>
@@ -318,6 +516,31 @@ const DemoPage: FC<Props & RouteComponentProps> = ({ history }) => {
               </Flex>
             </Fade>
           </StartNote>
+          {noteMade &&
+            content
+              .filter(
+                (paragraph, index) =>
+                  (waiting &&
+                    paragraph.paragraphSequence === lastSequence - 1) ||
+                  (paragraph.paragraphContent !== '' &&
+                    paragraph.paragraphContent !== '0' &&
+                    paragraph.paragraphContent !== ' ')
+              )
+              .map((paragraph, index) => (
+                <ParagraphForDemo
+                  key={paragraph.paragraphSequence}
+                  recording={waiting}
+                  bookmarked={paragraph.isBookmarked === 1}
+                  content={paragraph.paragraphContent}
+                  startTime={paragraph.startTime}
+                  note={paragraph.memoContent}
+                  waiting={
+                    waiting && paragraph.paragraphSequence === lastSequence - 1
+                  }
+                  partialResult={partialResult}
+                  keywords={paragraph.keywords.map(({ keyword }) => keyword)}
+                />
+              ))}
         </NoteContents>
       </Demo>
     </Root>

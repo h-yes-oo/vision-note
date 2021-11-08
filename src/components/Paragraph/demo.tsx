@@ -15,7 +15,6 @@ import HighlightCancel from 'assets/icons/HighlightCancel.png';
 import MoreHorizontal from 'assets/icons/MoreHorizontal.svg';
 
 interface Props {
-  paragraphId: number;
   bookmarked: boolean;
   content: string;
   startTime: number;
@@ -26,8 +25,7 @@ interface Props {
   keywords: string[];
 }
 
-const Paragraph: FC<Props> = ({
-  paragraphId,
+const ParagraphForDemo: FC<Props> = ({
   bookmarked,
   content,
   startTime,
@@ -39,10 +37,12 @@ const Paragraph: FC<Props> = ({
 }) => {
   const [bookmark, setBookmark] = useState<boolean>(bookmarked);
   const [noted, setNoted] = useState<boolean>(note !== null && note !== '');
-  const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
-  const [showHighlightBtn, setShowHighlightBtn] = useState<boolean>(false);
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const [memo, setMemo] = useState<string | null>(note);
+  // recoil states
+  const authToken = useRecoilValue(authenticateToken);
+  const setAlert = useSetRecoilState(alertInfo);
+  // about editing
   const [memoEditMode, setMemoEditMode] = useState<boolean>(false);
   const [newMemo, setNewMemo] = useState<string>(note ?? '');
   const [contentToShow, setContentToShow] = useState<string>(content);
@@ -52,12 +52,13 @@ const Paragraph: FC<Props> = ({
     useRef<HTMLTextAreaElement>(null);
   const contentRef: React.RefObject<HTMLTextAreaElement> =
     useRef<HTMLTextAreaElement>(null);
-  const authToken = useRecoilValue(authenticateToken);
+  // about highlight keywords
+  const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
+  const [showHighlightBtn, setShowHighlightBtn] = useState<boolean>(false);
   const [highlightKeyword, setHighlightKeyword] = useState<string[]>(keywords);
   const [selectedKeyword, setSelectedKeyword] = useState<string>('');
   const [showHighlightCancelBtn, setShowHighlightCancelBtn] =
     useState<boolean>(false);
-  const setAlert = useSetRecoilState(alertInfo);
 
   useEffect(() => {
     setContentToShow(content);
@@ -65,19 +66,6 @@ const Paragraph: FC<Props> = ({
   }, [content]);
 
   const bookmarkParagraph = async () => {
-    try {
-      const bookmarkData = new FormData();
-      bookmarkData.append('paragraphId', String(paragraphId));
-      bookmarkData.append('isBookmarked', bookmark ? '0' : '1');
-      await axios.put(`/v1/script/paragraph/${paragraphId}`, bookmarkData, {
-        headers: { Authorization: `Bearer ${authToken}` },
-      });
-    } catch {
-      setAlert({
-        show: true,
-        message: '북마크에 실패했습니다. \n다시 시도해주세요.',
-      });
-    }
     setBookmark(!bookmark);
   };
 
@@ -98,52 +86,14 @@ const Paragraph: FC<Props> = ({
     }
   };
 
-  const addNewKeyword = (keyword: string) => {
-    try {
-      const keywordData = new FormData();
-      keywordData.append('paragraphId', String(paragraphId));
-      keywordData.append('keyword', keyword);
-      axios.post(`/v1/script/paragraph/keyword/${paragraphId}`, keywordData, {
-        headers: { Authorization: `Bearer ${authToken}` },
-      });
-    } catch {
-      setAlert({
-        show: true,
-        message: '하이라이팅이 저장되지 않았습니다. \n다시 시도해주세요.',
-      });
-    }
-  };
-
-  const deleteKeyword = (keyword: string) => {
-    try {
-      const keywordData = new FormData();
-      keywordData.append('paragraphId', String(paragraphId));
-      keywordData.append('keyword', keyword);
-      axios.post(
-        `/v1/script/paragraph/keyword/delete/${paragraphId}`,
-        keywordData,
-        {
-          headers: { Authorization: `Bearer ${authToken}` },
-        }
-      );
-    } catch {
-      setAlert({
-        show: true,
-        message: '하이라이팅이 제거되지 않았습니다. \n다시 시도해주세요.',
-      });
-    }
-  };
-
   const highlightRange = (keyword: string) => {
     if (keyword.includes('?')) {
       const newKeywords = keyword
         .split('?')
         .map((value: string) => value.trim());
       setHighlightKeyword((prev) => [...prev, ...newKeywords]);
-      newKeywords.forEach((keyword) => addNewKeyword(keyword));
     } else {
       setHighlightKeyword((prev) => [...prev, keyword]);
-      addNewKeyword(keyword);
     }
     window.getSelection()?.removeAllRanges();
   };
@@ -163,7 +113,6 @@ const Paragraph: FC<Props> = ({
     setHighlightKeyword((prev) =>
       prev.filter((val) => val !== selectedKeyword)
     );
-    deleteKeyword(selectedKeyword);
     setShowHighlightCancelBtn(false);
   };
 
@@ -186,47 +135,15 @@ const Paragraph: FC<Props> = ({
 
   const endEditingMemo = async () => {
     setMemoEditMode(false);
-    try {
-      const memoData = new FormData();
-      memoData.append('paragraphId', String(paragraphId));
-      memoData.append('memoContent', newMemo);
-      await axios.put(`/v1/script/paragraph/${paragraphId}`, memoData, {
-        headers: { Authorization: `Bearer ${authToken}` },
-      });
-      setMemo(newMemo);
-      if (newMemo !== '') setNoted(true);
-      else setNoted(false);
-    } catch {
-      setAlert({
-        show: true,
-        message: '메모를 변경하지 못했습니다. \n다시 시도해주세요.',
-      });
-    }
+    setMemo(newMemo);
+    if (newMemo !== '') setNoted(true);
+    else setNoted(false);
   };
 
   const endEditingContent = async () => {
     setParagraphEditMode(false);
     if (newContent !== '') {
-      try {
-        const paragraphData = new FormData();
-        paragraphData.append('paragraphId', String(paragraphId));
-        paragraphData.append('paragraphContent', newContent);
-        await axios.put(`/v1/script/paragraph/${paragraphId}`, paragraphData, {
-          headers: { Authorization: `Bearer ${authToken}` },
-        });
-        setContentToShow(newContent);
-      } catch {
-        setAlert({
-          show: true,
-          message: '스크립트를 변경하지 못했습니다. \n다시 시도해주세요.',
-        });
-      }
-    }
-  };
-
-  const onPressEnterMemo = async (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      await endEditingMemo();
+      setContentToShow(newContent);
     }
   };
 
@@ -293,7 +210,9 @@ const Paragraph: FC<Props> = ({
       contentRef.current.style.height = '0px';
       const { scrollHeight } = contentRef.current;
       contentRef.current.style.height = scrollHeight + 'px';
-      if (paragraphEditMode) setTimeout(() => contentRef.current!.focus(), 10);
+      if (paragraphEditMode) {
+        setTimeout(() => contentRef.current!.focus(), 10);
+      }
     }
   }, [newContent, paragraphEditMode]);
 
@@ -356,7 +275,7 @@ const Paragraph: FC<Props> = ({
                 closeMenu={() => setShowMenu(false)}
                 bookmarked={bookmark}
                 noted={noted}
-                paragraphId={paragraphId}
+                paragraphId={0}
                 editMemo={editMemo}
                 editParagraph={editParagraph}
                 bookmarkParagraph={bookmarkParagraph}
@@ -683,4 +602,4 @@ const DotFalling = styled.div`
   }
 `;
 
-export default Paragraph;
+export default ParagraphForDemo;
