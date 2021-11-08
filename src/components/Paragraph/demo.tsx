@@ -356,8 +356,9 @@ const Memo = styled.div`
   border-top: solid 8rem ${(props) => props.theme.color.hover};
   padding: 20rem;
   box-sizing: border-box;
-  overflow: scroll;
+  overflow: auto;
   margin-top: 4rem;
+  white-space: break-spaces;
 
   font-family: Pretendard;
   font-size: 14rem;
@@ -393,8 +394,9 @@ const EditMemo = styled.textarea<{ visible: boolean }>`
   border-top: solid 8rem ${(props) => props.theme.color.hover};
   padding: 20rem;
   box-sizing: border-box;
-  overflow: scroll;
+  overflow: auto;
   margin-top: 4rem;
+  white-space: break-spaces;
 
   font-family: Pretendard;
   font-size: 14rem;
