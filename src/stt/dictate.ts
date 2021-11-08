@@ -182,7 +182,7 @@ export class Dictate {
         try {
           // window.AudioContext = window.AudioContext || window.webkitAudioContext;
           // navigator.mediaDevices.getUserMedia = navigator.mediaDevices.getUserMedia || navigator.mediaDevices.webkitGetUserMedia || navigator.mediaDevices.mozGetUserMedia;
-          audioContext = new AudioContext();
+          audioContext = new AudioContext({ sampleRate: 16000 });
 
           if (navigator.mediaDevices.getUserMedia !== undefined) {
             // 마이크를 이용하여 녹음
