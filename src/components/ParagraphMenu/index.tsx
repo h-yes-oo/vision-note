@@ -75,7 +75,6 @@ const ParagraphMenu: FC<Props> = ({
 };
 
 const Menu = styled.div<{ show: boolean }>`
-  width: 150rem;
   border-radius: 5rem;
   box-shadow: 3rem 5rem 16rem 0 rgba(0, 0, 0, 0.12);
   background-color: ${(props) => props.theme.color.contextBackground};
@@ -96,9 +95,9 @@ const Menu = styled.div<{ show: boolean }>`
 
 const MenuList = styled.button`
   border: none;
-  width: 150rem;
+  width: max-content;
   height: 38rem;
-  padding: 0rem;
+  padding: 0 19rem 0 0;
   background-color: ${(props) => props.theme.color.contextBackground};
 
   font-family: Pretendard;

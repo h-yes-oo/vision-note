@@ -74,7 +74,6 @@ const UserMenu: FC<Props & RouteComponentProps> = ({
 };
 
 const Menu = styled.div<{ show: boolean }>`
-  width: 150rem;
   border-radius: 5rem;
   box-shadow: 3rem 5rem 16rem 0 rgba(0, 0, 0, 0.12);
   background-color: ${(props) => props.theme.color.contextBackground};
@@ -95,9 +94,9 @@ const Menu = styled.div<{ show: boolean }>`
 
 const MenuList = styled.button`
   border: none;
-  width: 150rem;
   height: 38rem;
-  padding: 0rem;
+  width: max-content;
+  padding: 0 19rem 0 0;
   background-color: ${(props) => props.theme.color.contextBackground};
 
   font-family: Pretendard;
