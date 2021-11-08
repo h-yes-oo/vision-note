@@ -25,3 +25,8 @@ html {
     font-size: 0.6px !important;
   }
 }
+@media all and (max-width: 632px) {
+  html {
+    font-size: 0.45px !important;
+  }
+}

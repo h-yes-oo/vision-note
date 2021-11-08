@@ -1,6 +1,5 @@
 import React, { FC, useState, useCallback, useRef, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
-import axios from 'axios';
 import ParagraphMenu from 'components/ParagraphMenu';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 
