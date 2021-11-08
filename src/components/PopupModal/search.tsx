@@ -227,7 +227,7 @@ const SearchIcon = styled.img`
 `;
 
 const ResultWrapper = styled.div`
-  overflow: scroll;
+  overflow: auto;
   border-radius: inherit;
   height: 100%;
 `;

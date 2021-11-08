@@ -707,7 +707,7 @@ const NoteWrapper = styled.div`
   height: calc(100% - 49rem);
   display: flex;
   flex-direction: column;
-  overflow: scroll;
+  overflow: auto;
 `;
 
 const DropZone = styled.div`
