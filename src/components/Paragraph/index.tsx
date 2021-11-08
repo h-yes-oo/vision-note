@@ -304,8 +304,8 @@ const Paragraph: FC<Props> = ({
         onClick={onClickOther}
       >
         <HighligtBtn
-          top={anchorPoint.y - 58}
-          left={anchorPoint.x - 30}
+          top={anchorPoint.y - 10}
+          left={anchorPoint.x - 10}
           src={showHighlightBtn ? HighlightButton : HighlightCancel}
           onClick={showHighlightBtn ? onClickHighlight : cancelHighlight}
         />
