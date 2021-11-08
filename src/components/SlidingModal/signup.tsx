@@ -310,7 +310,7 @@ const Title = styled.div`
   letter-spacing: normal;
   text-align: left;
   color: #000;
-  margin-bottom: 13px;
+  margin-bottom: 13rem;
 `;
 
 const shake = keyframes`
@@ -648,7 +648,7 @@ const Menu = styled.div<{ show: boolean }>`
 `;
 
 const ToggleImage = styled.img`
-  width: 24px;
+  width: 24rem;
 `;
 
 export default SignUp;

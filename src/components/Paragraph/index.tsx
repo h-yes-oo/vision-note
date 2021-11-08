@@ -90,10 +90,11 @@ const Paragraph: FC<Props> = ({
         setSelectedKeyword(userSelection.toString().trim());
       }
     } catch {
-      setAlert({
-        show: true,
-        message: '하이라이팅에 실패했습니다. \n다시 시도해주세요.',
-      });
+      // setAlert({
+      //   show: true,
+      //   message: '하이라이팅에 실패했습니다. \n다시 시도해주세요.',
+      // });
+      console.log('Oops..');
     }
   };
 
@@ -436,10 +437,10 @@ const Memo = styled.div`
   box-shadow: 0 5rem 12rem 0 rgba(0, 0, 0, 0.12);
   background-color: ${(props) => props.theme.color.contextBackground};
   border-top: solid 8rem ${(props) => props.theme.color.hover};
-  padding: 20px;
+  padding: 20rem;
   box-sizing: border-box;
   overflow: scroll;
-  margin-top: 4px;
+  margin-top: 4rem;
 
   font-family: Pretendard;
   font-size: 14rem;
@@ -473,13 +474,13 @@ const EditMemo = styled.textarea<{ visible: boolean }>`
   background-color: ${(props) => props.theme.color.contextBackground};
   border: none;
   border-top: solid 8rem ${(props) => props.theme.color.hover};
-  padding: 20px;
+  padding: 20rem;
   box-sizing: border-box;
   overflow: scroll;
-  margin-top: 4px;
+  margin-top: 4rem;
 
   font-family: Pretendard;
-  font-size: 14px;
+  font-size: 14rem;
   font-weight: normal;
   font-stretch: normal;
   font-style: normal;
@@ -595,7 +596,7 @@ const DotWrapper = styled.span`
   position: relative;
   overflow: hidden;
   border: none;
-  margin: 10px;
+  margin: 10rem;
   min-width: 40rem;
   max-width: 40rem;
   height: fit-content;
