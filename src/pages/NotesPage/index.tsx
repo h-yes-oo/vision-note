@@ -3,7 +3,7 @@ import styled, { keyframes } from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import axios from 'axios';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { decodeUnicode, formatTime } from 'functions';
+import { decodeUnicode, formatTime, isMobile } from 'functions';
 import { Dictate } from 'stt/dictate';
 
 import { authenticateToken, theme, userInfo, alertInfo } from 'state';
@@ -731,7 +731,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
                 {/* <MemoBtn onClick={() => setShowMemo(!showMemo)}>
                   {showMemo ? '전체 메모 닫기' : '전체 메모 보기'}
                 </MemoBtn> */}
-                {player !== null && (
+                {player !== null && !isMobile() && (
                   <MemoBtn onClick={() => setShowRecord(!showRecord)}>
                     다시 듣기
                     <ToggleBtn src={getToggleSrc()} />
