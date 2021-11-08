@@ -123,7 +123,10 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
       const response = await SpacingApi.post('', { text: newContent });
       newContent = response.data.result;
     } catch {
-      console.log('not spaced');
+      setAlert({
+        show: true,
+        message: '띄어쓰기에 실패했습니다. \n',
+      });
     }
     setContent((prevContent) => [
       ...prevContent.slice(0, -1),
@@ -259,6 +262,12 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
       stopRecording();
     };
   }, [dictate]);
+
+  useEffect(() => {
+    return () => {
+      if (player !== null) player.pause();
+    };
+  }, [player]);
 
   const recordWithoutMic = () => {
     if (dictate !== undefined) {
@@ -470,7 +479,6 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
       const { data } = await axios.get(`/v1/script/${noteId}`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
-      console.log(data);
       setFolderName(data.parentFolder.folderName);
       setStarred(data.script.isImportant);
       setTitle(data.script.fileName);
@@ -647,6 +655,24 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
     }
   };
 
+  const onClickBackward = () => {
+    if (player !== null) {
+      const nextTime = player.currentTime - 5;
+      if (nextTime < 0) player.currentTime = 0;
+      else player.currentTime = nextTime;
+      setCurrLength(Math.ceil(player.currentTime));
+    }
+  };
+
+  const onClickForward = () => {
+    if (player !== null) {
+      const nextTime = player.currentTime + 5;
+      if (nextTime > audioLength) player.currentTime = audioLength;
+      else player.currentTime = nextTime;
+      setCurrLength(Math.ceil(player.currentTime));
+    }
+  };
+
   return (
     <BaseLayout grey={false}>
       {loading ? (
@@ -718,6 +744,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
                 <Control>
                   <ControlButton
                     src={currentTheme === lightTheme ? Backward : BackwardWhite}
+                    onClick={onClickBackward}
                   />
                   {playing ? (
                     <ControlButton
@@ -732,6 +759,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
                   )}
                   <ControlButton
                     src={currentTheme === lightTheme ? Forward : ForwardWhite}
+                    onClick={onClickForward}
                   />
                 </Control>
                 <ProgressBar>
@@ -820,7 +848,7 @@ const Flex = styled.div`
 const PlayBar = styled(Flex)`
   width: 100%;
   justify-content: space-between;
-  margin-top: 34px;
+  margin-top: 34rem;
   align-items: center;
 `;
 
