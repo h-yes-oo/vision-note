@@ -302,7 +302,7 @@ const UserModal: FC<Props & RouteComponentProps> = ({
                 />
               </StatusBar>
               <StorageInfo>{`15GB 중 ${
-                user ? user.totalMemoryUsage / 100 : 0
+                user ? (user.totalMemoryUsage / 100).toFixed(2) : 0
               }GB 사용`}</StorageInfo>
             </FlexColumn>
           </FlexCenter>
