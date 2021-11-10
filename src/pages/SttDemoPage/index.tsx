@@ -1,4 +1,4 @@
-import { FC, useState, useEffect, useRef } from 'react';
+import { FC, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Dictate } from 'stt/dictate';
 import { useRecoilValue } from 'recoil';
@@ -77,9 +77,9 @@ const SttDemoPage: FC<Props> = () => {
     };
   }, [dictate]);
 
-  const recordWithMic = () => {
+  const record = (option: number) => {
     if (dictate !== undefined) {
-      dictate.init(0).then((result) => {
+      dictate.init(option).then((result) => {
         if (result) {
           dictate.startListening();
           setRecording(true);
@@ -93,24 +93,13 @@ const SttDemoPage: FC<Props> = () => {
     setRecording(false);
   };
 
-  const recordWithoutMic = () => {
-    if (dictate !== undefined) {
-      dictate.init(1).then((result) => {
-        if (result) {
-          dictate.startListening();
-          setRecording(true);
-        }
-      });
-    }
-  };
-
   return (
     <Root>
       <ButtonWrapper>
-        <PurpleButton disabled={!canStart} onClick={recordWithoutMic}>
+        <PurpleButton disabled={!canStart} onClick={() => record(1)}>
           마이크 없이 녹음하기
         </PurpleButton>
-        <PurpleButton disabled={!canStart} onClick={recordWithMic}>
+        <PurpleButton disabled={!canStart} onClick={() => record(0)}>
           마이크 이용하여 녹음하기
         </PurpleButton>
         <PurpleButton onClick={stopListening} disabled={!recording}>

@@ -148,43 +148,10 @@ const DemoPage: FC<Props & RouteComponentProps> = ({ history }) => {
     setSequence((prev) => prev + 1);
   };
 
-  const recordWithMic = () => {
+  const record = (option: number) => {
     if (isChrome()) {
       if (dictate !== undefined) {
-        dictate.init(0).then((result) => {
-          if (result) {
-            setNoteMade(true);
-            setContent([
-              {
-                paragraphSequence: lastSequence,
-                startTime: 0,
-                endTime: 0,
-                paragraphContent: '',
-                memoContent: null,
-                isBookmarked: 0,
-                keywords: [],
-              },
-            ]);
-            setSequence((prev) => prev + 1);
-            dictate.startListening();
-            setRecording(true);
-            setWaiting(true);
-          }
-        });
-      }
-    } else {
-      setAlert({
-        show: true,
-        message:
-          '녹음은 크롬 브라우저에서만 가능합니다.\n크롬에서 다시 시도해주세요.',
-      });
-    }
-  };
-
-  const recordWithoutMic = () => {
-    if (isChrome()) {
-      if (dictate !== undefined) {
-        dictate.init(1).then((result) => {
+        dictate.init(option).then((result) => {
           if (result) {
             setNoteMade(true);
             setContent([
@@ -487,7 +454,7 @@ const DemoPage: FC<Props & RouteComponentProps> = ({ history }) => {
                   disabled={!canStart}
                   onMouseOver={() => setMouseOnCapture(true)}
                   onMouseOut={() => setMouseOnCapture(false)}
-                  onClick={recordWithoutMic}
+                  onClick={() => record(1)}
                 >
                   <BtnImage
                     src={
@@ -502,7 +469,7 @@ const DemoPage: FC<Props & RouteComponentProps> = ({ history }) => {
                   disabled={!canStart}
                   onMouseOver={() => setMouseOnMic(true)}
                   onMouseOut={() => setMouseOnMic(false)}
-                  onClick={recordWithMic}
+                  onClick={() => record(0)}
                 >
                   <BtnImage
                     src={

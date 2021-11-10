@@ -156,29 +156,6 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
       .then((response) => {
         const id = response.data.paragraphId;
         setLastId((prev) => id);
-        // if (remaining !== '') {
-        //   setContent((prevContent) => [
-        //     ...prevContent.slice(0, -1),
-        //     {
-        //       ...prevContent[prevContent.length - 1],
-        //       paragraphContent: `${
-        //         prevContent[prevContent.length - 1].paragraphContent
-        //       }
-        // \n
-        // ${remaining}`,
-        //     },
-        //     {
-        //       paragraphId: id,
-        //       paragraphSequence: lastSequence,
-        //       startTime: time,
-        //       endTime: time,
-        //       paragraphContent: '',
-        //       memoContent: null,
-        //       isBookmarked: 0,
-        //       keywords: [],
-        //     },
-        //   ]);
-        // } else {
         setContent((prevContent) => [
           ...prevContent,
           {
@@ -192,14 +169,13 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
             keywords: [],
           },
         ]);
-        // }
         setSequence((prev) => prev + 1);
       });
   };
 
-  const recordWithMic = () => {
+  const record = (option: number) => {
     if (dictate !== undefined) {
-      dictate.init(0).then((result) => {
+      dictate.init(option).then((result) => {
         if (result) {
           const paragraphData = new FormData();
           paragraphData.append('scriptId', match.params.noteId);
@@ -269,61 +245,6 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
     };
   }, [player]);
 
-  const recordWithoutMic = () => {
-    if (dictate !== undefined) {
-      dictate.init(1).then((result) => {
-        if (result) {
-          const paragraphData = new FormData();
-          paragraphData.append('scriptId', match.params.noteId);
-          paragraphData.append('startTime', '0');
-          paragraphData.append('endTime', '0');
-          paragraphData.append('paragraphContent', '');
-          paragraphData.append('paragraphSequence', String(lastSequence));
-          paragraphData.append('isBookmarked', '0');
-          axios
-            .post(
-              `/v1/script/paragraph/${match.params.noteId}`,
-              paragraphData,
-              {
-                headers: { Authorization: `Bearer ${authToken}` },
-              }
-            )
-            .then((response) => {
-              const id = response.data.paragraphId;
-              setLastId((prev) => id);
-              setContent([
-                {
-                  paragraphId: id,
-                  paragraphSequence: lastSequence,
-                  startTime: 0,
-                  endTime: 0,
-                  paragraphContent: '',
-                  memoContent: null,
-                  isBookmarked: 0,
-                  keywords: [],
-                },
-              ]);
-              setSequence((prev) => prev + 1);
-              dictate.startListening();
-              setRecording(true);
-              setShowRecordingOptions(false);
-              setWaiting(true);
-              const fileData = new FormData();
-              fileData.append('scriptId', match.params.noteId);
-              fileData.append('isRecording', '0');
-              axios.post(
-                `/v1/script/recording/${match.params.noteId}`,
-                fileData,
-                {
-                  headers: { Authorization: `Bearer ${authToken}` },
-                }
-              );
-            });
-        }
-      });
-    }
-  };
-
   // useEffect(() => {
   //   console.log(`id changed to ${lastId}`);
   // }, [lastId]);
@@ -366,113 +287,6 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
       }
     }
   }, [lastEndTime]);
-
-  useEffect(() => {
-    const dictate = new Dictate({
-      server: 'wss://stt.visionnote.io/client/ws/speech',
-      serverStatus: 'wss://stt.visionnote.io/client/ws/status',
-      recorderWorkerPath: './recorderWorker.js',
-      user_id: String(user ? user.userId : '1003'),
-      content_id: match.params.noteId,
-      onReadyForSpeech: () => {
-        addToLogs('READY FOR SPEECH\n');
-      },
-      onEndOfSpeech: () => {
-        addToLogs('END OF SPEECH\n');
-      },
-      onEndOfSession: () => {
-        addToLogs('END OF SESSION\n');
-      },
-      onServerStatus: (json) => {
-        addToLogs(
-          json.num_workers_available + ':' + json.num_requests_processed
-        );
-        if (json.num_workers_available === 0) {
-          setCanStart(false);
-          addToLogs('unable to start\n');
-        } else {
-          setCanStart(true);
-          addToLogs('can start\n');
-        }
-      },
-      onPartialResults: (hypos) => {
-        const result = decodeUnicode(hypos[0].transcript)
-          .replace(/<UNK>/gi, '')
-          .replace(/{/gi, '')
-          .replace(/}/gi, '')
-          .replace(/\[/gi, '')
-          .replace(/\]/gi, '')
-          .replace(/\(/gi, '')
-          .replace(/\)/gi, '');
-        if (result !== '.' && !result.includes('^'))
-          setPartialResult((prev) => result);
-      },
-      onResults: (hypos, start: number, end: number) => {
-        setPartialResult((prev) => '');
-        const result = decodeUnicode(hypos[0].transcript)
-          .replace(/<UNK>/gi, '')
-          .replace(/{/gi, '')
-          .replace(/}/gi, '')
-          .replace(/\[/gi, '')
-          .replace(/\]/gi, '')
-          .replace(/\(/gi, '')
-          .replace(/\)/gi, '');
-        console.log(`result : ${result}, start: ${start}, end: ${end}`);
-        if (result.includes('^')) {
-          const startTime = Math.floor(start);
-          setLastContent((prev) => '');
-          addNewParagraph(startTime);
-        } else if (result !== '' && result !== '.') {
-          const endTime = Math.floor(end);
-          addToContent(result, endTime);
-          setLastEndTime((prev) => endTime);
-        }
-      },
-      onError: (code, data) => {
-        addToLogs(`Error: ${code}: ${data}\n`);
-        dictate.cancel();
-      },
-      onEvent: (code, data) => {
-        addToLogs(`msg: ${code} : ${data || ''}\n`);
-      },
-      onWsClose: () => {
-        setWaiting(false);
-      },
-      onShareStop: () => {
-        setRecording(false);
-      },
-      onEndRecording: (blob: Blob) => {
-        try {
-          const audioData = new FormData();
-          audioData.append('scriptId', String(match.params.noteId));
-          audioData.append('audio', blob);
-          console.log(blob.size);
-          axios
-            .post(`/v1/script/audio/${match.params.noteId}`, audioData, {
-              headers: { Authorization: `Bearer ${authToken}` },
-            })
-            .then((response) =>
-              setPlayer(
-                (prev) =>
-                  new Audio(
-                    `https://visionnote-static.s3.ap-northeast-2.amazonaws.com/audio/${response.data.savedAudioName}`
-                  )
-              )
-            );
-        } catch {
-          setAlert({
-            show: true,
-            message: '강의 음성을 저장하지 못했습니다. \n',
-          });
-        }
-      },
-    });
-
-    setDictate(dictate);
-    return () => {
-      if (dictate !== undefined) dictate.cancel();
-    };
-  }, []);
 
   const getNoteInfo = async (noteId) => {
     try {
@@ -561,10 +375,114 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
     setLoading(false);
     if (isRecording) {
       setShowRecordingOptions(true);
+      const dictate = new Dictate({
+        server: 'wss://stt.visionnote.io/client/ws/speech',
+        serverStatus: 'wss://stt.visionnote.io/client/ws/status',
+        recorderWorkerPath: './recorderWorker.js',
+        user_id: String(user ? user.userId : '1003'),
+        content_id: match.params.noteId,
+        onReadyForSpeech: () => {
+          addToLogs('READY FOR SPEECH\n');
+        },
+        onEndOfSpeech: () => {
+          addToLogs('END OF SPEECH\n');
+        },
+        onEndOfSession: () => {
+          addToLogs('END OF SESSION\n');
+        },
+        onServerStatus: (json) => {
+          addToLogs(
+            json.num_workers_available + ':' + json.num_requests_processed
+          );
+          if (json.num_workers_available === 0) {
+            setCanStart(false);
+            addToLogs('unable to start\n');
+          } else {
+            setCanStart(true);
+            addToLogs('can start\n');
+          }
+        },
+        onPartialResults: (hypos) => {
+          const result = decodeUnicode(hypos[0].transcript)
+            .replace(/<UNK>/gi, '')
+            .replace(/{/gi, '')
+            .replace(/}/gi, '')
+            .replace(/\[/gi, '')
+            .replace(/\]/gi, '')
+            .replace(/\(/gi, '')
+            .replace(/\)/gi, '');
+          if (result !== '.' && !result.includes('^'))
+            setPartialResult((prev) => result);
+        },
+        onResults: (hypos, start: number, end: number) => {
+          setPartialResult((prev) => '');
+          const result = decodeUnicode(hypos[0].transcript)
+            .replace(/<UNK>/gi, '')
+            .replace(/{/gi, '')
+            .replace(/}/gi, '')
+            .replace(/\[/gi, '')
+            .replace(/\]/gi, '')
+            .replace(/\(/gi, '')
+            .replace(/\)/gi, '');
+          console.log(`result : ${result}, start: ${start}, end: ${end}`);
+          if (result.includes('^')) {
+            const startTime = Math.floor(start);
+            setLastContent((prev) => '');
+            addNewParagraph(startTime);
+          } else if (result !== '' && result !== '.') {
+            const endTime = Math.floor(end);
+            addToContent(result, endTime);
+            setLastEndTime((prev) => endTime);
+          }
+        },
+        onError: (code, data) => {
+          addToLogs(`Error: ${code}: ${data}\n`);
+          dictate.cancel();
+        },
+        onEvent: (code, data) => {
+          addToLogs(`msg: ${code} : ${data || ''}\n`);
+        },
+        onWsClose: () => {
+          setWaiting(false);
+        },
+        onShareStop: () => {
+          setRecording(false);
+        },
+        onEndRecording: (blob: Blob) => {
+          try {
+            const audioData = new FormData();
+            audioData.append('scriptId', String(match.params.noteId));
+            audioData.append('audio', blob);
+            console.log(blob.size);
+            axios
+              .post(`/v1/script/audio/${match.params.noteId}`, audioData, {
+                headers: { Authorization: `Bearer ${authToken}` },
+              })
+              .then((response) =>
+                setPlayer(
+                  (prev) =>
+                    new Audio(
+                      `https://visionnote-static.s3.ap-northeast-2.amazonaws.com/audio/${response.data.savedAudioName}`
+                    )
+                )
+              );
+          } catch {
+            setAlert({
+              show: true,
+              message: '강의 음성을 저장하지 못했습니다. \n',
+            });
+          }
+        },
+      });
+      setDictate(dictate);
     }
   };
 
   useEffect(() => {
+    if (dictate !== undefined) {
+      stopRecording();
+      setDictate(undefined);
+    }
     getStarted();
   }, [match.params.noteId]);
 
@@ -782,7 +700,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
                     disabled={!canStart}
                     onMouseOver={() => setMouseOnCapture(true)}
                     onMouseOut={() => setMouseOnCapture(false)}
-                    onClick={recordWithoutMic}
+                    onClick={() => record(1)}
                   >
                     <BtnImage
                       src={
@@ -797,7 +715,7 @@ const NotesPage: FC<Props & RouteComponentProps<MatchParams>> = ({
                     disabled={!canStart}
                     onMouseOver={() => setMouseOnMic(true)}
                     onMouseOut={() => setMouseOnMic(false)}
-                    onClick={recordWithMic}
+                    onClick={() => record(0)}
                   >
                     <BtnImage
                       src={
