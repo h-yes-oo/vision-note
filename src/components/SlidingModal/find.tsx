@@ -1,8 +1,80 @@
-import { FC } from 'react';
+import React, { FC, useState } from 'react';
 import styled from 'styled-components';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
+import axios from 'axios';
+import { useSetRecoilState } from 'recoil';
+import { alertInfo } from 'state';
 
 import LoginArrow from 'assets/icons/LoginArrow.svg';
+import LoadingDots from 'components/LoadingDots';
+
+interface Props {
+  toSignUp: any;
+  toLogin: any;
+}
+
+const Find: FC<Props & RouteComponentProps> = ({
+  toSignUp,
+  toLogin,
+  history,
+}) => {
+  const [email, setEmail] = useState<string>('');
+  const [nickname, setNickname] = useState<string>('');
+  const setAlert = useSetRecoilState(alertInfo);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const onChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+  };
+  const onChangeNickname = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNickname(e.target.value);
+  };
+
+  const goTo = async () => {
+    const findData = new FormData();
+    findData.append('email', email);
+    findData.append('nickname', nickname);
+    try {
+      setLoading(true);
+      await axios.post('/v1/user/find-password', findData);
+      alert('임시 비밀번호가 메일로 발급되었습니다');
+    } catch (error: any) {
+      if (error.response.status === 400) {
+        setAlert({
+          show: true,
+          message: '잘못된 회원 정보입니다. \n다시 시도해주세요.',
+        });
+      }
+    }
+    setLoading(false);
+  };
+
+  return (
+    <>
+      <Title>비밀번호 찾기</Title>
+      <Info>가입하신 메일 주소로 임시 비밀번호를 보내드립니다.</Info>
+      <Form placeholder="이메일 주소" type="email" onChange={onChangeEmail} />
+      <Form placeholder="닉네임" type="text" onChange={onChangeNickname} />
+      {loading ? (
+        <LoadingDots small={false} />
+      ) : (
+        <FindBtn onClick={goTo}>비밀번호 찾기</FindBtn>
+      )}
+      <FlexBetween>
+        <Flex>
+          <NotYet>아직 회원이 아니신가요?</NotYet>
+          <PurpleAnchor onClick={toSignUp}>회원가입하기</PurpleAnchor>
+        </Flex>
+        <Flex>
+          <PurpleAnchor onClick={toLogin}>
+            로그인 하기
+            <Arrow src={LoginArrow} />
+          </PurpleAnchor>
+        </Flex>
+      </FlexBetween>
+    </>
+  );
+};
 
 const Title = styled.div`
   font-family: Pretendard;
@@ -116,39 +188,5 @@ const FlexBetween = styled(Flex)`
 const Arrow = styled.img`
   height: 18rem;
 `;
-
-interface Props {
-  toSignUp: any;
-  toLogin: any;
-}
-
-const Find: FC<Props & RouteComponentProps> = ({
-  toSignUp,
-  toLogin,
-  history,
-}) => {
-  const goTo = () => history.push('/folder');
-
-  return (
-    <>
-      <Title>비밀번호 찾기</Title>
-      <Info>가입하신 메일 주소로 임시 비밀번호를 보내드립니다.</Info>
-      <Form placeholder="이메일 주소" type="email" />
-      <FindBtn onClick={goTo}>비밀번호 찾기</FindBtn>
-      <FlexBetween>
-        <Flex>
-          <NotYet>아직 회원이 아니신가요?</NotYet>
-          <PurpleAnchor onClick={toSignUp}>회원가입하기</PurpleAnchor>
-        </Flex>
-        <Flex>
-          <PurpleAnchor onClick={toLogin}>
-            로그인 하기
-            <Arrow src={LoginArrow} />
-          </PurpleAnchor>
-        </Flex>
-      </FlexBetween>
-    </>
-  );
-};
 
 export default withRouter(Find);
